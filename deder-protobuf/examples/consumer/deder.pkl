@@ -1,0 +1,48 @@
+amends "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl"
+
+import "../../src/main/resources/ProtobufPlugin.pkl" as PB
+
+plugins {
+  new PB.ProtobufPlugin {
+    config = new PB.ProtobufPluginConfig {
+      defaults = new PB.ModuleDefaults {
+        builtins {
+          new PB.BuiltinLanguageTarget {
+            name = "java"
+          }
+        }
+        plugins {
+          new PB.PluginTarget {
+            name = "grpc-java"
+            resolver = new PB.ResolverConfig {
+              kind = "binary-maven"
+              dependency = "io.grpc:protoc-gen-grpc-java:1.75.0"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+modules {
+  new ScalaModule {
+    id = "consumer"
+    root = "."
+    scalaVersion = "3.7.4"
+    sources = new Listing {
+      "src/main/scala"
+    }
+    resources = new Listing {
+      "src/main/resources"
+    }
+    deps {
+      "com.google.protobuf:protobuf-java:4.31.1"
+      "io.grpc:grpc-api:1.75.0"
+      "io.grpc:grpc-protobuf:1.75.0"
+      "io.grpc:grpc-stub:1.75.0"
+      "javax.annotation:javax.annotation-api:1.3.2"
+    }
+    mainClass = "example.greeter.Main"
+  }
+}

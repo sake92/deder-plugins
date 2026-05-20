@@ -1,0 +1,50 @@
+amends "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl"
+
+local const scalaVer = "3.7.4"
+local const pluginApiVersion = "0.7.8-SNAPSHOT"
+local const pluginVersion = "0.1.0-SNAPSHOT"
+
+local const function pom(artId: String, artName: String, artDesc: String): PomSettings = new {
+  groupId = "ba.sake"
+  artifactId = artId
+  version = pluginVersion
+  name = artName
+  description = artDesc
+  url = "https://github.com/sake92/deder-plugins"
+  licenses {
+    new PomLicense {
+      name = "Apache 2.0 License"
+      url = "https://opensource.org/license/apache-2-0"
+    }
+  }
+}
+
+local const pluginModules =
+  new CreateScalaModules {
+    root = "deder-protobuf"
+    id = "deder-protobuf"
+    layout = "maven"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "com.lihaoyi::os-lib:0.11.6"
+      }
+      pomSettings =
+        pom(
+          "deder-protobuf",
+          "Deder Protobuf Plugin",
+          "Deder plugin for protobuf and gRPC code generation",
+        )
+      publish = true
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
+modules {
+  ...pluginModules.all
+}
