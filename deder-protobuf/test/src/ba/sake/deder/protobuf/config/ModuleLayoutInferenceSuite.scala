@@ -37,4 +37,17 @@ class ModuleLayoutInferenceSuite extends FunSuite {
       Seq("test/protobuf", "test/proto")
     )
   }
+
+  test("plain-layout test sources still select default proto defaults") {
+    val layout = ModuleLayoutInference.infer(
+      sources = Seq("test/src"),
+      resources = Seq("test/resources")
+    )
+
+    assertEquals(layout, ModuleLayout.DefaultLike)
+    assertEquals(
+      ModuleLayoutInference.defaultProtoSourceDirs(layout, SourceSetKind.Test),
+      Seq("test/protobuf", "test/proto")
+    )
+  }
 }

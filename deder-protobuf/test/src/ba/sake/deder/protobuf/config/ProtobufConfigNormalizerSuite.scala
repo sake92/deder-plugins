@@ -7,6 +7,30 @@ import java.util.{List as JList, Map as JMap}
 
 class ProtobufConfigNormalizerSuite extends FunSuite {
 
+  test("default-like test modules fall back to test proto directories") {
+    val defaults = new Protobuf.ModuleDefaults(
+      true,
+      new Protobuf.ResolverConfig(Protobuf.ResolverKind.SYSTEM_PATH, "protoc", null, null, null, JList.of(), null, null, null, null, false),
+      JList.of(),
+      JList.of(),
+      new Protobuf.ImportConfig(true, JList.of(), JList.of()),
+      null,
+      new Protobuf.SourceSetConfig(true, JList.of(), JList.of("**/*.proto"), JList.of(), JList.of(), JList.of(), JList.of(), JMap.of()),
+      new Protobuf.SourceSetConfig(true, JList.of(), JList.of("**/*.proto"), JList.of(), JList.of(), JList.of(), JList.of(), JMap.of())
+    )
+    val config = new Protobuf.ProtobufPluginConfig(defaults, JMap.of())
+
+    val resolved = ProtobufConfigNormalizer.normalize(
+      moduleId = "consumer-test",
+      sources = Seq("test/src"),
+      resources = Seq("test/resources"),
+      sourceSetKind = SourceSetKind.Test,
+      config = config
+    )
+
+    assertEquals(resolved.sourceSet.sourceDirs, Seq("test/protobuf", "test/proto"))
+  }
+
   test("module overrides win over defaults for test source sets") {
     val defaults = new Protobuf.ModuleDefaults(
       true,
@@ -42,8 +66,8 @@ class ProtobufConfigNormalizerSuite extends FunSuite {
 
     val resolved = ProtobufConfigNormalizer.normalize(
       moduleId = "consumer-test",
-      sources = Seq("src/test/scala"),
-      resources = Seq("src/test/resources"),
+      sources = Seq("test/src"),
+      resources = Seq("test/resources"),
       sourceSetKind = SourceSetKind.Test,
       config = config
     )
@@ -74,8 +98,8 @@ class ProtobufConfigNormalizerSuite extends FunSuite {
 
     val resolved = ProtobufConfigNormalizer.normalize(
       moduleId = "consumer",
-      sources = Seq("src/main/scala"),
-      resources = Seq("src/main/resources"),
+      sources = Seq("src"),
+      resources = Seq("resources"),
       sourceSetKind = SourceSetKind.Main,
       config = config
     )

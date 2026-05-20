@@ -7,7 +7,7 @@ class ProtocCommandBuilderSuite extends FunSuite {
   test("command builder includes imports builtins plugins descriptor and args") {
     val request = ProtocInvocationRequest(
       executable = ResolvedExecutable.command("protoc"),
-      protoFiles = Seq("src/main/protobuf/example/greeter/service.proto"),
+      protoFiles = Seq("protobuf/example/greeter/service.proto"),
       importRoots = Seq("/imports/project", "/imports/deps"),
       sourceOutDir = "/tmp/out/sources",
       builtins = Seq(ResolvedBuiltinTarget("java", Some("lite"), None)),
@@ -37,7 +37,7 @@ class ProtocCommandBuilderSuite extends FunSuite {
         "--descriptor_set_out=/tmp/out/resources/descriptor-set.pb",
         "--include_imports",
         "--experimental_allow_proto3_optional",
-        "src/main/protobuf/example/greeter/service.proto"
+        "protobuf/example/greeter/service.proto"
       )
     )
   }

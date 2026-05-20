@@ -23,7 +23,7 @@ local const pluginModules =
   new CreateScalaModules {
     root = "deder-protobuf"
     id = "deder-protobuf"
-    layout = "maven"
+    layout = "default"
     template = new ScalaModule {
       scalaVersion = scalaVer
       deps {
