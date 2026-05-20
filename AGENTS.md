@@ -43,7 +43,7 @@ Prerequisites called out by the repo docs: JDK 21+, `deder`, `pkl-codegen-java`,
 
 ## Key conventions
 
-- Treat `deder-protobuf/resources/ProtobufPlugin.pkl` as the source of truth for plugin configuration. The generated Java bindings under `deder-protobuf/src/ba/sake/deder/protobuf` and extra generated resources are committed and must be regenerated when the Pkl schema changes.
+- Treat `deder-protobuf/resources/ProtobufPlugin.pkl` as the source of truth for plugin configuration. The generated Java bindings under `deder-protobuf/src/ba/sake/deder` (for example `Protobuf.java`) and extra generated resources are committed and must be regenerated when the Pkl schema changes.
 - Keep build assumptions anchored to the root `deder.pkl`, not to the `deder-protobuf/` directory layout. The module source roots are nested, but task execution is driven from the repository root.
 - New tests should follow the existing subsystem split under `deder-protobuf/test/src/ba/sake/deder/protobuf/`: `config`, `sources`, `protoc`, and `tasks`. The suites are MUnit `FunSuite`s named after the runtime component they cover.
 - Configuration fields that are intentionally out of MVP scope are still present in the Pkl schema for forward compatibility, but the Scala layer is expected to fail fast when they are set. Preserve that explicit rejection behavior instead of adding silent fallbacks.
