@@ -7,7 +7,9 @@ import ba.sake.deder.Protobuf
 class ProtobufPluginImpl extends DederPluginApi {
   override def id: String = "protobuf"
 
-  override def tasks(params: PluginTasksParams): Either[String, Seq[AbstractTask[?]]] =
+  override def tasks(
+      params: PluginTasksParams
+  ): Either[String, Seq[AbstractTask[?]]] =
     try {
       val pluginModule = PluginConfigEvaluators.evaluate(
         pluginClassLoader = getClass.getClassLoader,
@@ -22,6 +24,8 @@ class ProtobufPluginImpl extends DederPluginApi {
       Right(Seq(protoSourceFiles, sourceGenerator, resourceGenerator))
     } catch {
       case error: Exception =>
-        Left(s"Failed to initialize protobuf plugin config: ${error.getMessage}")
+        Left(
+          s"Failed to initialize protobuf plugin config: ${error.getMessage}"
+        )
     }
 }
