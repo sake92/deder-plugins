@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PKL_FILE="$ROOT_DIR/resources/ProtobufPlugin.pkl"
-WORK_DIR="$ROOT_DIR/.gen-plugin-bindings.$BASHPID"
+WORK_DIR="$ROOT_DIR/tmp/.gen-plugin-bindings.$BASHPID"
 
 cleanup() {
   rm -rf "$WORK_DIR"
