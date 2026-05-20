@@ -13,7 +13,7 @@ Prerequisites:
 
 
 
-Pkl bindings should be regenerated after editing a plugin's Pkl config (e.g. `ProtobufPlugin.pkl`):
+Pkl bindings should be regenerated after editing a plugin's Pkl config (e.g. `deder-protobuf/resources/ProtobufPlugin.pkl`):
 ```bash
 ./scripts/gen-plugin-bindings.sh
 ```
@@ -24,5 +24,4 @@ Run tests from the repo root:
 ```bash
 deder exec -t test -m deder-protobuf-test
 ```
-
 

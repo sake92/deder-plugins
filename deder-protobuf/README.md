@@ -9,7 +9,7 @@ Status: MVP
 ## Minimal plugin config
 
 ```pkl
-import "src/main/resources/ProtobufPlugin.pkl" as PB
+import "resources/ProtobufPlugin.pkl" as PB
 
 plugins {
   new PB.ProtobufPlugin {
@@ -29,7 +29,7 @@ plugins {
 ## gRPC example config
 
 ```pkl
-import "src/main/resources/ProtobufPlugin.pkl" as PB
+import "resources/ProtobufPlugin.pkl" as PB
 
 plugins {
   new PB.ProtobufPlugin {
@@ -85,7 +85,6 @@ The following are intentionally out of scope for the current MVP and fail fast i
 ## Development
 Prerequisites:
 - `protoc` when using the system-path resolver
-
 
 
 

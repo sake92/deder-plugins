@@ -1,6 +1,6 @@
 amends "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl"
 
-import "../../src/main/resources/ProtobufPlugin.pkl" as PB
+import "../../resources/ProtobufPlugin.pkl" as PB
 
 plugins {
   new PB.ProtobufPlugin {
@@ -31,10 +31,7 @@ modules {
     root = "."
     scalaVersion = "3.7.4"
     sources = new Listing {
-      "src/main/scala"
-    }
-    resources = new Listing {
-      "src/main/resources"
+      "src"
     }
     deps {
       "com.google.protobuf:protobuf-java:4.31.1"
