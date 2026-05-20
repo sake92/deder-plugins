@@ -2,40 +2,9 @@
 
 Standalone Deder plugin for protobuf and gRPC code generation.
 
-## Status
+Status: MVP
 
-This repository currently targets the **recommended MVP slice**:
 
-- typed Deder plugin config via `ProtobufPlugin.pkl`
-- layout-aware proto source defaults for Maven-style and default-layout modules
-- built-in `protoc` outputs plus external plugins resolved from path, binary Maven artifacts, or JVM Maven artifacts
-- imports from local paths, configured Maven artifacts, and project dependencies
-- generated sources wired through Deder `SourceGenerator` tasks, with optional descriptor output as `ResourceGenerator`
-
-Deferred parity items such as URL distributions, digest verification, sanctioned executable paths, and optional plugin skipping are parsed but rejected explicitly for now.
-
-## Development
-
-Prerequisites:
-
-- JDK 21+
-- `deder`
-- `pkl-codegen-java`
-- `protoc` when using the system-path resolver
-
-Generate the committed Pkl bindings after editing `deder-protobuf/src/main/resources/ProtobufPlugin.pkl` from the repo root:
-
-```bash
-./scripts/gen-plugin-bindings.sh
-```
-
-Bindings are **committed** in this repository, matching the Deder hello-plugin example.
-
-Run tests from the repo root:
-
-```bash
-deder exec -t test -m deder-protobuf-test
-```
 
 ## Minimal plugin config
 
@@ -112,3 +81,11 @@ The following are intentionally out of scope for the current MVP and fail fast i
 - sanctioned executable paths
 - optional plugin skipping on unsupported platforms
 - descriptor inputs beyond generated descriptor-set output
+
+## Development
+Prerequisites:
+- `protoc` when using the system-path resolver
+
+
+
+

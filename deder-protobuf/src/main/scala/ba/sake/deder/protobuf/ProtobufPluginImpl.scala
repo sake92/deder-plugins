@@ -24,8 +24,6 @@ class ProtobufPluginImpl extends DederPluginApi {
       Right(Seq(protoSourceFiles, sourceGenerator, resourceGenerator))
     } catch {
       case error: Exception =>
-        Left(
-          s"Failed to initialize protobuf plugin config: ${error.getMessage}"
-        )
+        Left(s"Failed to initialize protobuf plugin config: ${error.getMessage}")
     }
 }
