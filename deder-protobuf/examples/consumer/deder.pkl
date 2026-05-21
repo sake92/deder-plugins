@@ -30,9 +30,6 @@ modules {
     id = "consumer"
     root = "."
     scalaVersion = "3.7.4"
-    sources = new Listing {
-      "src"
-    }
     deps {
       "com.google.protobuf:protobuf-java:4.31.1"
       "io.grpc:grpc-api:1.75.0"
