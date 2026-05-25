@@ -45,6 +45,33 @@ local const pluginModules =
     }
   }.get
 
+local const buildInfoModules =
+  new CreateScalaModules {
+    root = "deder-build-info"
+    id = "deder-build-info"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "com.lihaoyi::os-lib:0.11.6"
+      }
+      pomSettings =
+        pom(
+          "deder-build-info",
+          "Deder BuildInfo Plugin",
+          "Deder plugin that generates a BuildInfo Scala object with build metadata constants",
+        )
+      publish = true
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
+  ...buildInfoModules.all
 }
