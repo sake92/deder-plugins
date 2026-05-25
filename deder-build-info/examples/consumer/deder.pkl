@@ -19,6 +19,6 @@ modules {
     id = "example"
     root = "."
     scalaVersion = "3.7.4"
-    mainClass = "consumer.Main"
+    mainClass = "consumer.main"
   }
 }
