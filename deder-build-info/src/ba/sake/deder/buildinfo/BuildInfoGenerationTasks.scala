@@ -7,6 +7,10 @@ import ba.sake.deder.BuildInfo
 
 object BuildInfoGenerationTasks {
 
+  private def moduleRoot(module: DederModule): os.Path =
+    if module.root == "." then DederGlobals.projectRootDir
+    else DederGlobals.projectRootDir / os.RelPath(module.root)
+
   private val supportedModuleTypes: Set[ModuleType] =
     Set(ModuleType.JAVA, ModuleType.JAVA_TEST, ModuleType.SCALA, ModuleType.SCALA_TEST)
 
@@ -35,8 +39,8 @@ object BuildInfoGenerationTasks {
         if !resolved.enabled then sourceOut
         else {
           val gitHash = if resolved.includeGitHash then {
-            val moduleRoot = os.Path(ctx.module.root)
-            Some(GitSupport.gitHead(moduleRoot))
+            val root = moduleRoot(ctx.module)
+            Some(GitSupport.gitHead(root))
           } else None
 
           val timestamp = if resolved.includeTimestamp then Some(System.currentTimeMillis()) else None

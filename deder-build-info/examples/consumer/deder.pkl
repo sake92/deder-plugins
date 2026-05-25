@@ -1,0 +1,24 @@
+amends "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl"
+
+import "../../resources/BuildInfoPlugin.pkl" as BI
+
+plugins {
+  new BI.BuildInfoPlugin {
+    config = new BI.BuildInfoPluginConfig {
+      defaults = new BI.ModuleDefaults {
+        packageName = "consumer"
+        includeGitHash = true
+        includeTimestamp = true
+      }
+    }
+  }
+}
+
+modules {
+  new ScalaModule {
+    id = "example"
+    root = "."
+    scalaVersion = "3.7.4"
+    mainClass = "consumer.Main"
+  }
+}
