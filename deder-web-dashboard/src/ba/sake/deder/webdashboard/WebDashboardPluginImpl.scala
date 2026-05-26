@@ -8,7 +8,6 @@ class WebDashboardPluginImpl extends DederPluginApi {
   override def id: String = "web-dashboard"
 
   private var server: Option[DashboardServer] = None
-  private var internals: Option[DederProjectInternals] = None
 
   override def tasks(params: PluginTasksParams): Either[String, Seq[AbstractTask[?]]] =
     try {
@@ -19,7 +18,11 @@ class WebDashboardPluginImpl extends DederPluginApi {
         clazz = classOf[WebDashboard]
       )
       val config = pluginModule.config
-      internals = Some(params.internals)
+      // if tasks() is re-called (e.g., config reload), stop any stale server
+      server.foreach { srv =>
+        srv.stop()
+        server = None
+      }
 
       val startTask = TaskBuilder.make[String](
         name = "webDashboardStart",
