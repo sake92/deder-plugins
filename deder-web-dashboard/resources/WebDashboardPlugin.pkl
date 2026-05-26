@@ -1,4 +1,4 @@
-module ba.sake.deder.webdashboard
+module ba.sake.deder.webDashboard
 
 import "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl" as P
 

@@ -88,7 +88,7 @@ from pathlib import Path
 import sys
 
 resources_dir = Path(sys.argv[1])
-properties_file = resources_dir / "META-INF" / "org" / "pkl" / "config" / "java" / "mapper" / "classes" / "ba.sake.deder.webdashboard.properties"
+properties_file = resources_dir / "META-INF" / "org" / "pkl" / "config" / "java" / "mapper" / "classes" / "ba.sake.deder.webDashboard.properties"
 
 if properties_file.exists():
     lines = properties_file.read_text().splitlines()
