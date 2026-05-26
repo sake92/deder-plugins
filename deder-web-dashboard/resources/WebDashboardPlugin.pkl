@@ -1,0 +1,5 @@
+class WebDashboardPluginConfig {
+  host: String = "localhost"
+  port: Int = 9090
+  statsRefreshIntervalMs: Int = 5000
+}
