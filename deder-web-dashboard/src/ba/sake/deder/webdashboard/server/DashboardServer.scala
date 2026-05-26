@@ -1,7 +1,9 @@
 package ba.sake.deder.webdashboard.server
 
 import ba.sake.sharaf.*, ba.sake.sharaf.jdkhttp.*
+import ba.sake.sharaf.given_ResponseWritable_Html
 import ba.sake.deder.*
+import ba.sake.deder.config.DederProject
 import ba.sake.deder.webdashboard.pages.{Layout, ModulesPage, LiveStatsPage}
 import WebDashboard.WebDashboardPluginConfig
 
@@ -12,7 +14,7 @@ class DashboardServer(
 ) {
   private var jdkServer: Option[JdkHttpServerSharafServer] = None
 
-  private val refreshMs = config.statsRefreshIntervalMs
+  private val refreshMs = config.statsRefreshIntervalMs.toInt
 
   private val routes = Routes {
     case GET -> Path() =>
@@ -37,7 +39,7 @@ class DashboardServer(
   }
 
   def start(): Unit = {
-    jdkServer = Some(JdkHttpServerSharafServer(config.host, config.port, routes))
+    jdkServer = Some(JdkHttpServerSharafServer(config.host, config.port.toInt, routes))
     jdkServer.foreach(_.start())
   }
 
