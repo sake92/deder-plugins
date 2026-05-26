@@ -71,7 +71,36 @@ local const buildInfoModules =
     }
   }.get
 
+local const dashboardModules =
+  new CreateScalaModules {
+    root = "deder-web-dashboard"
+    id = "deder-web-dashboard"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      scalacOptions { "-Yretain-trees" }
+      deps {
+        "ba.sake::deder-plugin-api:0.11.2-SNAPSHOT"
+        "ba.sake::sharaf-jdk-httpserver:0.18.1-SNAPSHOT"
+        "com.lihaoyi::os-lib:0.11.6"
+      }
+      pomSettings =
+        pom(
+          "deder-web-dashboard",
+          "Deder Web Dashboard Plugin",
+          "Deder plugin that starts a web dashboard showing module info and live server stats",
+        )
+      publish = true
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
+  ...dashboardModules.all
 }
