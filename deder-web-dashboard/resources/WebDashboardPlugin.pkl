@@ -1,5 +1,19 @@
+module ba.sake.deder.webdashboard
+
+import "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl" as P
+
+class WebDashboardPlugin extends P.DederPlugin {
+  id = "web-dashboard"
+  deps {
+    "ba.sake::deder-web-dashboard:0.1.0-SNAPSHOT"
+  }
+  config: WebDashboardPluginConfig = new {}
+}
+
 class WebDashboardPluginConfig {
   host: String = "localhost"
   port: Int = 9090
   statsRefreshIntervalMs: Int = 5000
 }
+
+config: WebDashboardPluginConfig = new {}
