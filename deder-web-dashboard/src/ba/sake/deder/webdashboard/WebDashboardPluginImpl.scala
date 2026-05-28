@@ -24,45 +24,19 @@ class WebDashboardPluginImpl extends DederPluginApi {
         server = None
       }
 
-      val startTask = TaskBuilder.make[String](
-        name = "webDashboardStart",
-        singleton = true,
-        category = "Web Dashboard",
-        kind = TaskKind.Standard
-      ).build { ctx =>
-        server match
-          case Some(srv) =>
-            s"Server already running at http://${config.host}:${config.port}"
-          case None =>
-            val srv = DashboardServer(config, ctx.project, params.internals)
-            val thread = new Thread(() => srv.start())
-            thread.setDaemon(true)
-            thread.setName("deder-web-dashboard-server")
-            thread.start()
-            server = Some(srv)
-            Thread.sleep(500)
-            s"http://${config.host}:${config.port}"
-      }
+      if config.enabled then
+        val srv = DashboardServer(config, params.project, params.internals)
+        val thread = new Thread(() => srv.start())
+        thread.setDaemon(true)
+        thread.setName("deder-web-dashboard-server")
+        thread.start()
+        server = Some(srv)
+        Thread.sleep(500)
 
-      val stopTask = TaskBuilder.make[String](
-        name = "webDashboardStop",
-        singleton = true,
-        category = "Web Dashboard",
-        kind = TaskKind.Standard
-      ).build { _ =>
-        server match
-          case Some(srv) =>
-            srv.stop()
-            server = None
-            "Server stopped"
-          case None =>
-            "Server not running"
-      }
-
-      Right(Seq(startTask, stopTask))
+      Right(Seq.empty)
     } catch {
       case error: Exception =>
-        Left(s"Failed to initialize web-dashboard plugin config: ${error.getMessage}")
+        Left(s"Failed to initialize web-dashboard plugin: ${error.getMessage}")
     }
 
   override def close(): Unit =

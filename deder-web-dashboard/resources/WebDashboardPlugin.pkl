@@ -11,6 +11,7 @@ class WebDashboardPlugin extends P.DederPlugin {
 }
 
 class WebDashboardPluginConfig {
+  enabled: Boolean = true
   host: String = "localhost"
   port: Int = 9090
   statsRefreshIntervalMs: Int = 5000

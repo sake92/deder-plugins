@@ -39,7 +39,7 @@ class DashboardServerSuite extends FunSuite {
       true
     )
 
-  private val config = WebDashboardPluginConfig(testHost, testPort, testRefreshMs)
+  private val config = WebDashboardPluginConfig(true, testHost, testPort.toLong, testRefreshMs.toLong)
   private val server = DashboardServer(config, stubProject, stubInternals)
   private val baseUrl = s"http://$testHost:$testPort"
 

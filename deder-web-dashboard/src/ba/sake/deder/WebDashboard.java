@@ -117,29 +117,37 @@ public final class WebDashboard {
   }
 
   public static final class WebDashboardPluginConfig {
+    public final boolean enabled;
+
     public final @NonNull String host;
 
     public final long port;
 
     public final long statsRefreshIntervalMs;
 
-    public WebDashboardPluginConfig(@Named("host") @NonNull String host, @Named("port") long port,
+    public WebDashboardPluginConfig(@Named("enabled") boolean enabled,
+        @Named("host") @NonNull String host, @Named("port") long port,
         @Named("statsRefreshIntervalMs") long statsRefreshIntervalMs) {
+      this.enabled = enabled;
       this.host = host;
       this.port = port;
       this.statsRefreshIntervalMs = statsRefreshIntervalMs;
     }
 
+    public WebDashboardPluginConfig withEnabled(boolean enabled) {
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs);
+    }
+
     public WebDashboardPluginConfig withHost(@NonNull String host) {
-      return new WebDashboardPluginConfig(host, port, statsRefreshIntervalMs);
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs);
     }
 
     public WebDashboardPluginConfig withPort(long port) {
-      return new WebDashboardPluginConfig(host, port, statsRefreshIntervalMs);
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs);
     }
 
     public WebDashboardPluginConfig withStatsRefreshIntervalMs(long statsRefreshIntervalMs) {
-      return new WebDashboardPluginConfig(host, port, statsRefreshIntervalMs);
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs);
     }
 
     @Override
@@ -148,6 +156,7 @@ public final class WebDashboard {
       if (obj == null) return false;
       if (this.getClass() != obj.getClass()) return false;
       WebDashboardPluginConfig other = (WebDashboardPluginConfig) obj;
+      if (!Objects.equals(this.enabled, other.enabled)) return false;
       if (!Objects.equals(this.host, other.host)) return false;
       if (!Objects.equals(this.port, other.port)) return false;
       if (!Objects.equals(this.statsRefreshIntervalMs, other.statsRefreshIntervalMs)) return false;
@@ -157,6 +166,7 @@ public final class WebDashboard {
     @Override
     public int hashCode() {
       int result = 1;
+      result = 31 * result + Objects.hashCode(this.enabled);
       result = 31 * result + Objects.hashCode(this.host);
       result = 31 * result + Objects.hashCode(this.port);
       result = 31 * result + Objects.hashCode(this.statsRefreshIntervalMs);
@@ -165,8 +175,9 @@ public final class WebDashboard {
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(200);
+      StringBuilder builder = new StringBuilder(250);
       builder.append(WebDashboardPluginConfig.class.getSimpleName()).append(" {");
+      appendProperty(builder, "enabled", this.enabled);
       appendProperty(builder, "host", this.host);
       appendProperty(builder, "port", this.port);
       appendProperty(builder, "statsRefreshIntervalMs", this.statsRefreshIntervalMs);
