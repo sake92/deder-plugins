@@ -9,7 +9,7 @@ class WebDashboardPluginImpl extends DederPluginApi {
 
   private var server: Option[DashboardServer] = None
 
-  override def tasks(params: PluginTasksParams): Either[String, Seq[AbstractTask[?]]] =
+  override def init(params: PluginInitParams): Either[String, Seq[AbstractTask[?]]] =
     try {
       val pluginModule = PluginConfigEvaluators.evaluate(
         pluginClassLoader = getClass.getClassLoader,
@@ -18,7 +18,7 @@ class WebDashboardPluginImpl extends DederPluginApi {
         clazz = classOf[WebDashboard]
       )
       val config = pluginModule.config
-      // if tasks() is re-called (e.g., config reload), stop any stale server
+      // if init() is re-called (e.g., config reload), stop any stale server
       server.foreach { srv =>
         srv.stop()
         server = None
@@ -65,7 +65,7 @@ class WebDashboardPluginImpl extends DederPluginApi {
         Left(s"Failed to initialize web-dashboard plugin config: ${error.getMessage}")
     }
 
-  override def onClose(): Unit =
+  override def close(): Unit =
     server.foreach { srv =>
       srv.stop()
       server = None

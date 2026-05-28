@@ -9,8 +9,8 @@ class WebDashboardPluginImplSuite extends FunSuite {
     assertEquals(plugin.id, "web-dashboard")
   }
 
-  test("onClose with no server does not throw") {
+  test("close with no server does not throw") {
     val plugin = new WebDashboardPluginImpl
-    plugin.onClose()
+    plugin.close()
   }
 }
