@@ -1,6 +1,8 @@
 package ba.sake.deder.webdashboard.pages
 
 import java.time.{Duration as JavaDuration, Instant}
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import scala.concurrent.duration.*
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.*
@@ -62,12 +64,12 @@ object LiveStatsPage {
       val rows = requests.map { req =>
         val elapsed = JavaDuration.between(req.startTime, Instant.now())
         val elapsedStr = formatElapsed(elapsed)
-        val idShort = req.requestId.take(8)
-        html"""<tr><td>${idShort}...</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(", ")}</td><td>${elapsedStr}</td></tr>"""
+        val startedStr = formatDateTime(req.startTime)
+        html"""<tr><td>${startedStr}</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(", ")}</td><td>${elapsedStr}</td></tr>"""
       }
       html"""
         <table>
-          <thead><tr><th>Request ID</th><th>Task</th><th>Modules</th><th>Elapsed</th></tr></thead>
+          <thead><tr><th>Started</th><th>Task</th><th>Modules</th><th>Elapsed</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """
@@ -81,17 +83,23 @@ object LiveStatsPage {
       val rows = history.map { req =>
         val statusClass = if req.success then "success" else "failure"
         val statusText = if req.success then "OK" else "FAIL"
-        val idShort = req.requestId.take(8)
+        val startedStr = formatDateTime(req.startTime)
         val durStr = formatFiniteDuration(req.duration)
-        html"""<tr><td>${idShort}...</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(", ")}</td><td>${durStr}</td><td class="${statusClass}">${statusText}</td></tr>"""
+        html"""<tr><td>${startedStr}</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(", ")}</td><td>${durStr}</td><td class="${statusClass}">${statusText}</td></tr>"""
       }
       html"""
         <table>
-          <thead><tr><th>Request ID</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
+          <thead><tr><th>Started</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """
   }
+
+  private val dateTimeFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss").withZone(ZoneId.systemDefault())
+
+  private def formatDateTime(instant: Instant): String =
+    dateTimeFormatter.format(instant)
 
   private def formatElapsed(duration: JavaDuration): String = {
     val totalSecs = duration.getSeconds
