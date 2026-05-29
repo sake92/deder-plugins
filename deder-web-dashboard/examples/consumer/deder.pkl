@@ -1,11 +1,11 @@
-amends "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/early-access/DederProject.pkl"
 
 import "../../resources/WebDashboardPlugin.pkl" as WD
 
 plugins {
   new WD.WebDashboardPlugin {
-    config = new WD.WebDashboardPluginConfig {
-      port = 9090
+    config = new {
+      enabled = true
     }
   }
 }

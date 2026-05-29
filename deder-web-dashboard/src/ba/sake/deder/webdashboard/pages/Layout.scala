@@ -11,8 +11,8 @@ object Layout {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${title}</title>
-        <link rel="stylesheet" href="/public/simple.min.css">
-        <script src="/public/htmx.min.js"></script>
+        <link rel="stylesheet" href="/simple.min.css">
+        <script src="/htmx.min.js"></script>
         <style>
           body { max-width: 960px; margin: 0 auto; padding: 1rem; }
           .navbar { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; }
