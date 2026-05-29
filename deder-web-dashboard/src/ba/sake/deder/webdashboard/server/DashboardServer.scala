@@ -29,13 +29,16 @@ class DashboardServer(
       Response.withBody(Layout.htmlPage("Live Stats - Deder Dashboard", content))
 
     case GET -> Path("stats", "overview") =>
-      Response.withBody(LiveStatsPage.overviewCards(internals))
+      val html = LiveStatsPage.overviewCards(internals)
+      Response.withBody(html)
 
     case GET -> Path("stats", "current") =>
-      Response.withBody(LiveStatsPage.currentRequestsTable(internals))
+      val html = LiveStatsPage.currentRequestsTable(internals)
+      Response.withBody(html)
 
     case GET -> Path("stats", "history") =>
-      Response.withBody(LiveStatsPage.historyTable(internals))
+      val html = LiveStatsPage.historyTable(internals)
+      Response.withBody(html)
   }
 
   def start(): Unit = {

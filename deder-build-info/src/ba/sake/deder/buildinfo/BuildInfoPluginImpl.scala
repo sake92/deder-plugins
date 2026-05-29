@@ -6,9 +6,7 @@ import ba.sake.deder.BuildInfo
 class BuildInfoPluginImpl extends DederPluginApi {
   override def id: String = "build-info"
 
-  override def tasks(
-      params: PluginTasksParams
-  ): Either[String, Seq[AbstractTask[?]]] =
+  override def init(params: PluginInitParams): Either[String, Seq[AbstractTask[?]]] =
     try {
       val pluginModule = PluginConfigEvaluators.evaluate(
         pluginClassLoader = getClass.getClassLoader,

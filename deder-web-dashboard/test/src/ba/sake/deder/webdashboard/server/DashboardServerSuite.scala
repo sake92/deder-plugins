@@ -1,9 +1,8 @@
 package ba.sake.deder.webdashboard.server
 
-import java.time.Instant
+import java.time.{Duration, Instant}
 import java.net.{URL, HttpURLConnection}
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration.{FiniteDuration, Duration}
 import ba.sake.deder.*
 import ba.sake.deder.config.DederProject
 import WebDashboard.WebDashboardPluginConfig
@@ -21,13 +20,13 @@ class DashboardServerSuite extends FunSuite {
     def recentHistory: Seq[CompletedRequest] =
       Seq(
         CompletedRequest("req-000", CallerType.Cli, "compile", Seq("my-module"),
-          Instant.now().minusSeconds(10), FiniteDuration(5L, TimeUnit.SECONDS), true)
+          Instant.now().minusSeconds(10), Duration.ofSeconds(5), true)
       )
     def taskStats(taskName: String): Option[TaskStats] = None
     def allTaskStats: Seq[(String, TaskStats)] = Seq.empty
     def totalRequestsServed: Long = 100L
     def totalErrors: Long = 5L
-    def serverUptime: Duration = FiniteDuration(8130L, TimeUnit.SECONDS)
+    def serverUptime: Duration = Duration.ofSeconds(8130L)
     def workerThreadPoolSize: Int = 10
   }
 

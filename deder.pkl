@@ -1,7 +1,7 @@
-amends "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.13.2/DederProject.pkl"
 
 local const scalaVer = "3.7.4"
-local const pluginApiVersion = "0.7.8-SNAPSHOT"
+local const pluginApiVersion = "0.13.3"
 local const pluginVersion = "0.1.0-SNAPSHOT"
 
 local const function pom(artId: String, artName: String, artDesc: String): PomSettings = new {
@@ -80,7 +80,7 @@ local const dashboardModules =
       scalaVersion = scalaVer
       scalacOptions { "-Yretain-trees" }
       deps {
-        "ba.sake::deder-plugin-api:0.11.2-SNAPSHOT"
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
         "ba.sake::sharaf-jdk-httpserver:0.18.1-SNAPSHOT"
         "com.lihaoyi::os-lib:0.11.6"
       }
