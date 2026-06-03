@@ -24,5 +24,6 @@ tmp/
 
 .worktrees/
 
+.superpowers/
 .scalex
 .opencode
