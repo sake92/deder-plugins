@@ -8,6 +8,22 @@ import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.*
 
 object LiveStatsPage {
+  def fullPage(internals: DederProjectInternals, refreshMs: Int): Html =
+    html"""
+      <h2>Live Stats</h2>
+      <div hx-get="/stats/overview" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
+        <p>Loading overview...</p>
+      </div>
+      <h3>Current Requests</h3>
+      <div hx-get="/stats/current" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
+        <p>Loading current requests...</p>
+      </div>
+      <h3>Recent History</h3>
+      <div hx-get="/stats/history" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
+        <p>Loading recent history...</p>
+      </div>
+    """
+
   def overviewCards(internals: DederProjectInternals): Html = {
     val uptime = internals.serverUptime
     val days = uptime.toDays

@@ -29,8 +29,12 @@ class DashboardServer(
       Response.withBody(Layout.htmlPage("Dependency Graph - Deder Dashboard", "graph", content))
 
     case GET -> Path("server") =>
-      val content = ServerPage.serverInfo(internals, project, refreshMs)
+      val content = ServerPage.serverInfo(internals, project)
       Response.withBody(Layout.htmlPage("Server - Deder Dashboard", "server", content))
+
+    case GET -> Path("live") =>
+      val content = LiveStatsPage.fullPage(internals, refreshMs)
+      Response.withBody(Layout.htmlPage("Live Stats - Deder Dashboard", "live", content))
 
     case GET -> Path("stats", "overview") =>
       val html = LiveStatsPage.overviewCards(internals)

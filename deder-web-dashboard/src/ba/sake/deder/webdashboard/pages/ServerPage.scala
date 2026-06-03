@@ -6,7 +6,7 @@ import ba.sake.deder.*
 import ba.sake.deder.config.DederProject
 
 object ServerPage {
-  def serverInfo(internals: DederProjectInternals, project: DederProject, refreshMs: Int): Html = {
+  def serverInfo(internals: DederProjectInternals, project: DederProject): Html = {
     val jdkVersion = System.getProperty("java.version")
     val jdkVendor = System.getProperty("java.vendor")
     val osName = System.getProperty("os.name")
@@ -36,28 +36,14 @@ object ServerPage {
       </div>
 
       ${
-        if caches.nonEmpty then cacheSection(caches)
-        else html"""<small style="color: var(--pico-muted-color);">No in-memory caches active.</small>"""
-      }
-
-      ${
         if plugins.nonEmpty then pluginsSection(plugins)
         else html""
       }
 
-      <hr style="margin:1rem 0;">
-      <h3>Live Stats</h3>
-      <div hx-get="/stats/overview" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading overview...</p>
-      </div>
-      <h4 style="margin-top:0.75rem;">Current Requests</h4>
-      <div hx-get="/stats/current" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading current requests...</p>
-      </div>
-      <h4 style="margin-top:0.75rem;">Recent History</h4>
-      <div hx-get="/stats/history" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading recent history...</p>
-      </div>
+      ${
+        if caches.nonEmpty then cacheSection(caches)
+        else html"""<small style="color: var(--pico-muted-color);">No in-memory caches active.</small>"""
+      }
     """
   }
 

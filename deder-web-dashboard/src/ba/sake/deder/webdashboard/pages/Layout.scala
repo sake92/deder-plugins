@@ -49,6 +49,9 @@ object Layout {
           <a href="/modules/graph" class="${
             if activeTab == "graph" then "active" else ""
           }">Dependency Graph</a>
+          <a href="/live" class="${
+            if activeTab == "live" then "active" else ""
+          }">Live Stats</a>
           <a href="/server" class="${
             if activeTab == "server" then "active" else ""
           }">Server</a>
