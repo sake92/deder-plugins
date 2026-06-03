@@ -1,6 +1,6 @@
 module ba.sake.deder.buildinfo
 
-import "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl" as P
+import "https://sake92.github.io/deder/config/v0.15.0/DederProject.pkl" as P
 
 class BuildInfoPlugin extends P.DederPlugin {
   id = "build-info"

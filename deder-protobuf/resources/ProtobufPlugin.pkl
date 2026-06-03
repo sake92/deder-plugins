@@ -1,6 +1,6 @@
 module ba.sake.deder.protobuf
 
-import "https://sake92.github.io/deder/config/v0.9.1/DederProject.pkl" as P
+import "https://sake92.github.io/deder/config/v0.15.0/DederProject.pkl" as P
 
 typealias ResolverKind = "system-path" | "path" | "binary-maven" | "jvm-maven"
 

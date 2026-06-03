@@ -8,31 +8,19 @@ import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.*
 
 object LiveStatsPage {
-  def fullStatsPage(internals: DederProjectInternals, refreshMs: Int): Html =
-    html"""
-      <h2>Live Stats</h2>
-      <div hx-get="/stats/overview" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading overview...</p>
-      </div>
-      <h3>Current Requests</h3>
-      <div hx-get="/stats/current" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading current requests...</p>
-      </div>
-      <h3>Recent History</h3>
-      <div hx-get="/stats/history" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading recent history...</p>
-      </div>
-    """
-
   def overviewCards(internals: DederProjectInternals): Html = {
     val uptime = internals.serverUptime
-    // TODO if days > 0 etc..
-    val totalSecs = uptime.toSeconds
     val days = uptime.toDays
-    val hours = uptime.toHours
-    val minutes = uptime.toMinutes
-    val seconds = uptime.toSeconds
-    val uptimeStr = s"${days}d ${hours}h ${minutes}m ${seconds}s"
+    val hours = uptime.toHours % 24
+    val minutes = uptime.toMinutes % 60
+    val seconds = uptime.toSeconds % 60
+    val parts = Seq(
+      if days > 0 then Some(s"${days}d") else None,
+      if hours > 0 || days > 0 then Some(s"${hours}h") else None,
+      if minutes > 0 || days > 0 || hours > 0 then Some(s"${minutes}m") else None,
+      Some(s"${seconds}s")
+    ).flatten
+    val uptimeStr = parts.mkString(" ")
     html"""
       <div style="display: flex; flex-wrap: wrap;">
         <div class="stat-card">
@@ -42,12 +30,12 @@ object LiveStatsPage {
         <div class="stat-card">
           <div class="label">Total Errors</div>
           <div class="value" style="color: ${
-        if internals.totalErrors > 0 then "red" else "green"
+        if internals.totalErrors > 0 then "var(--pico-color-red-400)" else "var(--pico-color-green-400)"
       }">${internals.totalErrors}</div>
         </div>
         <div class="stat-card">
           <div class="label">Uptime</div>
-          <div class="value" style="font-size:1.2rem">${uptimeStr}</div>
+          <div class="value" style="font-size:1rem">$uptimeStr</div>
         </div>
       </div>
     """

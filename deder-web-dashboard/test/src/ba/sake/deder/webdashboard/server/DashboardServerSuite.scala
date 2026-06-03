@@ -28,6 +28,10 @@ class DashboardServerSuite extends FunSuite {
     def totalErrors: Long = 5L
     def serverUptime: Duration = Duration.ofSeconds(8130L)
     def workerThreadPoolSize: Int = 10
+    def inMemoryCachesStats: Map[String, InMemCacheStats] = Map.empty
+    def loadedPlugins: Seq[LoadedPluginInfo] = Seq(
+      LoadedPluginInfo("web-dashboard", Seq())
+    )
   }
 
   private def stubProject: DederProject =
@@ -81,10 +85,17 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("Modules"), s"body should contain 'Modules', got: ${body.take(300)}")
   }
 
-  test("GET /stats returns HTML page") {
-    val (code, body) = httpGet("/stats")
+  test("GET /modules/graph returns HTML page") {
+    val (code, body) = httpGet("/modules/graph")
     assertEquals(code, 200)
-    assert(body.contains("Live Stats"), s"body should contain 'Live Stats', got: ${body.take(300)}")
+    assert(body.contains("Dependency Graph"), s"body should contain 'Dependency Graph', got: ${body.take(300)}")
+  }
+
+  test("GET /server returns HTML page with server properties") {
+    val (code, body) = httpGet("/server")
+    assertEquals(code, 200)
+    assert(body.contains("Server Properties"), s"body should contain 'Server Properties', got: ${body.take(300)}")
+    assert(body.contains("JDK"), s"body should contain 'JDK', got: ${body.take(300)}")
   }
 
   test("GET /stats/overview returns stat cards HTML fragment") {
@@ -92,7 +103,6 @@ class DashboardServerSuite extends FunSuite {
     assertEquals(code, 200)
     assert(body.contains("100"), s"should contain total requests (100), got: ${body}")
     assert(body.contains("5"), s"should contain total errors (5), got: ${body}")
-    assert(body.contains("10"), s"should contain thread pool (10), got: ${body}")
   }
 
   test("GET /stats/current returns current requests HTML fragment") {

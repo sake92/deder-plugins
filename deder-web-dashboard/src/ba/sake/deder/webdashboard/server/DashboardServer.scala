@@ -4,7 +4,7 @@ import ba.sake.sharaf.*, ba.sake.sharaf.jdkhttp.*
 import ba.sake.sharaf.given_ResponseWritable_Html
 import ba.sake.deder.*
 import ba.sake.deder.config.DederProject
-import ba.sake.deder.webdashboard.pages.{Layout, ModulesPage, LiveStatsPage}
+import ba.sake.deder.webdashboard.pages.{Layout, ModulesPage, ModulesGraphPage, ServerPage, LiveStatsPage}
 import WebDashboard.WebDashboardPluginConfig
 
 class DashboardServer(
@@ -22,11 +22,15 @@ class DashboardServer(
 
     case GET -> Path("modules") =>
       val content = ModulesPage.modulesTable(project)
-      Response.withBody(Layout.htmlPage("Modules - Deder Dashboard", content))
+      Response.withBody(Layout.htmlPage("Modules - Deder Dashboard", "modules", content))
 
-    case GET -> Path("stats") =>
-      val content = LiveStatsPage.fullStatsPage(internals, refreshMs)
-      Response.withBody(Layout.htmlPage("Live Stats - Deder Dashboard", content))
+    case GET -> Path("modules", "graph") =>
+      val content = ModulesGraphPage.dependencyGraph(project)
+      Response.withBody(Layout.htmlPage("Dependency Graph - Deder Dashboard", "graph", content))
+
+    case GET -> Path("server") =>
+      val content = ServerPage.serverInfo(internals, project, refreshMs)
+      Response.withBody(Layout.htmlPage("Server - Deder Dashboard", "server", content))
 
     case GET -> Path("stats", "overview") =>
       val html = LiveStatsPage.overviewCards(internals)
