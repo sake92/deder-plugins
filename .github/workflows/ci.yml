@@ -1,0 +1,33 @@
+
+name: CI
+
+on:
+  push:
+    branches: main
+  pull_request:
+  workflow_call:
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: coursier/cache-action@v7
+        with:
+          extraFiles: deder.pkl
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+      - name: Install deder
+        run: |
+          brew install sake92/tap/deder
+      - name: Compile
+        run: deder exec -t compile
+      - name: Test Deder
+        run: deder exec -t test
