@@ -1,5 +1,9 @@
 name: Deploy GhPages
 
+concurrency:
+  group: gh-pages
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
