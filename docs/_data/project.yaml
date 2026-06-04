@@ -1,0 +1,13 @@
+plugins:
+  - name: Build Info
+    dir: deder-build-info
+    schema: BuildInfoPlugin.pkl
+    description: Generates a Scala BuildInfo object with metadata (version, git hash, timestamp).
+  - name: Protobuf
+    dir: deder-protobuf
+    schema: ProtobufPlugin.pkl
+    description: Generates protobuf and gRPC Java/Scala code from .proto files.
+  - name: Web Dashboard
+    dir: deder-web-dashboard
+    schema: WebDashboardPlugin.pkl
+    description: Embedded HTTP dashboard showing module info, dependency graph, and live stats.
