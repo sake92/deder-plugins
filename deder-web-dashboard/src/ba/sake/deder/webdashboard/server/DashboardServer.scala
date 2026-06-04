@@ -22,11 +22,11 @@ class DashboardServer(
 
     case GET -> Path("modules") =>
       val content = ModulesPage.modulesTable(project)
-      Response.withBody(Layout.htmlPage("Modules - Deder Dashboard", "modules", content))
+      Response.withBody(Layout.htmlPage("Modules list - Deder Dashboard", "modules", content))
 
     case GET -> Path("modules", "graph") =>
       val content = ModulesGraphPage.dependencyGraph(project)
-      Response.withBody(Layout.htmlPage("Dependency Graph - Deder Dashboard", "graph", content))
+      Response.withBody(Layout.htmlPage("Modules graph - Deder Dashboard", "graph", content))
 
     case GET -> Path("server") =>
       val content = ServerPage.serverInfo(internals, project)

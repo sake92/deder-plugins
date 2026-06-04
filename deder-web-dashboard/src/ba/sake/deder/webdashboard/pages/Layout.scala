@@ -45,10 +45,10 @@ object Layout {
         <nav class="navbar" hx-boost="true">
           <a href="/modules" class="${
             if activeTab == "modules" then "active" else ""
-          }">Modules</a>
+          }">Modules list</a>
           <a href="/modules/graph" class="${
             if activeTab == "graph" then "active" else ""
-          }">Dependency Graph</a>
+          }">Modules graph</a>
           <a href="/live" class="${
             if activeTab == "live" then "active" else ""
           }">Live Stats</a>

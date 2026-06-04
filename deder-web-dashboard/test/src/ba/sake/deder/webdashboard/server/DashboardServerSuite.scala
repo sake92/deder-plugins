@@ -88,7 +88,7 @@ class DashboardServerSuite extends FunSuite {
   test("GET /modules/graph returns HTML page") {
     val (code, body) = httpGet("/modules/graph")
     assertEquals(code, 200)
-    assert(body.contains("Dependency Graph"), s"body should contain 'Dependency Graph', got: ${body.take(300)}")
+    assert(body.contains("Modules graph"), s"body should contain 'Modules graph', got: ${body.take(300)}")
   }
 
   test("GET /server returns HTML page with server properties") {

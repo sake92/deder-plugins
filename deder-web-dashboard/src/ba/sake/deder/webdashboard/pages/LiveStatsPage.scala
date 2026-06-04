@@ -65,13 +65,14 @@ object LiveStatsPage {
         val elapsed = Duration.between(req.startTime, Instant.now())
         val elapsedStr = formatElapsed(elapsed)
         val startedStr = formatDateTime(req.startTime)
-        html"""<tr><td>${startedStr}</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(
+        val clientStr = formatCallerType(req.caller)
+        html"""<tr><td>${startedStr}</td><td>$clientStr</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(
             ", "
           )}</td><td>${elapsedStr}</td></tr>"""
       }
       html"""
         <table>
-          <thead><tr><th>Started</th><th>Task</th><th>Modules</th><th>Elapsed</th></tr></thead>
+          <thead><tr><th>Started</th><th>Client</th><th>Task</th><th>Modules</th><th>Elapsed</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """
@@ -86,17 +87,23 @@ object LiveStatsPage {
         val statusText = if req.success then "OK" else "FAIL"
         val startedStr = formatDateTime(req.startTime)
         val durStr = formatElapsed(req.duration)
-        html"""<tr><td>${startedStr}</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(
+        val clientStr = formatCallerType(req.caller)
+        html"""<tr><td>${startedStr}</td><td>$clientStr</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(
             ", "
           )}</td><td>${durStr}</td><td class="${statusClass}">${statusText}</td></tr>"""
       }
       html"""
         <table>
-          <thead><tr><th>Started</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
+          <thead><tr><th>Started</th><th>Client</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """
   }
+
+  private def formatCallerType(ct: CallerType): String = ct match
+    case CallerType.Cli => "CLI"
+    case CallerType.Bsp => "BSP"
+    case null => ct.toString
 
   private val dateTimeFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss").withZone(ZoneId.systemDefault())

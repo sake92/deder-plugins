@@ -47,18 +47,55 @@ object ModulesGraphPage {
           </div>
         </div>
         <script>
-        var cy = cytoscape({
+        window.__cy = cytoscape({
           container: document.getElementById('cy'),
           elements: ${HtmlFormat.raw(json)},
           style: [
             {
               selector: 'node',
               style: {
-                'label': 'data(id)'
+                'background-color': 'data(color)',
+                'label': 'data(label)',
+                'font-size': '10px',
+                'text-valign': 'center',
+                'text-halign': 'center',
+                'color': '#fff',
+                'text-outline-width': 0,
+                'width': 28,
+                'height': 28,
+                'border-width': 1,
+                'border-color': '#fff'
+              }
+            },
+            { selector: 'node[type="SCALA"]', style: { 'shape': 'ellipse' } },
+            { selector: 'node[type="JAVA"]', style: { 'shape': 'ellipse' } },
+            { selector: 'node[type="SCALA_TEST"]', style: { 'shape': 'round-rectangle' } },
+            { selector: 'node[type="JAVA_TEST"]', style: { 'shape': 'round-rectangle' } },
+            {
+              selector: 'edge',
+              style: {
+                'width': 1,
+                'line-color': '#aaa',
+                'target-arrow-color': '#aaa',
+                'target-arrow-shape': 'triangle',
+                'curve-style': 'bezier'
               }
             }
           ],
-          zoom: 0.7,
+          layout: { name: 'cose-bilkent', animate: false, nodeRepulsion: 5000 }
+        });
+
+        window.__cy.on('tap', 'node', function(evt) {
+          var node = evt.target;
+          window.__cy.elements().removeClass('highlighted');
+          node.addClass('highlighted');
+          node.neighborhood().addClass('highlighted');
+        });
+
+        window.__cy.on('tap', function(evt) {
+          if (evt.target === window.__cy) {
+            window.__cy.elements().removeClass('highlighted');
+          }
         });
         </script>
       """
