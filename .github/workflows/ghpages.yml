@@ -1,0 +1,42 @@
+name: Deploy GhPages
+
+on:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows: ["Release"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    if: |
+      github.repository == 'sake92/deder-plugins' &&
+      (
+        (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'Releasing version')) ||
+        (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+      )
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Build docs
+        env:
+          FLATMARK_BASE_URL: https://sake92.github.io/deder-plugins
+        run: |
+          wget https://github.com/sake92/flatmark/releases/download/v0.0.28/flatmark-1.0.0.pkg
+          sudo installer -pkg flatmark-1.0.0.pkg -target /
+          ./scripts/build-docs.sh
+
+      - name: Deploy to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs/_site
+          branch: gh-pages
+          clean: true
