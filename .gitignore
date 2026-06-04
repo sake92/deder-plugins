@@ -27,3 +27,8 @@ tmp/
 .superpowers/
 .scalex
 .opencode
+
+# flatmark generated output
+docs/_site/
+docs/.flatmark-cache
+docs/static/config/
