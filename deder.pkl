@@ -2,12 +2,10 @@ amends "https://sake92.github.io/deder/config/v0.15.0/DederProject.pkl"
 
 local const scalaVer = "3.7.4"
 local const pluginApiVersion = "0.15.0"
-local const pluginVersion = "0.1.0-SNAPSHOT"
 
 local const function pom(artId: String, artName: String, artDesc: String): PomSettings = new {
   groupId = "ba.sake"
   artifactId = artId
-  version = pluginVersion
   name = artName
   description = artDesc
   url = "https://github.com/sake92/deder-plugins"
