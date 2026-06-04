@@ -37,9 +37,9 @@ object ModulesGraphPage {
         }">
           <div class="graph-controls">
             <label><input type="checkbox" x-model="showScala" @change="applyFilters()"> Scala</label>
-            <label><input type="checkbox" x-model="showJava" @change="applyFilters()"> Java</label>
             <label><input type="checkbox" x-model="showScalaJs" @change="applyFilters()"> Scala.js</label>
             <label><input type="checkbox" x-model="showScalaNative" @change="applyFilters()"> Scala Native</label>
+            <label><input type="checkbox" x-model="showJava" @change="applyFilters()"> Java</label>
             <label><input type="checkbox" x-model="showTest" @change="applyFilters()"> Test</label>
             <input type="search" @input="search($$el.value)" placeholder="Search module..." style="max-width:200px; margin-left:auto;" aria-label="Search graph">
             <button type="button" class="outline secondary" @click="reset()" style="font-size:0.8rem; padding:0.2rem 0.5rem;">Reset</button>
@@ -47,11 +47,11 @@ object ModulesGraphPage {
           <div id="cy"></div>
           <div style="font-size: 0.72rem; margin-top: 0.25rem; color: var(--pico-muted-color); display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
             <span><img src="/icons/scala.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala</span>
-            <span><img src="/icons/java.svg" style="width:14px;height:14px;vertical-align:middle;"> Java</span>
             <span><img src="/icons/scalajs.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala.js</span>
-            <span><img src="/icons/scalanative.webp" style="width:14px;height:14px;vertical-align:middle;"> Scala Native</span>
+            <span><img src="/icons/scalanative.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala Native</span>
+            <span><img src="/icons/java.svg" style="width:14px;height:14px;vertical-align:middle;"> Java</span>
             <span style="display:inline-block;width:14px;height:14px;border:2px dashed #999;border-radius:3px;vertical-align:middle;"></span> Test
-            &mdash; Arrow = depends on. Tap a node to highlight its neighborhood.
+            &mdash; Arrow = depends on. Click a node to highlight its neighborhood.
           </div>
         </div>
         <script>
@@ -129,10 +129,10 @@ object ModulesGraphPage {
       val (typ, iconPath) = m match
         case _: ScalaTestModule         => ("SCALA_TEST", "/icons/scala.svg")
         case _: ScalaJsTestModule       => ("SCALA_JS_TEST", "/icons/scalajs.svg")
-        case _: ScalaNativeTestModule   => ("SCALA_NATIVE_TEST", "/icons/scalanative.svg")
+        case _: ScalaNativeTestModule   => ("SCALA_NATIVE_TEST", "/icons/scalanative.png")
         case _: JavaTestModule          => ("JAVA_TEST", "/icons/java.svg")
         case _: ScalaJsModule           => ("SCALA_JS", "/icons/scalajs.svg")
-        case _: ScalaNativeModule       => ("SCALA_NATIVE", "/icons/scalanative.svg")
+        case _: ScalaNativeModule       => ("SCALA_NATIVE", "/icons/scalanative.png")
         case _: ScalaModule             => ("SCALA", "/icons/scala.svg")
         case _: JavaModule              => ("JAVA", "/icons/java.svg")
         case _                          => ("UNKNOWN", "")
