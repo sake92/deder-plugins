@@ -49,7 +49,7 @@ object ModulesGraphPage {
             <span><img src="/icons/scala.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala</span>
             <span><img src="/icons/java.svg" style="width:14px;height:14px;vertical-align:middle;"> Java</span>
             <span><img src="/icons/scalajs.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala.js</span>
-            <span><img src="/icons/scalanative.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala Native</span>
+            <span><img src="/icons/scalanative.webp" style="width:14px;height:14px;vertical-align:middle;"> Scala Native</span>
             <span style="display:inline-block;width:14px;height:14px;border:2px dashed #999;border-radius:3px;vertical-align:middle;"></span> Test
             &mdash; Arrow = depends on. Tap a node to highlight its neighborhood.
           </div>
@@ -68,6 +68,8 @@ object ModulesGraphPage {
                 'background-fit': 'contain',
                 'background-width': '60%',
                 'background-height': '60%',
+                'background-position-x': '50%',
+                'background-position-y': '50%',
                 'label': 'data(label)',
                 'font-size': '10px',
                 'text-valign': 'center',
@@ -129,9 +131,9 @@ object ModulesGraphPage {
         case _: ScalaJsTestModule       => ("SCALA_JS_TEST", "/icons/scalajs.svg")
         case _: ScalaNativeTestModule   => ("SCALA_NATIVE_TEST", "/icons/scalanative.svg")
         case _: JavaTestModule          => ("JAVA_TEST", "/icons/java.svg")
-        case _: ScalaModule             => ("SCALA", "/icons/scala.svg")
         case _: ScalaJsModule           => ("SCALA_JS", "/icons/scalajs.svg")
         case _: ScalaNativeModule       => ("SCALA_NATIVE", "/icons/scalanative.svg")
+        case _: ScalaModule             => ("SCALA", "/icons/scala.svg")
         case _: JavaModule              => ("JAVA", "/icons/java.svg")
         case _                          => ("UNKNOWN", "")
       s"""{ "data": { "id": "${esc(m.id)}", "type": "$typ", "label": "${esc(m.id)}", "icon": "$iconPath" } }"""
