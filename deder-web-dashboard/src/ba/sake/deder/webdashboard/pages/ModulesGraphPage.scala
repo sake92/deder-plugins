@@ -142,7 +142,7 @@ object ModulesGraphPage {
     val edges = modules.flatMap { m =>
       val deps = m.moduleDeps.asScala.toSeq.map(_.id)
       deps.map(dep =>
-        s"""{ "data": { "id": "${esc(dep)}->${esc(m.id)}", "source": "${esc(dep)}", "target": "${esc(m.id)}" } }"""
+        s"""{ "data": { "id": "${esc(m.id)}->${esc(dep)}", "source": "${esc(m.id)}", "target": "${esc(dep)}" } }"""
       )
     }
 
