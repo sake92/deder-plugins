@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Official Deder Build Tool Plugins">
+  <title> Deder Plugins | Deder Plugins </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/deder-plugins/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/deder-plugins/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/deder-plugins/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/deder-plugins/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/deder-plugins/plugins">Plugins</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#deder-plugins">Deder Plugins</a>
+         <ul>
+          <li><a href="#available-plugins">Available Plugins</a></li>
+          <li><a href="#using-a-plugin">Using a Plugin</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="deder-plugins">Deder Plugins<a href="#deder-plugins" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>Official plugins for the <a href="https://sake92.github.io/deder/">Deder build tool</a>.</p>
+   <h2 id="available-plugins">Available Plugins<a href="#available-plugins" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <table>
+    <thead>
+     <tr>
+      <th>Plugin</th>
+      <th>Schema</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><strong>Build Info</strong></td>
+      <td><a href="config/deder-build-info/early-access/BuildInfoPlugin.pkl">early-access</a></td>
+     </tr>
+     <tr>
+      <td>Generates a Scala <code>BuildInfo</code> object with metadata.</td>
+      <td></td>
+     </tr>
+     <tr>
+      <td><strong>Protobuf</strong></td>
+      <td><a href="config/deder-protobuf/early-access/ProtobufPlugin.pkl">early-access</a></td>
+     </tr>
+     <tr>
+      <td>Generates protobuf and gRPC code from <code>.proto</code> files.</td>
+      <td></td>
+     </tr>
+     <tr>
+      <td><strong>Web Dashboard</strong></td>
+      <td><a href="config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl">early-access</a></td>
+     </tr>
+     <tr>
+      <td>Embedded HTTP dashboard with module info and live stats.</td>
+      <td></td>
+     </tr>
+    </tbody>
+   </table>
+   <h2 id="using-a-plugin">Using a Plugin<a href="#using-a-plugin" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Add a plugin to your <code>deder.pkl</code> by amending its config schema:</p>
+   <pre><code class="language-pkl">amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/early-access/ProtobufPlugin.pkl"
+</code></pre>
+   <p>Or pin to a specific version:</p>
+   <pre><code class="language-pkl">amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/v0.1.0/ProtobufPlugin.pkl"
+</code></pre>
+   <p>Versioned schemas are published automatically for every git tag.</p>
+  </main>
+  <footer class="pico container">Deder Plugins | Official Deder Build Tool Plugins</footer>
+ </body>
+</html>
