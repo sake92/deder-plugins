@@ -20,29 +20,37 @@ object ModulesGraphPage {
         <div x-data="{
           showScala: true,
           showJava: true,
-          showScalaTest: true,
-          showJavaTest: true,
-          toggleScala(show)   { window.toggleGraphType(window.__cy, 'SCALA', show) },
-          toggleJava(show)    { window.toggleGraphType(window.__cy, 'JAVA', show) },
-          toggleScalaTest(show) { window.toggleGraphType(window.__cy, 'SCALA_TEST', show) },
-          toggleJavaTest(show)  { window.toggleGraphType(window.__cy, 'JAVA_TEST', show) },
+          showScalaJs: true,
+          showScalaNative: true,
+          showTest: true,
+          applyFilters() { window.applyFilters(window.__cy) },
           search(term) { window.graphSearch(window.__cy, term) },
-          reset() { window.graphReset(window.__cy); showScala=true; showJava=true; showScalaTest=true; showJavaTest=true; }
+          reset() {
+            window.graphReset(window.__cy);
+            showScala = true;
+            showJava = true;
+            showScalaJs = true;
+            showScalaNative = true;
+            showTest = true;
+            window.applyFilters(window.__cy);
+          }
         }">
           <div class="graph-controls">
-            <label><input type="checkbox" x-model="showScala" @change="toggleScala(showScala)"> Scala</label>
-            <label><input type="checkbox" x-model="showJava" @change="toggleJava(showJava)"> Java</label>
-            <label><input type="checkbox" x-model="showScalaTest" @change="toggleScalaTest(showScalaTest)"> Scala Test</label>
-            <label><input type="checkbox" x-model="showJavaTest" @change="toggleJavaTest(showJavaTest)"> Java Test</label>
+            <label><input type="checkbox" x-model="showScala" @change="applyFilters()"> Scala</label>
+            <label><input type="checkbox" x-model="showJava" @change="applyFilters()"> Java</label>
+            <label><input type="checkbox" x-model="showScalaJs" @change="applyFilters()"> Scala.js</label>
+            <label><input type="checkbox" x-model="showScalaNative" @change="applyFilters()"> Scala Native</label>
+            <label><input type="checkbox" x-model="showTest" @change="applyFilters()"> Test</label>
             <input type="search" @input="search($$el.value)" placeholder="Search module..." style="max-width:200px; margin-left:auto;" aria-label="Search graph">
             <button type="button" class="outline secondary" @click="reset()" style="font-size:0.8rem; padding:0.2rem 0.5rem;">Reset</button>
           </div>
           <div id="cy"></div>
-          <div style="font-size: 0.72rem; margin-top: 0.25rem; color: var(--pico-muted-color);">
-            <span style="color:#e74c3c;">● Scala</span>
-            <span style="color:#3498db; margin-left:0.5rem;">● Java</span>
-            <span style="color:#f8a5c2; margin-left:0.5rem;">● Scala Test</span>
-            <span style="color:#85d0e7; margin-left:0.5rem;">● Java Test</span>
+          <div style="font-size: 0.72rem; margin-top: 0.25rem; color: var(--pico-muted-color); display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <span><img src="/icons/scala.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala</span>
+            <span><img src="/icons/java.svg" style="width:14px;height:14px;vertical-align:middle;"> Java</span>
+            <span><img src="/icons/scalajs.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala.js</span>
+            <span><img src="/icons/scalanative.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala Native</span>
+            <span style="display:inline-block;width:14px;height:14px;border:2px dashed #999;border-radius:3px;vertical-align:middle;"></span> Test
             &mdash; Arrow = depends on. Tap a node to highlight its neighborhood.
           </div>
         </div>
@@ -77,7 +85,7 @@ object ModulesGraphPage {
             { selector: 'node[type="SCALA_JS"]',      style: { 'shape': 'ellipse' } },
             { selector: 'node[type="SCALA_NATIVE"]',  style: { 'shape': 'ellipse' } },
             // All test modules: round-rectangle + dashed border
-            { selector: 'node[type$="_TEST"]', style: {
+            { selector: 'node[type${"$"}="_TEST"]', style: {
               'shape': 'round-rectangle',
               'border-style': 'dashed',
               'border-width': 2,
