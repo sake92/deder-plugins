@@ -1,3 +1,11 @@
+---
+title: Deder Plugins
+description: Official Deder Build Tool Plugins
+pagination:
+  enabled: false
+layout: page.html
+---
+
 # Deder Plugins
 
 Official plugins for the [Deder build tool](https://sake92.github.io/deder/).

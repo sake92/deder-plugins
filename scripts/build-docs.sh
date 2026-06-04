@@ -44,7 +44,18 @@ for tag in $(git tag --sort=-creatordate | grep -v 'early-access'); do
 done
 
 echo "=== Building flatmark site ==="
-flatmark build -i docs
+# Use a non-hidden temp dir to work around flatmark's hidden-directory scanning bug
+BUILD_DIR=$(mktemp -d)
+trap 'rm -rf "$BUILD_DIR"' EXIT
+rsync -a docs/ "$BUILD_DIR/" --exclude "_site" --exclude "superpowers" --exclude ".flatmark-cache"
+# Also copy the theme cache so flatmark doesn't re-download themes
+cp -a docs/.flatmark-cache "$BUILD_DIR/" 2>/dev/null || true
+flatmark build -i "$BUILD_DIR"
+rm -rf docs/_site
+mv "$BUILD_DIR/_site" docs/_site
+# Copy theme cache back (may have been updated)
+rm -rf docs/.flatmark-cache
+mv "$BUILD_DIR/.flatmark-cache" docs/.flatmark-cache 2>/dev/null || true
 
 echo "=== Done ==="
 echo "Site built to docs/_site/"
