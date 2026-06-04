@@ -55,24 +55,34 @@ object ModulesGraphPage {
             {
               selector: 'node',
               style: {
-                'background-color': 'data(color)',
+                'background-color': '#f8f9fa',
+                'background-image': 'data(icon)',
+                'background-fit': 'contain',
+                'background-width': '60%',
+                'background-height': '60%',
                 'label': 'data(label)',
                 'font-size': '10px',
                 'text-valign': 'center',
                 'text-halign': 'center',
-                'color': '#fff',
-                'text-outline-width': 1,
-                'text-outline-color': '#000',
-                'width': 28,
-                'height': 28,
+                'color': '#222',
+                'width': 32,
+                'height': 32,
                 'border-width': 1,
-                'border-color': '#fff'
+                'border-color': '#ccc'
               }
             },
-            { selector: 'node[type="SCALA"]', style: { 'shape': 'ellipse' } },
-            { selector: 'node[type="JAVA"]', style: { 'shape': 'ellipse' } },
-            { selector: 'node[type="SCALA_TEST"]', style: { 'shape': 'round-rectangle' } },
-            { selector: 'node[type="JAVA_TEST"]', style: { 'shape': 'round-rectangle' } },
+            // All non-test modules: ellipse shape
+            { selector: 'node[type="SCALA"]',         style: { 'shape': 'ellipse' } },
+            { selector: 'node[type="JAVA"]',          style: { 'shape': 'ellipse' } },
+            { selector: 'node[type="SCALA_JS"]',      style: { 'shape': 'ellipse' } },
+            { selector: 'node[type="SCALA_NATIVE"]',  style: { 'shape': 'ellipse' } },
+            // All test modules: round-rectangle + dashed border
+            { selector: 'node[type$="_TEST"]', style: {
+              'shape': 'round-rectangle',
+              'border-style': 'dashed',
+              'border-width': 2,
+              'border-color': '#999'
+            }},
             {
               selector: 'edge',
               style: {
