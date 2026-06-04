@@ -16,6 +16,8 @@ object Layout {
         <script src="/htmx.min.js"></script>
         <script src="/alpine.min.js" defer></script>
         <script src="/cytoscape.min.js"></script>
+        <script src="/dagre.min.js"></script>
+        <script src="/cytoscape-dagre.min.js"></script>
         <script src="/dashboard.js" defer></script>
         <style>
           :root {

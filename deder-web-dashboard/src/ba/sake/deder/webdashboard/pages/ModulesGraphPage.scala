@@ -47,6 +47,7 @@ object ModulesGraphPage {
           </div>
         </div>
         <script>
+        cytoscape.use(cytoscapeDagre);
         window.__cy = cytoscape({
           container: document.getElementById('cy'),
           elements: ${HtmlFormat.raw(json)},
@@ -60,7 +61,8 @@ object ModulesGraphPage {
                 'text-valign': 'center',
                 'text-halign': 'center',
                 'color': '#fff',
-                'text-outline-width': 0,
+                'text-outline-width': 1,
+                'text-outline-color': '#000',
                 'width': 28,
                 'height': 28,
                 'border-width': 1,
@@ -78,11 +80,12 @@ object ModulesGraphPage {
                 'line-color': '#aaa',
                 'target-arrow-color': '#aaa',
                 'target-arrow-shape': 'triangle',
-                'curve-style': 'bezier'
+                'curve-style': 'bezier',
               }
             }
           ],
-          layout: { name: 'cose-bilkent', animate: false, nodeRepulsion: 5000 }
+          layout: { name: 'dagre', rankDir: 'TB', spacingFactor: 1.2 },
+          wheelSensitivity: 0.2
         });
 
         window.__cy.on('tap', 'node', function(evt) {
@@ -104,10 +107,10 @@ object ModulesGraphPage {
   private def buildGraphJson(modules: Seq[DederModule]): String = {
     val nodes = modules.map { m =>
       val (typ, color) = m match
-        case _: ScalaModule => ("SCALA", "#e74c3c")
         case _: ScalaTestModule => ("SCALA_TEST", "#f8a5c2")
-        case _: JavaModule => ("JAVA", "#3498db")
         case _: JavaTestModule => ("JAVA_TEST", "#85d0e7")
+        case _: ScalaModule => ("SCALA", "#e74c3c")
+        case _: JavaModule => ("JAVA", "#3498db")
         case _ => ("UNKNOWN", "#95a5a6")
       s"""{ "data": { "id": "${esc(m.id)}", "type": "$typ", "label": "${esc(m.id)}", "color": "$color" } }"""
     }
