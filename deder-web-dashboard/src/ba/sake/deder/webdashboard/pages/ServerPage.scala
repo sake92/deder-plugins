@@ -23,16 +23,16 @@ object ServerPage {
     html"""
       <h2>Server Properties</h2>
       <div style="display: flex; flex-wrap: wrap;">
-        ${statCard("JDK", s"$jdkVersion")}
-        ${statCard("Vendor", jdkVendor)}
-        ${statCard("OS / Arch", s"$osName $osArch")}
-        ${statCard("Processors", processors.toString)}
-        ${statCard("Heap", s"${usedHeapMB}MB / ${maxHeapMB}MB")}
         ${statCard("Deder Version", dederVersion)}
         ${statCard("Uptime", uptimeStr)}
         ${statCard("Modules", moduleCount.toString)}
         ${statCard("Plugins Loaded", plugins.size.toString)}
-        ${statCard("Caches", caches.size.toString)}
+        ${statCard("In-Memory Caches", caches.size.toString)}
+        ${statCard("Heap", s"${usedHeapMB}MB / ${maxHeapMB}MB")}
+        ${statCard("JDK", s"$jdkVersion")}
+        ${statCard("JDK Vendor", jdkVendor)}
+        ${statCard("OS / Arch", s"$osName $osArch")}
+        ${statCard("Processors", processors.toString)}
       </div>
 
       ${

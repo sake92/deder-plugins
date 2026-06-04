@@ -31,14 +31,14 @@ object ModulesPage {
 
   private def buildRow(m: DederModule): Html = {
     val (typeLabel, typeClass) = m match
-      case _: ScalaModule => ("SCALA", "pico-color-red-400")
       case _: ScalaTestModule => ("SCALA_TEST", "pico-color-pink-300")
-      case _: JavaModule => ("JAVA", "pico-color-blue-400")
       case _: JavaTestModule => ("JAVA_TEST", "pico-color-cyan-300")
+      case _: ScalaModule => ("SCALA", "pico-color-red-400")
+      case _: JavaModule => ("JAVA", "pico-color-blue-400")
       case _ => (if m.`type` != null then m.`type`.name().toLowerCase else "unknown", "")
     val lang = m match
-      case sm: ScalaModule => Option(sm.scalaVersion).filter(_.nonEmpty).getOrElse("Scala 3")
       case sm: ScalaTestModule => Option(sm.scalaVersion).filter(_.nonEmpty).getOrElse("Scala 3")
+      case sm: ScalaModule => Option(sm.scalaVersion).filter(_.nonEmpty).getOrElse("Scala 3")
       case _: JavaModule | _: JavaTestModule => "Java"
       case _ => "?"
     val depCount = try m.moduleDeps.size() catch case _: Throwable => 0
