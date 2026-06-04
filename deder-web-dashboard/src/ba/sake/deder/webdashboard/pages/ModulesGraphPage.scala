@@ -4,7 +4,7 @@ package ba.sake.deder.webdashboard.pages
 import play.twirl.api.HtmlFormat
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.config.DederProject
-import ba.sake.deder.config.DederProject.{DederModule, JavaModule, JavaTestModule, ScalaModule, ScalaTestModule}
+import ba.sake.deder.config.DederProject.{DederModule, JavaModule, JavaTestModule, ScalaModule, ScalaTestModule, ScalaJsModule, ScalaJsTestModule, ScalaNativeModule, ScalaNativeTestModule}
 import scala.jdk.CollectionConverters.*
 
 object ModulesGraphPage {
@@ -106,13 +106,17 @@ object ModulesGraphPage {
 
   private def buildGraphJson(modules: Seq[DederModule]): String = {
     val nodes = modules.map { m =>
-      val (typ, color) = m match
-        case _: ScalaTestModule => ("SCALA_TEST", "#f8a5c2")
-        case _: JavaTestModule => ("JAVA_TEST", "#85d0e7")
-        case _: ScalaModule => ("SCALA", "#e74c3c")
-        case _: JavaModule => ("JAVA", "#3498db")
-        case _ => ("UNKNOWN", "#95a5a6")
-      s"""{ "data": { "id": "${esc(m.id)}", "type": "$typ", "label": "${esc(m.id)}", "color": "$color" } }"""
+      val (typ, iconPath) = m match
+        case _: ScalaTestModule         => ("SCALA_TEST", "/icons/scala.svg")
+        case _: ScalaJsTestModule       => ("SCALA_JS_TEST", "/icons/scalajs.svg")
+        case _: ScalaNativeTestModule   => ("SCALA_NATIVE_TEST", "/icons/scalanative.svg")
+        case _: JavaTestModule          => ("JAVA_TEST", "/icons/java.svg")
+        case _: ScalaModule             => ("SCALA", "/icons/scala.svg")
+        case _: ScalaJsModule           => ("SCALA_JS", "/icons/scalajs.svg")
+        case _: ScalaNativeModule       => ("SCALA_NATIVE", "/icons/scalanative.svg")
+        case _: JavaModule              => ("JAVA", "/icons/java.svg")
+        case _                          => ("UNKNOWN", "")
+      s"""{ "data": { "id": "${esc(m.id)}", "type": "$typ", "label": "${esc(m.id)}", "icon": "$iconPath" } }"""
     }
 
     val edges = modules.flatMap { m =>
