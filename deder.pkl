@@ -90,7 +90,7 @@ local const dashboardModules =
       scalacOptions { "-Yretain-trees" }
       deps {
         "ba.sake::deder-plugin-api:\(pluginApiVersion)"
-        "ba.sake::sharaf-jdk-httpserver:0.18.1-SNAPSHOT"
+        "ba.sake::sharaf-jdk-httpserver:0.18.2"
         "com.lihaoyi::os-lib:0.11.6"
       }
       pomSettings =
