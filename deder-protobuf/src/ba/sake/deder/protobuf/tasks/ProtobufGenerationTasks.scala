@@ -16,7 +16,7 @@ object ProtobufGenerationTasks {
   def sourceGeneratorTask(
       config: Protobuf.ProtobufPluginConfig,
       protoSourceFilesTask: SourceFilesTask,
-      coreTasks: CoreTasksApi
+      allDependenciesTask: AbstractTask[Seq[Dependency]]
   ) =
     CachedTaskBuilder
       .make[os.Path](
@@ -26,7 +26,7 @@ object ProtobufGenerationTasks {
         kind = TaskKind.SourceGenerator
       )
       .dependsOn(protoSourceFilesTask)
-      .dependsOn(coreTasks.allDependenciesTask)
+      .dependsOn(allDependenciesTask)
       .build { ctx =>
         val (protoFiles, dependencies) = ctx.depResults
         val resolved = ProtobufConfigNormalizer.normalize(ctx.module, config)

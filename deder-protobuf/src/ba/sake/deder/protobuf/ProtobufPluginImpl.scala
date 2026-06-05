@@ -17,7 +17,7 @@ class ProtobufPluginImpl extends DederPluginApi {
       )
       val config = pluginModule.config
       val protoSourceFiles = ProtoInputTasks.protoSourceFilesTask(config)
-      val sourceGenerator = ProtobufGenerationTasks.sourceGeneratorTask(config, protoSourceFiles, params.coreTasks)
+      val sourceGenerator = ProtobufGenerationTasks.sourceGeneratorTask(config, protoSourceFiles, params.coreTasks.allDependenciesTask)
       val resourceGenerator = ProtobufGenerationTasks.resourceGeneratorTask(config, sourceGenerator)
       Right(Seq(protoSourceFiles, sourceGenerator, resourceGenerator))
     } catch {
