@@ -15,6 +15,7 @@ object ServerPage {
     val maxHeapMB = Runtime.getRuntime().maxMemory() / (1024 * 1024)
     val usedHeapMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)
     val dederVersion = DederGlobals.version
+    val projectRootDir = DederGlobals.projectRootDir.toString
     val uptimeStr = formatUptime(internals.serverUptime)
     val moduleCount = if project != null && project.modules != null then project.modules.size() else 0
     val caches = internals.inMemoryCachesStats
@@ -24,6 +25,7 @@ object ServerPage {
       <h2>Server Properties</h2>
       <div style="display: flex; flex-wrap: wrap;">
         ${statCard("Deder Version", dederVersion)}
+        ${statCard("Project Root", projectRootDir)}
         ${statCard("Uptime", uptimeStr)}
         ${statCard("Modules", moduleCount.toString)}
         ${statCard("Plugins Loaded", plugins.size.toString)}

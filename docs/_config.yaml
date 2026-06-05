@@ -1,7 +1,5 @@
 name: Deder Plugins
 description: Official Deder Build Tool Plugins
 
-categories:
-  plugins:
-    label: Plugins
-    description: Available Deder plugins
+search:
+  enabled: false

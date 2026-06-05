@@ -45,14 +45,22 @@ class DashboardServerSuite extends FunSuite {
   private val config = WebDashboardPluginConfig(true, testHost, testPort.toLong, testRefreshMs.toLong)
   private val server = DashboardServer(config, stubProject, stubInternals)
   private val baseUrl = s"http://$testHost:$testPort"
+  private val projectRootProperty = "DEDER_PROJECT_ROOT_DIR"
+  private var previousProjectRoot: Option[String] = None
 
   override def beforeAll(): Unit = {
+    previousProjectRoot = Option(System.getProperty(projectRootProperty))
+    System.setProperty(projectRootProperty, os.pwd.toString)
     server.start()
     Thread.sleep(500)
   }
 
   override def afterAll(): Unit = {
     server.stop()
+    previousProjectRoot match {
+      case Some(value) => System.setProperty(projectRootProperty, value)
+      case None => System.clearProperty(projectRootProperty)
+    }
   }
 
   private def httpGet(path: String): (Int, String) = {
@@ -96,6 +104,7 @@ class DashboardServerSuite extends FunSuite {
     assertEquals(code, 200)
     assert(body.contains("Server Properties"), s"body should contain 'Server Properties', got: ${body.take(300)}")
     assert(body.contains("JDK"), s"body should contain 'JDK', got: ${body.take(300)}")
+    assert(body.contains("Project Root"), s"body should contain 'Project Root', got: ${body.take(300)}")
   }
 
   test("GET /live returns HTML page with live stats") {
