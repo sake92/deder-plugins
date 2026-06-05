@@ -79,6 +79,8 @@ object ModulesGraphPage {
                 'text-valign': 'center',
                 'text-halign': 'center',
                 'color': '#222',
+                'text-outline-color': '#fff',
+                'text-outline-width': 1,
                 'width': 32,
                 'height': 32,
                 'border-width': 1,
