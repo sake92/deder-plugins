@@ -103,7 +103,7 @@ docs/static/config/
 | Aspect | deder | deder-plugins |
 |--------|-------|---------------|
 | Config location | `config/*.pkl` (single source dir) | `*/resources/*Plugin.pkl` (per-plugin) |
-| Directory structure | `config/early-access/`, `config/v0.15.0/` | `config/<plugin>/early-access/`, `config/<plugin>/v0.1.0/` |
+| Directory structure | `config/early-access/`, `config/v0.16.0/` | `config/<plugin>/early-access/`, `config/<plugin>/v0.1.0/` |
 | Plugin discovery | N/A (single product) | Auto-discovered from directory structure |
 | Release workflow | Full JReleaser pipeline | Not yet exists (future work) |
 | Docs content | Extensive (tutorials, how-tos, reference) | Starts minimal, grows incrementally |

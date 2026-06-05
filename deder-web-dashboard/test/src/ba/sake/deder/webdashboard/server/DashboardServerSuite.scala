@@ -19,8 +19,15 @@ class DashboardServerSuite extends FunSuite {
       Seq(LiveRequest("req-001", CallerType.Cli, "compile", Seq("my-module"), Instant.now()))
     def recentHistory: Seq[CompletedRequest] =
       Seq(
-        CompletedRequest("req-000", CallerType.Cli, "compile", Seq("my-module"),
-          Instant.now().minusSeconds(10), Duration.ofSeconds(5), true)
+        CompletedRequest(
+          "req-000",
+          CallerType.Cli,
+          "compile",
+          Seq("my-module"),
+          Instant.now().minusSeconds(10),
+          Duration.ofSeconds(5),
+          true
+        )
       )
     def taskStats(taskName: String): Option[TaskStats] = None
     def allTaskStats: Seq[(String, TaskStats)] = Seq.empty
@@ -39,7 +46,11 @@ class DashboardServerSuite extends FunSuite {
       java.util.List.of(),
       java.util.List.of(),
       java.util.List.of(),
-      true
+      true,
+      java.util.List.of(),
+      true,
+      1,
+      1
     )
 
   private val config = WebDashboardPluginConfig(true, testHost, testPort.toLong, testRefreshMs.toLong)
@@ -59,7 +70,7 @@ class DashboardServerSuite extends FunSuite {
     server.stop()
     previousProjectRoot match {
       case Some(value) => System.setProperty(projectRootProperty, value)
-      case None => System.clearProperty(projectRootProperty)
+      case None        => System.clearProperty(projectRootProperty)
     }
   }
 

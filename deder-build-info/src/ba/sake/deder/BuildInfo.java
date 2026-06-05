@@ -182,8 +182,7 @@ public final class BuildInfo {
     public final @NonNull Map<@NonNull String, @NonNull String> extra;
 
     public ModuleDefaults(@Named("enabled") boolean enabled,
-        @Named("packageName") String packageName,
-        @Named("objectName") @NonNull String objectName,
+        @Named("packageName") String packageName, @Named("objectName") @NonNull String objectName,
         @Named("includeGitHash") boolean includeGitHash,
         @Named("includeTimestamp") boolean includeTimestamp,
         @Named("extra") @NonNull Map<@NonNull String, @NonNull String> extra) {
@@ -248,7 +247,7 @@ public final class BuildInfo {
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(300);
+      StringBuilder builder = new StringBuilder(350);
       builder.append(ModuleDefaults.class.getSimpleName()).append(" {");
       appendProperty(builder, "enabled", this.enabled);
       appendProperty(builder, "packageName", this.packageName);
@@ -275,8 +274,7 @@ public final class BuildInfo {
     public final Map<@NonNull String, @NonNull String> extra;
 
     public ModuleOverride(@Named("enabled") Boolean enabled,
-        @Named("packageName") String packageName,
-        @Named("objectName") String objectName,
+        @Named("packageName") String packageName, @Named("objectName") String objectName,
         @Named("includeGitHash") Boolean includeGitHash,
         @Named("includeTimestamp") Boolean includeTimestamp,
         @Named("extra") Map<@NonNull String, @NonNull String> extra) {
@@ -341,7 +339,7 @@ public final class BuildInfo {
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(300);
+      StringBuilder builder = new StringBuilder(350);
       builder.append(ModuleOverride.class.getSimpleName()).append(" {");
       appendProperty(builder, "enabled", this.enabled);
       appendProperty(builder, "packageName", this.packageName);

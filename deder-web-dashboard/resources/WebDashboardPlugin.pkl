@@ -1,6 +1,6 @@
 module ba.sake.deder.webDashboard
 
-import "https://sake92.github.io/deder/config/v0.15.0/DederProject.pkl" as P
+import "https://sake92.github.io/deder/config/v0.16.0/DederProject.pkl" as P
 
 class WebDashboardPlugin extends P.DederPlugin {
   id = "web-dashboard"

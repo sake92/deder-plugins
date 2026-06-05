@@ -8,7 +8,32 @@ layout: page.html
 
 # Web Dashboard
 
-Starts an embedded HTTP dashboard with module info, dependency graph, and live stats.
+Starts an HTTP server app that shows modules info, modules graph, live stats etc.  
+By default it is available at http://localhost:9292
+
+Add it to your plugins list:
+```pkl
+import "https://sake92.github.io/deder-plugins/config/v0.16.0/WebDashboardPlugin.pkl" as WD
+
+plugins {
+  new WD.WebDashboardPlugin {}
+}
+```
+
+Here are the defaults if you need to tweak them:
+```pkl
+plugins {
+  new WD.WebDashboardPlugin {
+    config = new {
+      enabled = true
+      host = "localhost"
+      port = 9292
+      statsRefreshIntervalMs = 5000
+    }
+  }
+}
+```
+
 
 ## Schema
 
