@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Web Dashboard plugin tasks, schema, and screenshots">
+  <title> Web Dashboard | Deder Plugins </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/deder-plugins/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/deder-plugins/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/deder-plugins/">Home</a></li>
+    </ul>
+    <ul></ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#web-dashboard">Web Dashboard</a>
+         <ul>
+          <li><a href="#schema">Schema</a></li>
+          <li><a href="#tasks">Tasks</a></li>
+          <li><a href="#screenshots">Screenshots</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="web-dashboard">Web Dashboard<a href="#web-dashboard" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>Starts an HTTP server app that shows modules info, modules graph, live stats etc.
+    <br>
+    By default it is available at <a href="http://localhost:9292">http://localhost:9292</a></p>
+   <p>Add it to your plugins list:</p>
+   <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.16.0/WebDashboardPlugin.pkl" as WD
+
+plugins {
+  new WD.WebDashboardPlugin {}
+}
+</code></pre>
+   <p>Here are the defaults if you need to tweak them:</p>
+   <pre><code class="language-pkl">plugins {
+  new WD.WebDashboardPlugin {
+    config = new {
+      enabled = true
+      host = "localhost"
+      port = 9292
+      statsRefreshIntervalMs = 5000
+    }
+  }
+}
+</code></pre>
+   <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <ul>
+    <li><a href="../config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl">early-access</a></li>
+   </ul>
+   <h2 id="tasks">Tasks<a href="#tasks" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>This plugin starts the dashboard server during plugin initialization and does not currently expose dedicated build tasks.</p>
+   <h2 id="screenshots">Screenshots<a href="#screenshots" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p><img src="https://sake92.github.io/deder-plugins/images/deder-web-dashboard/modules_list.png" alt="Modules list"> <img src="https://sake92.github.io/deder-plugins/images/deder-web-dashboard/modules_graph.png" alt="Modules graph"> <img src="https://sake92.github.io/deder-plugins/images/deder-web-dashboard/server_info.png" alt="Server info"> <img src="https://sake92.github.io/deder-plugins/images/deder-web-dashboard/live_stats.png" alt="Live stats"></p>
+  </main>
+  <footer class="pico container">Deder Plugins | Official Deder Build Tool Plugins</footer>
+ </body>
+</html>
