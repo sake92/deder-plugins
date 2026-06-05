@@ -1,5 +1,7 @@
 
-- show current dir
+
+- white border around module name, easier to see
+
 - add TUI like web dash https://github.com/oyvindberg/jatatui
 
 
