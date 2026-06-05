@@ -10,23 +10,23 @@ local const function pom(artId: String, artName: String, artDesc: String): PomSe
   description = artDesc
   url = "https://github.com/sake92/deder-plugins"
   licenses {
-      new PomLicense {
-        name = "Apache 2.0 License"
-        url = "https://opensource.org/license/apache-2-0"
-      }
-    }
-    developers {
-      new PomDeveloper {
-        id = "sake92"
-        name = "Sakib Hadžiavdić"
-        email = "sake92@sake.ba"
-      }
-    }
-    scm {
-      url = "https://github.com/sake92/deder-plugins"
-      connection = "scm:git:git://github.com/sake92/deder-plugins.git"
+    new PomLicense {
+      name = "Apache 2.0 License"
+      url = "https://opensource.org/license/apache-2-0"
     }
   }
+  developers {
+    new PomDeveloper {
+      id = "sake92"
+      name = "Sakib Hadžiavdić"
+      email = "sake92@sake.ba"
+    }
+  }
+  scm {
+    url = "https://github.com/sake92/deder-plugins"
+    connection = "scm:git:git://github.com/sake92/deder-plugins.git"
+  }
+}
 
 local const pluginModules =
   new CreateScalaModules {
