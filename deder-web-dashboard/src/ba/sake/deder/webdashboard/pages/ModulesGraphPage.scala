@@ -8,6 +8,10 @@ import ba.sake.deder.config.DederProject.{DederModule, JavaModule, JavaTestModul
 import scala.jdk.CollectionConverters.*
 
 object ModulesGraphPage {
+  val scalaIcon = "/icons/scala.png"
+  val scalaJsIcon = "/icons/scalajs.png"
+  val scalaNativeIcon = "/icons/scalanative.png"
+  val javaIcon = "/icons/java.svg"
   def dependencyGraph(project: DederProject): Html = {
     val modules = if project == null then java.util.List.of() else project.modules
     if modules == null || modules.isEmpty then
@@ -46,10 +50,10 @@ object ModulesGraphPage {
           </div>
           <div id="cy"></div>
           <div style="font-size: 0.72rem; margin-top: 0.25rem; color: var(--pico-muted-color); display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-            <span><img src="/icons/scala.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala</span>
-            <span><img src="/icons/scalajs.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala.js</span>
-            <span><img src="/icons/scalanative.svg" style="width:14px;height:14px;vertical-align:middle;"> Scala Native</span>
-            <span><img src="/icons/java.svg" style="width:14px;height:14px;vertical-align:middle;"> Java</span>
+            <span><img src="${scalaIcon}" style="width:14px;height:14px;vertical-align:middle;"> Scala</span>
+            <span><img src="${scalaJsIcon}" style="width:14px;height:14px;vertical-align:middle;"> Scala.js</span>
+            <span><img src="${scalaNativeIcon}" style="width:14px;height:14px;vertical-align:middle;"> Scala Native</span>
+            <span><img src="${javaIcon}" style="width:14px;height:14px;vertical-align:middle;"> Java</span>
             <span style="display:inline-block;width:14px;height:14px;border:2px dashed #999;border-radius:3px;vertical-align:middle;"></span> Test
             &mdash; Arrow = depends on. Click a node to highlight its neighborhood.
           </div>
@@ -127,14 +131,14 @@ object ModulesGraphPage {
   private def buildGraphJson(modules: Seq[DederModule]): String = {
     val nodes = modules.map { m =>
       val (typ, iconPath) = m match
-        case _: ScalaTestModule         => ("SCALA_TEST", "/icons/scala.svg")
-        case _: ScalaJsTestModule       => ("SCALA_JS_TEST", "/icons/scalajs.svg")
-        case _: ScalaNativeTestModule   => ("SCALA_NATIVE_TEST", "/icons/scalanative.png")
-        case _: JavaTestModule          => ("JAVA_TEST", "/icons/java.svg")
-        case _: ScalaJsModule           => ("SCALA_JS", "/icons/scalajs.svg")
-        case _: ScalaNativeModule       => ("SCALA_NATIVE", "/icons/scalanative.png")
-        case _: ScalaModule             => ("SCALA", "/icons/scala.svg")
-        case _: JavaModule              => ("JAVA", "/icons/java.svg")
+        case _: ScalaTestModule         => ("SCALA_TEST", scalaIcon)
+        case _: ScalaJsTestModule       => ("SCALA_JS_TEST", scalaJsIcon)
+        case _: ScalaNativeTestModule   => ("SCALA_NATIVE_TEST", scalaNativeIcon)
+        case _: JavaTestModule          => ("JAVA_TEST", javaIcon)
+        case _: ScalaJsModule           => ("SCALA_JS", scalaJsIcon)
+        case _: ScalaNativeModule       => ("SCALA_NATIVE", scalaNativeIcon)
+        case _: ScalaModule             => ("SCALA", scalaIcon)
+        case _: JavaModule              => ("JAVA", javaIcon)
         case _                          => ("UNKNOWN", "")
       s"""{ "data": { "id": "${esc(m.id)}", "type": "$typ", "label": "${esc(m.id)}", "icon": "$iconPath" } }"""
     }
