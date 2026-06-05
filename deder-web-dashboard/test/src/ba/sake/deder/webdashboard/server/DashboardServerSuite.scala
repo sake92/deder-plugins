@@ -42,7 +42,7 @@ class DashboardServerSuite extends FunSuite {
   }
 
   private def stubProject: DederProject =
-    new DederProject(
+    new DederProject( 
       java.util.List.of(),
       java.util.List.of(),
       java.util.List.of(),
