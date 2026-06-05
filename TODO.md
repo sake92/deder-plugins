@@ -3,6 +3,9 @@
 - add TUI like web dash https://github.com/oyvindberg/jatatui
 
 
-git tag -a v0.1.0 -m "First release: 0.1.0"
 
+## Releasing
+VERSION=v0.1.1 && git tag -a $VERSION -m "First release: $VERSION"
+
+git push origin $VERSION
 
