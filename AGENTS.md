@@ -88,4 +88,4 @@ These paths are already covered by `.gitignore`; do not add exceptions.
 - The root `deder.pkl` uses `CreateScalaModules` helpers to define both the main module and the test module (named `<id>-test`) for each plugin
 - `ModuleDefaults` + `ModuleOverride` pattern: defaults apply to all modules; per-module overrides are `Option`-typed fields that shadow defaults when set
 - `supportedModuleTypes` in each task restricts which Deder module types (Java, Scala, their test variants) the task activates for
-- `examples/consumer/` projects reference the plugin via a local `SNAPSHOT` version; use `publishLocal` before running them
+- if `examples/consumer/` projects reference the plugin via a local `SNAPSHOT` version; use `publishLocal` before running them
