@@ -7,7 +7,7 @@
 
 
 ## Releasing
-VERSION=v0.1.1 && git tag -a $VERSION -m "First release: $VERSION"
+VERSION=v0.2.0 && git tag -a $VERSION -m "First release: $VERSION"
 
 git push origin $VERSION
 

@@ -21,7 +21,7 @@ amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/early-acces
 Or pin to a specific version:
 
 ```pkl
-amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/v0.1.0/ProtobufPlugin.pkl"
+amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/v0.2.0/ProtobufPlugin.pkl"
 ```
 
 Versioned schemas are published automatically for every git tag.
