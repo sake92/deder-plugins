@@ -62,8 +62,11 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     Sub.http.pollMs(s"${state.serverUrl}/api/stats/current", pollMs, CurrentResp.apply),
     Sub.http.pollMs(s"${state.serverUrl}/api/stats/history", pollMs, HistoryResp.apply),
     Sub.onKeyPress {
-      case Key.Char('q') => Some(Quit)
-      case _             => None
+      case Key.Char('q')       => Some(Quit)
+      // SIGQUIT / SIGINT often map to these control chars in raw mode
+      case Key.Ctrl('c')       => Some(Quit)
+      case Key.Ctrl('x')       => Some(Quit)
+      case _                   => None
     }
   )
 
