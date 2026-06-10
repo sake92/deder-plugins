@@ -14,7 +14,7 @@ class WebDashboardPluginConfig {
   enabled: Boolean = true
   host: String = "localhost"
   port: Int = 9292
-  statsRefreshIntervalMs: Int = 5000
+  statsRefreshIntervalMs: Int = 1000
 }
 
 config: WebDashboardPluginConfig = new {}
