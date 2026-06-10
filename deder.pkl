@@ -115,10 +115,7 @@ local const tuiModules =
       scalaVersion = scalaVer
       deps {
         "ba.sake::tupson:0.13.0"
-        "com.softwaremill.sttp.client3::core:3.10.3"
-        "com.olvind.jatatui:jatatui-core:0.30.0"
-        "com.olvind.jatatui:jatatui-widgets:0.30.0"
-        "com.olvind.jatatui:jatatui-crossterm:0.30.0"
+        "xyz.matthieucourt::layoutz:0.7.0"
       }
       mainClass = "ba.sake.deder.tuidashboard.app.TuiDashboardMain"
       pomSettings =

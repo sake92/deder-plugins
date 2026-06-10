@@ -16,6 +16,14 @@ local const m1 = new ScalaModule {
   root = "."
   scalaVersion = "3.7.4"
   mainClass = "example.main"
+  mvnApps {
+    ["tui"] = new MvnApp {
+      deps  {
+        "ba.sake::deder-tui-dashboard:0.2.1-SNAPSHOT"
+      }
+      mainClass = "ba.sake.deder.tuidashboard.app.TuiDashboardMain"
+    }
+  }
 }
 
 local const m2 = new ScalaModule {
