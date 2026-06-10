@@ -2,7 +2,7 @@ package ba.sake.deder.webdashboard
 
 import ba.sake.deder.*
 import ba.sake.deder.webdashboard.server.DashboardServer
-import WebDashboard.WebDashboardPluginConfig
+import ba.sake.deder.plugins.WebDashboard
 
 class WebDashboardPluginImpl extends DederPluginApi {
   override def id: String = "web-dashboard"

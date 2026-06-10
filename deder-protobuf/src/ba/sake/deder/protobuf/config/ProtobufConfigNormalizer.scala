@@ -1,6 +1,6 @@
 package ba.sake.deder.protobuf.config
 
-import ba.sake.deder.Protobuf
+import ba.sake.deder.plugins.Protobuf
 import ba.sake.deder.config.DederProject.{DederModule, JavaModule, JavaTestModule, ScalaModule, ScalaTestModule}
 import scala.jdk.CollectionConverters.*
 import ba.sake.deder.protobuf.protoc.*

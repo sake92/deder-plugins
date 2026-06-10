@@ -1,13 +1,13 @@
-module ba.sake.deder.protobuf
+module ba.sake.deder.plugins.protobuf
 
-import "https://sake92.github.io/deder/config/v0.16.0/DederProject.pkl" as P
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
 
 typealias ResolverKind = "system-path" | "path" | "binary-maven" | "jvm-maven"
 
 class ProtobufPlugin extends P.DederPlugin {
   id = "protobuf"
   deps {
-    "ba.sake::deder-protobuf:0.1.1"
+    "ba.sake::deder-protobuf:0.1.2-SNAPSHOT"
   }
   config: ProtobufPluginConfig = new {}
 }

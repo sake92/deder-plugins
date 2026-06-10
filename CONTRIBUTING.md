@@ -14,9 +14,11 @@ Prerequisites:
 
 
 Pkl bindings should be regenerated after editing a plugin's Pkl config (e.g. `deder-protobuf/resources/ProtobufPlugin.pkl`):
+
 ```bash
-./scripts/gen-plugin-bindings.sh
+Run `./scripts/gen-plugin-bindings.sh deder-build-info` to generate java bindings
 ```
+
 Bindings are committed in this repository.
 
 Run tests from the repo root:

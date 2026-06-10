@@ -1,7 +1,7 @@
-amends "https://sake92.github.io/deder/config/v0.16.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.17.0/DederProject.pkl"
 
 local const scalaVer = "3.7.4"
-local const pluginApiVersion = "0.16.0"
+local const pluginApiVersion = "0.17.0"
 
 local const function pom(artId: String, artName: String, artDesc: String): PomSettings = new {
   groupId = "ba.sake"
@@ -37,7 +37,6 @@ local const pluginModules =
       scalaVersion = scalaVer
       deps {
         "ba.sake::deder-plugin-api:\(pluginApiVersion)"
-        "com.lihaoyi::os-lib:0.11.6"
       }
       pomSettings =
         pom(
@@ -63,7 +62,6 @@ local const buildInfoModules =
       scalaVersion = scalaVer
       deps {
         "ba.sake::deder-plugin-api:\(pluginApiVersion)"
-        "com.lihaoyi::os-lib:0.11.6"
       }
       pomSettings =
         pom(
@@ -91,7 +89,6 @@ local const dashboardModules =
       deps {
         "ba.sake::deder-plugin-api:\(pluginApiVersion)"
         "ba.sake::sharaf-jdk-httpserver:0.18.2"
-        "com.lihaoyi::os-lib:0.11.6"
       }
       pomSettings =
         pom(

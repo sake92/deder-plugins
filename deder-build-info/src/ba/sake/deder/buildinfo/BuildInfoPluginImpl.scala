@@ -1,7 +1,7 @@
 package ba.sake.deder.buildinfo
 
 import ba.sake.deder.*
-import ba.sake.deder.BuildInfo
+import ba.sake.deder.plugins.Buildinfo
 
 class BuildInfoPluginImpl extends DederPluginApi {
   override def id: String = "build-info"
@@ -12,7 +12,7 @@ class BuildInfoPluginImpl extends DederPluginApi {
         pluginClassLoader = getClass.getClassLoader,
         modulePath = "BuildInfoPlugin.pkl",
         configText = params.configText,
-        clazz = classOf[BuildInfo]
+        clazz = classOf[Buildinfo]
       )
       val config = pluginModule.config
       val generator = BuildInfoGenerationTasks.sourceGeneratorTask(config)

@@ -1,27 +1,27 @@
-amends "https://sake92.github.io/deder/config/v0.16.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.17.0/DederProject.pkl"
 
 import "../../resources/WebDashboardPlugin.pkl" as WD
 
 plugins {
   new WD.WebDashboardPlugin {
     config = new {
-//      enabled = false
+      enabled = true
       statsRefreshIntervalMs = 1000
     }
   }
 }
 
 local const m1 = new ScalaModule {
-    id = "example"
-    root = "."
-    scalaVersion = "3.7.4"
-    mainClass = "example.main"
-  }
+  id = "example"
+  root = "."
+  scalaVersion = "3.7.4"
+  mainClass = "example.main"
+}
 
 local const m2 = new ScalaModule {
-    id = "m2"
-    root = "m2"
-    scalaVersion = "3.7.4"
+  id = "m2"
+  root = "m2"
+  scalaVersion = "3.7.4"
   moduleDeps { m1 }
 }
 

@@ -1,20 +1,20 @@
-amends "https://sake92.github.io/deder/config/v0.16.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.17.0/DederProject.pkl"
 
 import "../../resources/ProtobufPlugin.pkl" as PB
 
 plugins {
   new PB.ProtobufPlugin {
-    config = new PB.ProtobufPluginConfig {
-      defaults = new PB.ModuleDefaults {
+    config = new {
+      defaults = new  {
         builtins {
-          new PB.BuiltinLanguageTarget {
+          new  {
             name = "java"
           }
         }
         plugins {
-          new PB.PluginTarget {
+          new {
             name = "grpc-java"
-            resolver = new PB.ResolverConfig {
+            resolver = new {
               kind = "binary-maven"
               dependency = "io.grpc:protoc-gen-grpc-java:1.75.0"
             }

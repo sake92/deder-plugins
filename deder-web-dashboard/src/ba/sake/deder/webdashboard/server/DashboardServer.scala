@@ -5,7 +5,7 @@ import ba.sake.sharaf.given_ResponseWritable_Html
 import ba.sake.deder.*
 import ba.sake.deder.config.DederProject
 import ba.sake.deder.webdashboard.pages.{Layout, ModulesPage, ModulesGraphPage, ServerPage, LiveStatsPage}
-import WebDashboard.WebDashboardPluginConfig
+import ba.sake.deder.plugins.WebDashboard.WebDashboardPluginConfig
 
 class DashboardServer(
     config: WebDashboardPluginConfig,

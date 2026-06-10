@@ -4,7 +4,7 @@ import ba.sake.deder.{*, given}
 import ba.sake.deder.config.DederProject.ModuleType
 import ba.sake.deder.protobuf.config.ProtobufConfigNormalizer
 import ba.sake.deder.protobuf.sources.ProtoInputResolver
-import ba.sake.deder.Protobuf
+import ba.sake.deder.plugins.Protobuf
 
 object ProtoInputTasks {
 

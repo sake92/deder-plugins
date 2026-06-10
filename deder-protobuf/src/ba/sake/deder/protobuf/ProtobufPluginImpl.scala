@@ -2,7 +2,7 @@ package ba.sake.deder.protobuf
 
 import ba.sake.deder.*
 import ba.sake.deder.protobuf.tasks.{ProtoInputTasks, ProtobufGenerationTasks}
-import ba.sake.deder.Protobuf
+import ba.sake.deder.plugins.Protobuf
 
 class ProtobufPluginImpl extends DederPluginApi {
   override def id: String = "protobuf"

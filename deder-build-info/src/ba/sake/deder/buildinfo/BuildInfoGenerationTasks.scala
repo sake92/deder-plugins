@@ -3,7 +3,7 @@ package ba.sake.deder.buildinfo
 import ba.sake.deder.{*, given}
 import ba.sake.deder.config.DederProject.{DederModule, JavaModule, JavaTestModule, ScalaModule, ScalaTestModule}
 import ba.sake.deder.config.DederProject.ModuleType
-import ba.sake.deder.BuildInfo
+import ba.sake.deder.plugins.Buildinfo
 
 object BuildInfoGenerationTasks {
 
@@ -15,10 +15,10 @@ object BuildInfoGenerationTasks {
     Set(ModuleType.JAVA, ModuleType.JAVA_TEST, ModuleType.SCALA, ModuleType.SCALA_TEST)
 
   def sourceGeneratorTask(
-      config: BuildInfo.BuildInfoPluginConfig
-  ): AbstractTask[os.Path] =
+      config: Buildinfo.BuildInfoPluginConfig
+  ): AbstractTask[DederPath] =
     TaskBuilder
-      .make[os.Path](
+      .make[DederPath](
         name = "buildInfoGenerate",
         supportedModuleTypes = supportedModuleTypes,
         category = "BuildInfo",
@@ -36,14 +36,15 @@ object BuildInfoGenerationTasks {
         val sourceOut = ctx.out / "sources"
         prepareDirectory(sourceOut)
 
-        if !resolved.enabled then sourceOut
-        else {
-          val gitHash = if resolved.includeGitHash then {
+        if resolved.enabled then {
+          val gitHash = Option.when(resolved.includeGitHash) {
             val root = moduleRoot(ctx.module)
-            Some(GitSupport.gitHead(root))
-          } else None
+            GitSupport.gitHead(root)
+          }
 
-          val timestamp = if resolved.includeTimestamp then Some(System.currentTimeMillis()) else None
+          val timestamp = Option.when(resolved.includeTimestamp) {
+            System.currentTimeMillis()
+          }
 
           val sourceCode = generateScalaSource(
             moduleName = moduleName,
@@ -60,8 +61,8 @@ object BuildInfoGenerationTasks {
           os.makeDir.all(pkgDir)
           val sourceFile = pkgDir / s"${resolved.objectName}.scala"
           os.write(sourceFile, sourceCode)
-          sourceOut
         }
+        DederPath(sourceOut)
       }
 
   private[buildinfo] def generateScalaSource(

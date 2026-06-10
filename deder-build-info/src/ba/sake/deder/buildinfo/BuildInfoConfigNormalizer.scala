@@ -1,6 +1,6 @@
 package ba.sake.deder.buildinfo
 
-import ba.sake.deder.BuildInfo
+import ba.sake.deder.plugins.Buildinfo
 import scala.jdk.CollectionConverters.*
 
 final case class ResolvedBuildInfoConfig(
@@ -19,7 +19,7 @@ object BuildInfoConfigNormalizer {
       moduleId: String,
       moduleType: String,
       scalaVersion: Option[String],
-      config: BuildInfo.BuildInfoPluginConfig
+      config: Buildinfo.BuildInfoPluginConfig
   ): ResolvedBuildInfoConfig = {
     val defaults = config.defaults
     val overrideConfig = Option(config.modules.get(moduleId))
