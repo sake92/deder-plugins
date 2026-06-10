@@ -38,3 +38,5 @@ Each plugin also has an `examples/` folder in this GitHub repository.
 | Generates protobuf and gRPC code from `.proto` files. | |
 | **[Web Dashboard](plugins/web-dashboard.html)** | [early-access](config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl) |
 | Embedded HTTP dashboard with module info and live stats. | |
+| **[TUI Dashboard](plugins/tui-dashboard.html)** | — |
+| Terminal-based dashboard that polls the Web Dashboard API. | |
