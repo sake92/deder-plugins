@@ -4,8 +4,9 @@ import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
 
 class WebDashboardPlugin extends P.DederPlugin {
   id = "web-dashboard"
+  // TODO parameterize version
   deps {
-    "ba.sake::deder-web-dashboard:0.2.0"
+    "ba.sake::deder-web-dashboard:0.2.1-SNAPSHOT"
   }
   config: WebDashboardPluginConfig = new {}
 }

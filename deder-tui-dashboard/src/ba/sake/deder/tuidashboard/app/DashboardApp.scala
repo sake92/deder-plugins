@@ -86,9 +86,13 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       if state.currentRequests.isEmpty then "(none)".color(Color.BrightBlack)
       else {
         val items = state.currentRequests.map(r =>
-          s"${r.requestId}  ${r.taskName}  [${r.moduleIds.mkString(", ")}]"
+          rowTight(
+            Text(r.requestId),
+            Text(s"  ${r.taskName}"),
+            Text(s"  [${r.moduleIds.mkString(", ")}]")
+          )
         )
-        Layout(items.map(Text.apply))
+        layout(items*)
       }
     ).border(Border.Round).color(Color.BrightBlue)
 
@@ -97,9 +101,14 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       else {
         val items = state.history.map { h =>
           val icon = if h.success then "✓".color(Color.Green) else "✗".color(Color.Red)
-          s"$icon ${h.taskName}  ${h.durationMs}ms  [${h.moduleIds.mkString(", ")}]"
+          rowTight(
+            icon,
+            Text(s" ${h.taskName}"),
+            Text(s"  ${h.durationMs}ms"),
+            Text(s"  [${h.moduleIds.mkString(", ")}]")
+          )
         }
-        Layout(items.map(Text.apply))
+        layout(items*)
       }
     ).border(Border.Round).color(Color.BrightMagenta)
 
