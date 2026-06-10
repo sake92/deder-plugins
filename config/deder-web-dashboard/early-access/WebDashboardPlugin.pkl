@@ -4,8 +4,9 @@ import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
 
 class WebDashboardPlugin extends P.DederPlugin {
   id = "web-dashboard"
+  version: String = "0.2.0"
   deps {
-    "ba.sake::deder-web-dashboard:0.2.0"
+    "ba.sake::deder-web-dashboard:\(version)"
   }
   config: WebDashboardPluginConfig = new {}
 }
@@ -14,7 +15,7 @@ class WebDashboardPluginConfig {
   enabled: Boolean = true
   host: String = "localhost"
   port: Int = 9292
-  statsRefreshIntervalMs: Int = 5000
+  statsRefreshIntervalMs: Int = 1000
 }
 
 config: WebDashboardPluginConfig = new {}

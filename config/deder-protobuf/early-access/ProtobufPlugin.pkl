@@ -6,8 +6,9 @@ typealias ResolverKind = "system-path" | "path" | "binary-maven" | "jvm-maven"
 
 class ProtobufPlugin extends P.DederPlugin {
   id = "protobuf"
+  version: String = "0.2.0"
   deps {
-    "ba.sake::deder-protobuf:0.2.0"
+    "ba.sake::deder-protobuf:\(version)"
   }
   config: ProtobufPluginConfig = new {}
 }

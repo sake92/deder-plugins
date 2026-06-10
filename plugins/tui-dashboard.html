@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Terminal-based dashboard for Deder live build stats">
+  <title> TUI Dashboard | Deder Plugins </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/deder-plugins/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/deder-plugins/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/deder-plugins/">Home</a></li>
+    </ul>
+    <ul></ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#tui-dashboard">TUI Dashboard</a>
+         <ul>
+          <li><a href="#running">Running</a></li>
+          <li><a href="#what-it-shows">What It Shows</a></li>
+          <li><a href="#screenshot">Screenshot</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="tui-dashboard">TUI Dashboard<a href="#tui-dashboard" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>A terminal-based dashboard that displays modules, live build stats, current requests, and recent history by polling the <a href="web-dashboard.html">Web Dashboard</a> HTTP API.</p>
+   <p><strong>Prerequisite:</strong> The Web Dashboard plugin must be running before starting the TUI dashboard. The TUI connects to the Web Dashboard's HTTP API to fetch real-time build data.</p>
+   <h2 id="running">Running<a href="#running" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>The TUI dashboard is a standalone CLI application. Run it with:</p>
+   <pre><code class="language-bash hljs" data-highlighted="yes">deder run -m deder-tui-dashboard
+</code></pre>
+   <p>By default it connects to <code>http://localhost:9292</code>. You can customize the server URL and poll interval:</p>
+   <pre><code class="language-bash hljs" data-highlighted="yes">deder run -m deder-tui-dashboard -- --server-url http://localhost:9292 --poll-ms 2000
+</code></pre>
+   <table>
+    <thead>
+     <tr>
+      <th>Flag</th>
+      <th>Default</th>
+      <th>Description</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><code>--server-url</code></td>
+      <td><code>http://localhost:9292</code></td>
+      <td>Web Dashboard API endpoint</td>
+     </tr>
+     <tr>
+      <td><code>--poll-ms</code></td>
+      <td><code>1000</code></td>
+      <td>Interval (ms) between data fetches</td>
+     </tr>
+    </tbody>
+   </table>
+   <p>Press <code>q</code> or <code>Ctrl+C</code> to quit.</p>
+   <h2 id="what-it-shows">What It Shows<a href="#what-it-shows" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <ul>
+    <li><strong>Header</strong> — connection URL and quit instructions</li>
+    <li><strong>Stats</strong> — total requests served, errors, and server uptime</li>
+    <li><strong>Modules table</strong> — module ID, type, and dependency count</li>
+    <li><strong>Current Requests</strong> — tasks currently executing, with module IDs</li>
+    <li><strong>Recent History</strong> — recently completed tasks with success/failure status and duration</li>
+   </ul>
+   <h2 id="screenshot">Screenshot<a href="#screenshot" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p><img src="https://sake92.github.io/deder-plugins/images/deder-tui-dashboard/tui.png" alt="TUI Dashboard"></p>
+  </main>
+  <footer class="pico container">Deder Plugins | Official Deder Build Tool Plugins</footer>
+ </body>
+</html>
