@@ -143,4 +143,39 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("compile"), s"should contain task name 'compile', got: ${body}")
     assert(body.contains("OK"), s"should contain success marker 'OK', got: ${body}")
   }
+
+  test("GET /api/modules returns JSON") {
+    val (code, body) = httpGet("/api/modules")
+    assertEquals(code, 200)
+    assert(body.startsWith("["), s"should be a JSON array, got: ${body.take(200)}")
+  }
+
+  test("GET /api/stats/overview returns JSON with totals") {
+    val (code, body) = httpGet("/api/stats/overview")
+    assertEquals(code, 200)
+    assert(body.contains("\"totalRequestsServed\": 100"), s"should contain 100 totalRequestsServed, got: $body")
+    assert(body.contains("\"totalErrors\": 5"), s"should contain 5 totalErrors, got: $body")
+    assert(body.contains("\"uptimeSecs\": 8130"), s"should contain 8130 uptimeSecs, got: $body")
+  }
+
+  test("GET /api/stats/current returns JSON with current request") {
+    val (code, body) = httpGet("/api/stats/current")
+    assertEquals(code, 200)
+    assert(body.contains("\"requestId\": \"req-001\""), s"should contain req-001, got: $body")
+    assert(body.contains("\"taskName\": \"compile\""), s"should contain compile, got: $body")
+    assert(body.contains("\"moduleIds\""), s"should contain moduleIds, got: $body")
+  }
+
+  test("GET /api/stats/history returns JSON with history entry") {
+    val (code, body) = httpGet("/api/stats/history")
+    assertEquals(code, 200)
+    assert(body.contains("\"requestId\": \"req-000\""), s"should contain req-000, got: $body")
+    assert(body.contains("\"taskName\": \"compile\""), s"should contain compile, got: $body")
+    assert(body.contains("\"success\": true"), s"should contain success:true, got: $body")
+  }
+
+  test("GET /nonexistent returns 404") {
+    val (code, _) = httpGet("/nonexistent")
+    assertEquals(code, 404)
+  }
 }
