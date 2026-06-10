@@ -1,6 +1,6 @@
 package ba.sake.deder.buildinfo
 
-import ba.sake.deder.BuildInfo
+import ba.sake.deder.plugins.Buildinfo
 import munit.FunSuite
 
 import java.util.{List as JList, Map as JMap}
@@ -8,7 +8,7 @@ import java.util.{List as JList, Map as JMap}
 class BuildInfoConfigNormalizerSuite extends FunSuite {
 
   test("defaults resolve to expected values") {
-    val defaults = new BuildInfo.ModuleDefaults(
+    val defaults = new Buildinfo.ModuleDefaults(
       true,
       null,
       "BuildInfo",
@@ -16,7 +16,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
       false,
       JMap.of()
     )
-    val config = new BuildInfo.BuildInfoPluginConfig(defaults, JMap.of())
+    val config = new Buildinfo.BuildInfoPluginConfig(defaults, JMap.of())
 
     val resolved = BuildInfoConfigNormalizer.normalize(
       moduleId = "my-module",
@@ -35,7 +35,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
   }
 
   test("packageName resolves to Some when set") {
-    val defaults = new BuildInfo.ModuleDefaults(
+    val defaults = new Buildinfo.ModuleDefaults(
       true,
       "com.example",
       "BuildInfo",
@@ -43,7 +43,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
       false,
       JMap.of()
     )
-    val config = new BuildInfo.BuildInfoPluginConfig(defaults, JMap.of())
+    val config = new Buildinfo.BuildInfoPluginConfig(defaults, JMap.of())
 
     val resolved = BuildInfoConfigNormalizer.normalize(
       moduleId = "my-module",
@@ -57,7 +57,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
   }
 
   test("module override wins over defaults") {
-    val defaults = new BuildInfo.ModuleDefaults(
+    val defaults = new Buildinfo.ModuleDefaults(
       true,
       null,
       "BuildInfo",
@@ -65,7 +65,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
       false,
       JMap.of()
     )
-    val moduleOverride = new BuildInfo.ModuleOverride(
+    val moduleOverride = new Buildinfo.ModuleOverride(
       null,
       "com.override",
       "MyBuildInfo",
@@ -73,7 +73,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
       null,
       JMap.of("myKey", "myValue")
     )
-    val config = new BuildInfo.BuildInfoPluginConfig(defaults, JMap.of("my-module", moduleOverride))
+    val config = new Buildinfo.BuildInfoPluginConfig(defaults, JMap.of("my-module", moduleOverride))
 
     val resolved = BuildInfoConfigNormalizer.normalize(
       moduleId = "my-module",
@@ -90,7 +90,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
   }
 
   test("disabled module resolves enabled=false") {
-    val defaults = new BuildInfo.ModuleDefaults(
+    val defaults = new Buildinfo.ModuleDefaults(
       true,
       null,
       "BuildInfo",
@@ -98,7 +98,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
       false,
       JMap.of()
     )
-    val moduleOverride = new BuildInfo.ModuleOverride(
+    val moduleOverride = new Buildinfo.ModuleOverride(
       false,
       null,
       null,
@@ -106,7 +106,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
       null,
       null
     )
-    val config = new BuildInfo.BuildInfoPluginConfig(defaults, JMap.of("my-module", moduleOverride))
+    val config = new Buildinfo.BuildInfoPluginConfig(defaults, JMap.of("my-module", moduleOverride))
 
     val resolved = BuildInfoConfigNormalizer.normalize(
       moduleId = "my-module",
@@ -119,7 +119,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
   }
 
   test("extra values merge from override and defaults") {
-    val defaults = new BuildInfo.ModuleDefaults(
+    val defaults = new Buildinfo.ModuleDefaults(
       true,
       null,
       "BuildInfo",
@@ -127,7 +127,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
       false,
       JMap.of("defaultKey", "defaultVal")
     )
-    val moduleOverride = new BuildInfo.ModuleOverride(
+    val moduleOverride = new Buildinfo.ModuleOverride(
       null,
       null,
       null,
@@ -135,7 +135,7 @@ class BuildInfoConfigNormalizerSuite extends FunSuite {
       null,
       JMap.of("overrideKey", "overrideVal")
     )
-    val config = new BuildInfo.BuildInfoPluginConfig(defaults, JMap.of("my-module", moduleOverride))
+    val config = new Buildinfo.BuildInfoPluginConfig(defaults, JMap.of("my-module", moduleOverride))
 
     val resolved = BuildInfoConfigNormalizer.normalize(
       moduleId = "my-module",

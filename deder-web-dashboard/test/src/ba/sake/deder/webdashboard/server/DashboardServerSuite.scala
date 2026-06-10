@@ -5,7 +5,7 @@ import java.net.{URL, HttpURLConnection}
 import java.util.concurrent.TimeUnit
 import ba.sake.deder.*
 import ba.sake.deder.config.DederProject
-import WebDashboard.WebDashboardPluginConfig
+import ba.sake.deder.plugins.WebDashboard.WebDashboardPluginConfig
 import munit.FunSuite
 
 class DashboardServerSuite extends FunSuite {

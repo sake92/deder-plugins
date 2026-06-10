@@ -1,7 +1,7 @@
 package ba.sake.deder.protobuf.tasks
 
 import ba.sake.deder.{*, given}
-import ba.sake.deder.Protobuf
+import ba.sake.deder.plugins.Protobuf
 import ba.sake.deder.deps.Dependency
 import ba.sake.tupson.JsonRW
 import munit.FunSuite

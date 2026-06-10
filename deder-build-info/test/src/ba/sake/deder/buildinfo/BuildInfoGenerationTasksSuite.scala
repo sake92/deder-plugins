@@ -1,7 +1,7 @@
 package ba.sake.deder.buildinfo
 
 import ba.sake.deder.{*, given}
-import ba.sake.deder.BuildInfo
+import ba.sake.deder.plugins.Buildinfo
 import ba.sake.tupson.JsonRW
 import munit.FunSuite
 
@@ -136,8 +136,8 @@ class BuildInfoGenerationTasksSuite extends FunSuite {
   }
 
   test("task name is buildInfoGenerate") {
-    val config = new BuildInfo.BuildInfoPluginConfig(
-      new BuildInfo.ModuleDefaults(true, null, "BuildInfo", false, false, JMap.of()),
+    val config = new Buildinfo.BuildInfoPluginConfig(
+      new Buildinfo.ModuleDefaults(true, null, "BuildInfo", false, false, JMap.of()),
       JMap.of()
     )
     val task = BuildInfoGenerationTasks.sourceGeneratorTask(config)

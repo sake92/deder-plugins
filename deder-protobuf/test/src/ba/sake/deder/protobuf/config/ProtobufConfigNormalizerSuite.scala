@@ -1,6 +1,6 @@
 package ba.sake.deder.protobuf.config
 
-import ba.sake.deder.Protobuf
+import ba.sake.deder.plugins.Protobuf
 import munit.FunSuite
 
 import java.util.{List as JList, Map as JMap}
