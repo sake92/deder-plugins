@@ -59,25 +59,33 @@ public final class Buildinfo {
   }
 
   public static final class BuildInfoPlugin extends DederPlugins.DederPlugin {
+    public final @NonNull String version;
+
     public final @NonNull BuildInfoPluginConfig config;
 
     public BuildInfoPlugin(@Named("id") @NonNull String id,
         @Named("deps") @NonNull List<@NonNull String> deps,
+        @Named("version") @NonNull String version,
         @Named("config") @NonNull BuildInfoPluginConfig config) {
       super(id, deps);
+      this.version = version;
       this.config = config;
     }
 
     public BuildInfoPlugin withId(@NonNull String id) {
-      return new BuildInfoPlugin(id, deps, config);
+      return new BuildInfoPlugin(id, deps, version, config);
     }
 
     public BuildInfoPlugin withDeps(@NonNull List<@NonNull String> deps) {
-      return new BuildInfoPlugin(id, deps, config);
+      return new BuildInfoPlugin(id, deps, version, config);
+    }
+
+    public BuildInfoPlugin withVersion(@NonNull String version) {
+      return new BuildInfoPlugin(id, deps, version, config);
     }
 
     public BuildInfoPlugin withConfig(@NonNull BuildInfoPluginConfig config) {
-      return new BuildInfoPlugin(id, deps, config);
+      return new BuildInfoPlugin(id, deps, version, config);
     }
 
     @Override
@@ -88,6 +96,7 @@ public final class Buildinfo {
       BuildInfoPlugin other = (BuildInfoPlugin) obj;
       if (!Objects.equals(this.id, other.id)) return false;
       if (!Objects.equals(this.deps, other.deps)) return false;
+      if (!Objects.equals(this.version, other.version)) return false;
       if (!Objects.equals(this.config, other.config)) return false;
       return true;
     }
@@ -97,16 +106,18 @@ public final class Buildinfo {
       int result = 1;
       result = 31 * result + Objects.hashCode(this.id);
       result = 31 * result + Objects.hashCode(this.deps);
+      result = 31 * result + Objects.hashCode(this.version);
       result = 31 * result + Objects.hashCode(this.config);
       return result;
     }
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(200);
+      StringBuilder builder = new StringBuilder(250);
       builder.append(BuildInfoPlugin.class.getSimpleName()).append(" {");
       appendProperty(builder, "id", this.id);
       appendProperty(builder, "deps", this.deps);
+      appendProperty(builder, "version", this.version);
       appendProperty(builder, "config", this.config);
       builder.append("\n}");
       return builder.toString();

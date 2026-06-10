@@ -59,25 +59,33 @@ public final class Protobuf {
   }
 
   public static final class ProtobufPlugin extends DederPlugins.DederPlugin {
+    public final @NonNull String version;
+
     public final @NonNull ProtobufPluginConfig config;
 
     public ProtobufPlugin(@Named("id") @NonNull String id,
         @Named("deps") @NonNull List<@NonNull String> deps,
+        @Named("version") @NonNull String version,
         @Named("config") @NonNull ProtobufPluginConfig config) {
       super(id, deps);
+      this.version = version;
       this.config = config;
     }
 
     public ProtobufPlugin withId(@NonNull String id) {
-      return new ProtobufPlugin(id, deps, config);
+      return new ProtobufPlugin(id, deps, version, config);
     }
 
     public ProtobufPlugin withDeps(@NonNull List<@NonNull String> deps) {
-      return new ProtobufPlugin(id, deps, config);
+      return new ProtobufPlugin(id, deps, version, config);
+    }
+
+    public ProtobufPlugin withVersion(@NonNull String version) {
+      return new ProtobufPlugin(id, deps, version, config);
     }
 
     public ProtobufPlugin withConfig(@NonNull ProtobufPluginConfig config) {
-      return new ProtobufPlugin(id, deps, config);
+      return new ProtobufPlugin(id, deps, version, config);
     }
 
     @Override
@@ -88,6 +96,7 @@ public final class Protobuf {
       ProtobufPlugin other = (ProtobufPlugin) obj;
       if (!Objects.equals(this.id, other.id)) return false;
       if (!Objects.equals(this.deps, other.deps)) return false;
+      if (!Objects.equals(this.version, other.version)) return false;
       if (!Objects.equals(this.config, other.config)) return false;
       return true;
     }
@@ -97,16 +106,18 @@ public final class Protobuf {
       int result = 1;
       result = 31 * result + Objects.hashCode(this.id);
       result = 31 * result + Objects.hashCode(this.deps);
+      result = 31 * result + Objects.hashCode(this.version);
       result = 31 * result + Objects.hashCode(this.config);
       return result;
     }
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(200);
+      StringBuilder builder = new StringBuilder(250);
       builder.append(ProtobufPlugin.class.getSimpleName()).append(" {");
       appendProperty(builder, "id", this.id);
       appendProperty(builder, "deps", this.deps);
+      appendProperty(builder, "version", this.version);
       appendProperty(builder, "config", this.config);
       builder.append("\n}");
       return builder.toString();

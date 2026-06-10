@@ -57,25 +57,33 @@ public final class WebDashboard {
   }
 
   public static final class WebDashboardPlugin extends DederPlugins.DederPlugin {
+    public final @NonNull String version;
+
     public final @NonNull WebDashboardPluginConfig config;
 
     public WebDashboardPlugin(@Named("id") @NonNull String id,
         @Named("deps") @NonNull List<@NonNull String> deps,
+        @Named("version") @NonNull String version,
         @Named("config") @NonNull WebDashboardPluginConfig config) {
       super(id, deps);
+      this.version = version;
       this.config = config;
     }
 
     public WebDashboardPlugin withId(@NonNull String id) {
-      return new WebDashboardPlugin(id, deps, config);
+      return new WebDashboardPlugin(id, deps, version, config);
     }
 
     public WebDashboardPlugin withDeps(@NonNull List<@NonNull String> deps) {
-      return new WebDashboardPlugin(id, deps, config);
+      return new WebDashboardPlugin(id, deps, version, config);
+    }
+
+    public WebDashboardPlugin withVersion(@NonNull String version) {
+      return new WebDashboardPlugin(id, deps, version, config);
     }
 
     public WebDashboardPlugin withConfig(@NonNull WebDashboardPluginConfig config) {
-      return new WebDashboardPlugin(id, deps, config);
+      return new WebDashboardPlugin(id, deps, version, config);
     }
 
     @Override
@@ -86,6 +94,7 @@ public final class WebDashboard {
       WebDashboardPlugin other = (WebDashboardPlugin) obj;
       if (!Objects.equals(this.id, other.id)) return false;
       if (!Objects.equals(this.deps, other.deps)) return false;
+      if (!Objects.equals(this.version, other.version)) return false;
       if (!Objects.equals(this.config, other.config)) return false;
       return true;
     }
@@ -95,16 +104,18 @@ public final class WebDashboard {
       int result = 1;
       result = 31 * result + Objects.hashCode(this.id);
       result = 31 * result + Objects.hashCode(this.deps);
+      result = 31 * result + Objects.hashCode(this.version);
       result = 31 * result + Objects.hashCode(this.config);
       return result;
     }
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(200);
+      StringBuilder builder = new StringBuilder(250);
       builder.append(WebDashboardPlugin.class.getSimpleName()).append(" {");
       appendProperty(builder, "id", this.id);
       appendProperty(builder, "deps", this.deps);
+      appendProperty(builder, "version", this.version);
       appendProperty(builder, "config", this.config);
       builder.append("\n}");
       return builder.toString();
