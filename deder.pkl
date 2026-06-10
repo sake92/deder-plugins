@@ -106,8 +106,39 @@ local const dashboardModules =
     }
   }.get
 
+local const tuiModules =
+  new CreateScalaModules {
+    root = "deder-tui-dashboard"
+    id = "deder-tui-dashboard"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::tupson:0.13.0"
+        "com.softwaremill.sttp.client3::core:3.10.3"
+        "com.olvind.jatatui:jatatui-core:0.30.0"
+        "com.olvind.jatatui:jatatui-widgets:0.30.0"
+        "com.olvind.jatatui:jatatui-crossterm:0.30.0"
+      }
+      mainClass = "ba.sake.deder.tuidashboard.app.TuiDashboardMain"
+      pomSettings =
+        pom(
+          "deder-tui-dashboard",
+          "Deder TUI Dashboard",
+          "CLI TUI dashboard for Deder live build stats"
+        )
+      publish = true
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
   ...dashboardModules.all
+  ...tuiModules.all
 }
