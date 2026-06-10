@@ -47,6 +47,22 @@ class DashboardServer(
     case GET -> Path("stats", "history") =>
       val html = LiveStatsPage.historyTable(internals)
       Response.withBody(html)
+
+    case GET -> Path("api", "modules") =>
+      Response.withBody(ApiRoutes.modulesJson(project))
+        .settingHeader("Content-Type", "application/json")
+
+    case GET -> Path("api", "stats", "overview") =>
+      Response.withBody(ApiRoutes.overviewJson(internals))
+        .settingHeader("Content-Type", "application/json")
+
+    case GET -> Path("api", "stats", "current") =>
+      Response.withBody(ApiRoutes.currentRequestsJson(internals))
+        .settingHeader("Content-Type", "application/json")
+
+    case GET -> Path("api", "stats", "history") =>
+      Response.withBody(ApiRoutes.historyJson(internals))
+        .settingHeader("Content-Type", "application/json")
   }
 
   def start(): Unit = {
