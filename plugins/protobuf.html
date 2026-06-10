@@ -44,6 +44,38 @@
    </div>
    <h1 id="protobuf">Protobuf<a href="#protobuf" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>Generates protobuf and gRPC Java/Scala code from <code>.proto</code> files.</p>
+   <p>Add it to your plugins list:</p>
+   <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.17.0/ProtobufPlugin.pkl" as PB
+
+plugins {
+  new PB.ProtobufPlugin {}
+}
+</code></pre>
+   <p>Here are the defaults if you need to tweak them:</p>
+   <pre><code class="language-pkl">plugins {
+  new PB.ProtobufPlugin {
+    config = new PB.ProtobufPluginConfig {
+      defaults = new PB.ModuleDefaults {
+        enabled = true
+        protoc = new PB.ResolverConfig {
+          kind = "system-path"
+        }
+        builtins = new {}
+        plugins = new {}
+        imports = new PB.ImportConfig {
+          includeProjectDependencies = true
+          dependencyArtifacts = new {}
+          paths = new {}
+        }
+        descriptor = null
+        main = new PB.SourceSetConfig {}
+        test = new PB.SourceSetConfig {}
+      }
+      modules = new Mapping {}
+    }
+  }
+}
+</code></pre>
    <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <ul>
     <li><a href="../config/deder-protobuf/early-access/ProtobufPlugin.pkl">early-access</a></li>

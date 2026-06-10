@@ -44,6 +44,41 @@
    </div>
    <h1 id="build-info">Build Info<a href="#build-info" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>Generates a Scala <code>BuildInfo</code> object with build metadata constants.</p>
+   <p>Add it to your plugins list:</p>
+   <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.17.0/BuildInfoPlugin.pkl" as BI
+
+plugins {
+  new BI.BuildInfoPlugin {
+    config = new BI.BuildInfoPluginConfig {
+      modules = new Mapping {
+        ["my-module"] = new BI.ModuleOverride {
+          extra = new Mapping {
+            ["appName"] = "my-service"
+            ["buildProfile"] = "dev"
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre>
+   <p>Here are the defaults if you need to tweak them:</p>
+   <pre><code class="language-pkl">plugins {
+  new BI.BuildInfoPlugin {
+    config = new BI.BuildInfoPluginConfig {
+      defaults = new BI.ModuleDefaults {
+        enabled = true
+        packageName = null
+        objectName = "BuildInfo"
+        includeGitHash = false
+        includeTimestamp = false
+        extra = new Mapping {}
+      }
+      modules = new Mapping {}
+    }
+  }
+}
+</code></pre>
    <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <ul>
     <li><a href="../config/deder-build-info/early-access/BuildInfoPlugin.pkl">early-access</a></li>
