@@ -89,6 +89,7 @@ local const dashboardModules =
       deps {
         "ba.sake::deder-plugin-api:\(pluginApiVersion)"
         "ba.sake::sharaf-jdk-httpserver:0.18.2"
+        "ba.sake::tupson:0.13.0"
       }
       pomSettings =
         pom(
