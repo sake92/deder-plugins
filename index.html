@@ -45,11 +45,12 @@
    <h1 id="deder-plugins">Deder Plugins<a href="#deder-plugins" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>Official plugins for the <a href="https://sake92.github.io/deder/">Deder build tool</a>.</p>
    <h2 id="using-a-plugin">Using a Plugin<a href="#using-a-plugin" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Add a plugin to your <code>deder.pkl</code> by amending its config schema:</p>
-   <pre><code class="language-pkl">amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/early-access/ProtobufPlugin.pkl"
-</code></pre>
-   <p>Or pin to a specific version:</p>
-   <pre><code class="language-pkl">amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/v0.2.0/ProtobufPlugin.pkl"
+   <p>Add a plugin to your <code>deder.pkl</code> by importing its config, and adding it in the <code>plugins</code> listing:</p>
+   <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl" as WD
+
+plugins {
+  new WD.WebDashboardPlugin {}
+}
 </code></pre>
    <p>Versioned schemas are published automatically for every git tag.</p>
    <p>Each plugin also has an <code>examples/</code> folder in this GitHub repository.</p>
