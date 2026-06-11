@@ -2,6 +2,6 @@
 
 Official Deder plugins
 
-See the [docs website]().
+See the [docs website](https://sake92.github.io/deder-plugins/).
 
-./scripts/gen-plugin-bindings.sh deder-build-info
+
