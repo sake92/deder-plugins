@@ -12,16 +12,14 @@ Official plugins for the [Deder build tool](https://sake92.github.io/deder/).
 
 ## Using a Plugin
 
-Add a plugin to your `deder.pkl` by amending its config schema:
+Add a plugin to your `deder.pkl` by importing its config, and adding it in the `plugins` listing:
 
 ```pkl
-amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/early-access/ProtobufPlugin.pkl"
-```
+import "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl" as WD
 
-Or pin to a specific version:
-
-```pkl
-amends "https://sake92.github.io/deder-plugins/config/deder-protobuf/v0.2.0/ProtobufPlugin.pkl"
+plugins {
+  new WD.WebDashboardPlugin {}
+}
 ```
 
 Versioned schemas are published automatically for every git tag.

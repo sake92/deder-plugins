@@ -13,7 +13,7 @@ By default it is available at http://localhost:9292
 
 Add it to your plugins list:
 ```pkl
-import "https://sake92.github.io/deder-plugins/config/v0.17.0/WebDashboardPlugin.pkl" as WD
+import "https://sake92.github.io/deder-plugins/config/v0.2.0/WebDashboardPlugin.pkl" as WD
 
 plugins {
   new WD.WebDashboardPlugin {}

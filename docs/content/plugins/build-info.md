@@ -12,7 +12,7 @@ Generates a Scala `BuildInfo` object with build metadata constants.
 
 Add it to your plugins list:
 ```pkl
-import "https://sake92.github.io/deder-plugins/config/v0.17.0/BuildInfoPlugin.pkl" as BI
+import "https://sake92.github.io/deder-plugins/config/v0.2.0/BuildInfoPlugin.pkl" as BI
 
 plugins {
   new BI.BuildInfoPlugin {
