@@ -4,7 +4,7 @@ import ba.sake.deder.tuidashboard.model.*
 import ba.sake.tupson.*
 import layoutz.*
 
-enum Tab { case Modules, TaskStats, History, Errors, ServerInfo }
+enum Tab { case Modules, Live, History, Aggregates, Info }
 enum SortOrder { case Newest, Oldest, Longest, Shortest }
 
 case class DashboardState(
@@ -108,10 +108,10 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     Sub.http.pollMs(s"${state.serverUrl}/api/server", pollMs, ServerInfoResp.apply),
     Sub.onKeyPress {
       case Key.Char('1')       => Some(ChangeTab(Tab.Modules))
-      case Key.Char('2')       => Some(ChangeTab(Tab.TaskStats))
+      case Key.Char('2')       => Some(ChangeTab(Tab.Live))
       case Key.Char('3')       => Some(ChangeTab(Tab.History))
-      case Key.Char('4')       => Some(ChangeTab(Tab.Errors))
-      case Key.Char('5')       => Some(ChangeTab(Tab.ServerInfo))
+      case Key.Char('4')       => Some(ChangeTab(Tab.Aggregates))
+      case Key.Char('5')       => Some(ChangeTab(Tab.Info))
       case Key.Char('s')       => Some(ToggleSort)
       case Key.Char('q')       => Some(Quit)
       case Key.Ctrl('c')       => Some(Quit)
@@ -125,28 +125,31 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
 
     val content = state.activeTab match
       case Tab.Modules    => modulesView(state)
-      case Tab.TaskStats  => taskStatsView(state)
+      case Tab.Live       => liveView(state)
       case Tab.History    => historyView(state)
-      case Tab.Errors     => errorsView(state)
-      case Tab.ServerInfo => serverInfoView(state)
+      case Tab.Aggregates => aggregatesView(state)
+      case Tab.Info       => infoView(state)
 
     val errorBanner = state.lastError.map { err =>
       banner(s"  $err").color(Color.Red).bg(Color.BrightBlack)
     }
 
-    val folderFooter = state.serverInfo.map { si =>
-      s"  ${si.projectRoot}".color(Color.BrightBlack)
-    }
+    val projectLine = state.serverInfo.map(si => s"Project: ${si.projectRoot}").getOrElse("")
+    val webDashLine = s"Web dashboard: ${state.serverUrl}"
 
     layout(
-      banner(s"Deder TUI Dashboard — ${state.serverUrl} (q to quit)")
+      banner(
+        layout(
+          Text("Deder TUI Dashboard").style(Style.Bold),
+          Text(projectLine),
+          Text(webDashLine)
+        )
+      )
         .border(Border.Double)
-        .color(Color.Cyan)
-        .style(Style.Bold),
+        .color(Color.Cyan),
       tabBar,
       errorBanner.getOrElse(empty),
-      content,
-      folderFooter.getOrElse(empty)
+      content
     )
   }
 
@@ -161,13 +164,13 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     rowTight(
       tab(1, "Modules", Tab.Modules),
       Text("  "),
-      tab(2, "Task Stats", Tab.TaskStats),
+      tab(2, "Live", Tab.Live),
       Text("  "),
       tab(3, "History", Tab.History),
       Text("  "),
-      tab(4, "Errors", Tab.Errors),
+      tab(4, "Aggregates", Tab.Aggregates),
       Text("  "),
-      tab(5, "Server Info", Tab.ServerInfo),
+      tab(5, "Info", Tab.Info),
       Text("    q quit")
     )
   }
@@ -175,6 +178,16 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
   // --- Tab 1: Modules ---
 
   private def modulesView(state: DashboardState): Element = {
+    if state.modules.isEmpty then "(no data)".color(Color.BrightBlack)
+    else table(
+      headers = Seq("Module", "Type", "Deps"),
+      rows = state.modules.map(m => Seq(Text(m.id), Text(m.`type`), Text(m.deps.toString)))
+    ).border(Border.Round)
+  }
+
+  // --- Tab 2: Live ---
+
+  private def liveView(state: DashboardState): Element = {
     val statsLine = state.overview match {
       case Some(o) =>
         val h = o.uptimeSecs / 3600
@@ -183,11 +196,6 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
         s"Served: ${o.totalRequestsServed}  Errors: ${o.totalErrors}  Uptime: ${h}h ${m}m ${s}s"
       case None => "Waiting for data..."
     }
-
-    val modulesTable = table(
-      headers = Seq("Module", "Type", "Deps"),
-      rows = state.modules.map(m => Seq(m.id, m.`type`, m.deps.toString))
-    ).border(Border.Round)
 
     val currentBox = box("Current Requests")(
       if state.currentRequests.isEmpty then "(none)".color(Color.BrightBlack)
@@ -205,24 +213,8 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
 
     layout(
       section("Stats")(statsLine.color(Color.BrightGreen)),
-      columns(modulesTable, currentBox)
+      currentBox
     )
-  }
-
-  // --- Tab 2: Task Stats ---
-
-  private def taskStatsView(state: DashboardState): Element = {
-    if state.taskStats.isEmpty then "(no data)".color(Color.BrightBlack)
-    else {
-      val rows = state.taskStats.map { s =>
-        Seq(Text(s.taskName), Text(s.invocations.toString), Text(s.errors.toString),
-          Text(s.avgTimeMs.toString), Text(s.maxTimeMs.toString), Text(s.longestModuleId))
-      }
-      table(
-        headers = Seq(Text("Task Name"), Text("Invocations"), Text("Errors"), Text("Avg(ms)"), Text("Max(ms)"), Text("Longest Module")),
-        rows = rows
-      ).border(Border.Round)
-    }
   }
 
   // --- Tab 3: History (with client-side sorting) ---
@@ -261,24 +253,40 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     layout(header, historyBox)
   }
 
-  // --- Tab 4: Errors ---
+  // --- Tab 4: Aggregates ---
 
-  private def errorsView(state: DashboardState): Element = {
-    if state.errors.isEmpty then "(no errors)".color(Color.BrightBlack)
+  private def aggregatesView(state: DashboardState): Element = {
+    val taskStatsTable = if state.taskStats.isEmpty then "(no data)".color(Color.BrightBlack)
+    else {
+      val rows = state.taskStats.map { s =>
+        Seq(Text(s.taskName), Text(s.invocations.toString), Text(s.errors.toString),
+          Text(s.avgTimeMs.toString + "ms"), Text(s.maxTimeMs.toString + "ms"), Text(s.longestModuleId))
+      }
+      table(
+        headers = Seq("Task Name", "Invocations", "Errors", "Avg", "Max", "Longest Module"),
+        rows = rows
+      ).border(Border.Round)
+    }
+
+    val errorTable = if state.errors.isEmpty then empty
     else {
       val rows = state.errors.map { e =>
         Seq(Text(e.taskName), Text(e.moduleIds.mkString(", ")), Text(e.errorCount.toString))
       }
-      table(
-        headers = Seq(Text("Task Name"), Text("Module IDs"), Text("Error Count")),
-        rows = rows
-      ).border(Border.Round)
+      box("Errors")(
+        table(
+          headers = Seq("Task Name", "Module IDs", "Error Count"),
+          rows = rows
+        ).border(Border.Round)
+      ).border(Border.Round).color(Color.Red)
     }
+
+    layout(taskStatsTable, errorTable)
   }
 
-  // --- Tab 5: Server Info ---
+  // --- Tab 5: Info ---
 
-  private def serverInfoView(state: DashboardState): Element = state.serverInfo match {
+  private def infoView(state: DashboardState): Element = state.serverInfo match {
     case None => "(loading...)".color(Color.BrightBlack)
     case Some(si) =>
       val h = si.uptimeSecs / 3600

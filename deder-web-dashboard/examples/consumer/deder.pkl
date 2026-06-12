@@ -2,6 +2,14 @@ amends "https://sake92.github.io/deder/config/v0.18.0/DederProject.pkl"
 
 import "../../resources/WebDashboardPlugin.pkl" as WD
 
+tools {
+  ["tui"] {
+    deps {
+      "ba.sake::deder-tui-dashboard:0.3.1-SNAPSHOT"
+    }
+  }
+}
+
 plugins {
   new WD.WebDashboardPlugin {
     version = "0.3.1-SNAPSHOT"
@@ -17,14 +25,6 @@ local const m1 = new ScalaModule {
   root = "."
   scalaVersion = "3.7.4"
   mainClass = "example.main"
-  mvnApps {
-    ["tui"] = new MvnApp {
-      deps  {
-        "ba.sake::deder-tui-dashboard:0.2.1-SNAPSHOT"
-      }
-      mainClass = "ba.sake.deder.tuidashboard.app.TuiDashboardMain"
-    }
-  }
 }
 
 local const m2 = new ScalaModule {

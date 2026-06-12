@@ -72,6 +72,17 @@ Tasks are built with `CachedTaskBuilder.make[T](name, supportedModuleTypes, cate
 
 Each plugin has a `*ConfigNormalizer` that merges `ModuleDefaults` with per-module `ModuleOverride` values before the tasks run. Tests for these live in `test/src/.../config/`.
 
+## Development Workflow
+
+Always use `.worktrees/` git worktrees for development. Create an isolated worktree before starting any feature work:
+
+```bash
+# Example: create a worktree for feature work
+git worktree add .worktrees/<feature-name> main
+```
+
+**Exception:** Only work directly on `main` if explicitly told to by the user.
+
 ## What Not to Commit
 
 Do not commit AI agent session artifacts. These are working files for AI tools and must stay out of version control:

@@ -93,8 +93,8 @@ class DashboardStateSuite extends FunSuite {
   test("ChangeTab switches active tab") {
     val app = DashboardApp("http://localhost:9292", 1000)
     val state = DashboardState()
-    val (newState, _) = app.update(ChangeTab(Tab.TaskStats), state)
-    assertEquals(newState.activeTab, Tab.TaskStats)
+    val (newState, _) = app.update(ChangeTab(Tab.Live), state)
+    assertEquals(newState.activeTab, Tab.Live)
     assertEquals(newState.lastError, None)
   }
 
