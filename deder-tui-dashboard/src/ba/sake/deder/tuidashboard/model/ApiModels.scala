@@ -7,10 +7,37 @@ case class StatsOverview(totalRequestsServed: Long, totalErrors: Long, uptimeSec
 case class ApiCurrentRequest(requestId: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long) derives JsonRW
 case class ApiHistoryEntry(requestId: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long, durationMs: Long, success: Boolean) derives JsonRW
 
-/** Combined snapshot of all data fetched from the dashboard API. */
-case class DashboardData(
-    modules: Seq[ApiModule],
-    overview: Option[StatsOverview],
-    currentRequests: Seq[ApiCurrentRequest],
-    history: Seq[ApiHistoryEntry]
-)
+case class ApiTaskAggregate(
+  taskName: String,
+  invocations: Long,
+  errors: Long,
+  totalTimeMs: Long,
+  avgTimeMs: Long,
+  minTimeMs: Long,
+  maxTimeMs: Long,
+  longestModuleId: String
+) derives JsonRW
+
+case class ApiErrorSummaryEntry(
+  taskName: String,
+  moduleIds: Seq[String],
+  errorCount: Long
+) derives JsonRW
+
+case class ApiPluginInfo(id: String, taskCount: Int, taskNames: Seq[String]) derives JsonRW
+
+case class ApiServerInfo(
+  dederVersion: String,
+  jdkVersion: String,
+  jdkVendor: String,
+  osName: String,
+  osArch: String,
+  processors: Int,
+  maxHeapMB: Long,
+  usedHeapMB: Long,
+  uptimeSecs: Long,
+  moduleCount: Int,
+  pluginCount: Int,
+  projectRoot: String,
+  plugins: Seq[ApiPluginInfo]
+) derives JsonRW
