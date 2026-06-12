@@ -48,4 +48,70 @@ class DashboardStateSuite extends FunSuite {
     assertEquals(newState.history(0).success, true)
     assertEquals(newState.history(1).success, false)
   }
+
+  test("update parses task stats JSON and sorts by total time desc") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState()
+    val json = """[{"taskName":"compile","invocations":10,"errors":2,"totalTimeMs":5000,"avgTimeMs":500,"minTimeMs":100,"maxTimeMs":1200,"longestModuleId":"core"},{"taskName":"test","invocations":5,"errors":0,"totalTimeMs":1000,"avgTimeMs":200,"minTimeMs":50,"maxTimeMs":400,"longestModuleId":"core-test"}]"""
+    val (newState, _) = app.update(TaskStatsResp(Right(json)), state)
+    assertEquals(newState.taskStats.length, 2)
+    assertEquals(newState.taskStats(0).taskName, "compile")
+    assertEquals(newState.taskStats(1).taskName, "test")
+    assertEquals(newState.lastError, None)
+  }
+
+  test("update sets error on bad task stats JSON") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState()
+    val (newState, _) = app.update(TaskStatsResp(Right("not json")), state)
+    assert(newState.lastError.isDefined)
+    assertEquals(newState.taskStats.length, 0)
+  }
+
+  test("update parses errors JSON") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState()
+    val json = """[{"taskName":"compile","moduleIds":["core"],"errorCount":3}]"""
+    val (newState, _) = app.update(ErrorsResp(Right(json)), state)
+    assertEquals(newState.errors.length, 1)
+    assertEquals(newState.errors(0).taskName, "compile")
+    assertEquals(newState.errors(0).errorCount, 3L)
+    assertEquals(newState.lastError, None)
+  }
+
+  test("update parses server info JSON") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState()
+    val json = """{"dederVersion":"0.18.0","jdkVersion":"21","jdkVendor":"Eclipse","osName":"Linux","osArch":"amd64","processors":8,"maxHeapMB":4096,"usedHeapMB":512,"uptimeSecs":3600,"moduleCount":5,"pluginCount":2,"projectRoot":"/home/project","plugins":[{"id":"web-dashboard","taskCount":0,"taskNames":[]}]}"""
+    val (newState, _) = app.update(ServerInfoResp(Right(json)), state)
+    assert(newState.serverInfo.isDefined)
+    assertEquals(newState.serverInfo.get.dederVersion, "0.18.0")
+    assertEquals(newState.serverInfo.get.projectRoot, "/home/project")
+    assertEquals(newState.lastError, None)
+  }
+
+  test("ChangeTab switches active tab") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState()
+    val (newState, _) = app.update(ChangeTab(Tab.TaskStats), state)
+    assertEquals(newState.activeTab, Tab.TaskStats)
+    assertEquals(newState.lastError, None)
+  }
+
+  test("ToggleSort cycles sort order") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState()
+
+    val (s1, _) = app.update(ToggleSort, state)
+    assertEquals(s1.historySort, SortOrder.Oldest)
+
+    val (s2, _) = app.update(ToggleSort, s1)
+    assertEquals(s2.historySort, SortOrder.Longest)
+
+    val (s3, _) = app.update(ToggleSort, s2)
+    assertEquals(s3.historySort, SortOrder.Shortest)
+
+    val (s4, _) = app.update(ToggleSort, s3)
+    assertEquals(s4.historySort, SortOrder.Newest)
+  }
 }
