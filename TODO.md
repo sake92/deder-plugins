@@ -1,7 +1,9 @@
 
 
-
-- add TUI like web dash https://github.com/oyvindberg/jatatui
+## dashboards
+- add more filters to history
+- add sort by longest running request etc
+- add stats by task type
 
 
 

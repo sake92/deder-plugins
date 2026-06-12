@@ -3,8 +3,8 @@ package ba.sake.deder.webdashboard.pages
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 
 object Layout {
-  
-  def htmlPage(title: String, activeTab: String, content: Html): Html =
+
+  def htmlPage(title: String, activeTab: String, content: Html, projectRoot: String = ""): Html =
     html"""
       <!DOCTYPE html>
       <html lang="en" data-theme="light">
@@ -41,6 +41,10 @@ object Layout {
           .graph-controls input[type="checkbox"] { margin: 0; }
           .highlighted { border-width: 3px !important; border-color: var(--pico-color-yellow-300) !important; }
           .dimmed { opacity: 0.15; }
+          .subnav { display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--pico-muted-border-color); font-size: 0.85rem; }
+          .subnav a { text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 4px; }
+          .subnav a:hover { background: var(--pico-muted-border-color); }
+          .subnav a.active { background: var(--pico-primary); color: var(--pico-primary-inverse); }
         </style>
       </head>
       <body>
@@ -52,13 +56,29 @@ object Layout {
             if activeTab == "graph" then "active" else ""
           }">Modules graph</a>
           <a href="/live" class="${
-            if activeTab == "live" then "active" else ""
-          }">Live Stats</a>
+            if activeTab == "live" || activeTab == "history" || activeTab == "stats" then "active" else ""
+          }">Stats</a>
           <a href="/server" class="${
             if activeTab == "server" then "active" else ""
           }">Server</a>
         </nav>
+        ${
+          if activeTab == "live" || activeTab == "history" || activeTab == "stats" then
+            html"""
+            <nav class="subnav" hx-boost="true">
+              <a href="/live" class="${if activeTab == "live" then "active" else ""}">Live</a>
+              <a href="/history" class="${if activeTab == "history" then "active" else ""}">History</a>
+              <a href="/stats" class="${if activeTab == "stats" then "active" else ""}">Aggregates</a>
+            </nav>
+            """
+          else Html("")
+        }
         <main>$content</main>
+        ${
+          if projectRoot.nonEmpty then
+            html"""<footer style="margin-top:1.5rem; padding-top:0.5rem; border-top:1px solid var(--pico-muted-border-color); text-align:center; font-size:0.75rem; color:var(--pico-muted-color);">📁 $projectRoot</footer>"""
+          else Html("")
+        }
       </body>
       </html>
     """

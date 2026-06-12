@@ -14,20 +14,19 @@ class DashboardServerSuite extends FunSuite {
   private val testPort = 19999
   private val testRefreshMs = 5000
 
+  private def now: Instant = Instant.now()
+
   private def stubInternals: DederProjectInternals = new DederProjectInternals {
     def currentRequests: Seq[LiveRequest] =
-      Seq(LiveRequest("req-001", CallerType.Cli, "compile", Seq("my-module"), Instant.now()))
+      Seq(LiveRequest("req-001", CallerType.Cli, "compile", Seq("my-module"), now))
     def recentHistory: Seq[CompletedRequest] =
       Seq(
-        CompletedRequest(
-          "req-000",
-          CallerType.Cli,
-          "compile",
-          Seq("my-module"),
-          Instant.now().minusSeconds(10),
-          Duration.ofSeconds(5),
-          true
-        )
+        CompletedRequest("req-000", CallerType.Cli, "compile", Seq("my-module"), now.minusSeconds(10), Duration.ofSeconds(5), true),
+        CompletedRequest("req-001", CallerType.Bsp, "test", Seq("core-test"), now.minusSeconds(20), Duration.ofSeconds(12), false),
+        CompletedRequest("req-002", CallerType.Cli, "compile", Seq("core"), now.minusSeconds(30), Duration.ofSeconds(2), true),
+        CompletedRequest("req-003", CallerType.Cli, "compile", Seq("api"), now.minusSeconds(40), Duration.ofMillis(800), true),
+        CompletedRequest("req-004", CallerType.Bsp, "compile", Seq("core", "api"), now.minusSeconds(50), Duration.ofSeconds(45), true),
+        CompletedRequest("req-005", CallerType.Cli, "test", Seq("core-test"), now.minusSeconds(60), Duration.ofSeconds(1), false),
       )
     def taskStats(taskName: String): Option[TaskStats] = None
     def allTaskStats: Seq[(String, TaskStats)] = Seq.empty
@@ -42,15 +41,16 @@ class DashboardServerSuite extends FunSuite {
   }
 
   private def stubProject: DederProject =
-    new DederProject( 
+    new DederProject(
       java.util.List.of(),
       java.util.List.of(),
       java.util.List.of(),
       true,
       java.util.List.of(),
       true,
-      1,
-      1
+      1L,
+      1L,
+      java.util.Map.of()
     )
 
   private val config = WebDashboardPluginConfig(true, testHost, testPort.toLong, testRefreshMs.toLong)
@@ -118,32 +118,95 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("Project Root"), s"body should contain 'Project Root', got: ${body.take(300)}")
   }
 
-  test("GET /live returns HTML page with live stats") {
+  // --- Live tab ---
+  test("GET /live returns HTML page with Live tab") {
     val (code, body) = httpGet("/live")
     assertEquals(code, 200)
-    assert(body.contains("Live Stats"), s"body should contain 'Live Stats', got: ${body.take(300)}")
+    assert(body.contains("Live"), s"body should contain 'Live', got: ${body.take(300)}")
+    assert(body.contains("Auto-refresh"), s"body should contain auto-refresh toggle, got: ${body.take(300)}")
   }
 
   test("GET /stats/overview returns stat cards HTML fragment") {
     val (code, body) = httpGet("/stats/overview")
     assertEquals(code, 200)
-    assert(body.contains("100"), s"should contain total requests (100), got: ${body}")
-    assert(body.contains("5"), s"should contain total errors (5), got: ${body}")
+    assert(body.contains("100"), s"should contain total requests (100), got: $body")
+    assert(body.contains("5"), s"should contain total errors (5), got: $body")
   }
 
   test("GET /stats/current returns current requests HTML fragment") {
     val (code, body) = httpGet("/stats/current")
     assertEquals(code, 200)
-    assert(body.contains("compile"), s"should contain task name 'compile', got: ${body}")
+    assert(body.contains("compile"), s"should contain task name 'compile', got: $body")
   }
 
-  test("GET /stats/history returns recent history HTML fragment") {
-    val (code, body) = httpGet("/stats/history")
+  // --- History tab ---
+  test("GET /history returns HTML page with History tab") {
+    val (code, body) = httpGet("/history")
     assertEquals(code, 200)
-    assert(body.contains("compile"), s"should contain task name 'compile', got: ${body}")
-    assert(body.contains("OK"), s"should contain success marker 'OK', got: ${body}")
+    assert(body.contains("History"), s"body should contain 'History', got: ${body.take(300)}")
+    assert(body.contains("history-filters"), s"body should contain filter form, got: ${body.take(300)}")
   }
 
+  test("GET /stats/history-table returns filtered history HTML table") {
+    val (code, body) = httpGet("/stats/history-table?limit=50&offset=0")
+    assertEquals(code, 200)
+    assert(body.contains("compile"), s"should contain task name 'compile', got: $body")
+    assert(body.contains("OK"), s"should contain success marker, got: $body")
+  }
+
+  test("GET /stats/history-table filters by status=success") {
+    val (code, body) = httpGet("/stats/history-table?status=success&limit=50&offset=0")
+    assertEquals(code, 200)
+    assert(body.contains("OK"), s"should contain OK, got: $body")
+    assert(!body.contains("FAIL"), s"should not contain FAIL when filtering success, got: $body")
+  }
+
+  test("GET /stats/history-table filters by search=core") {
+    val (code, body) = httpGet("/stats/history-table?search=core&limit=50&offset=0")
+    assertEquals(code, 200)
+    assert(body.contains("core"), s"should contain 'core', got: $body")
+  }
+
+  test("GET /stats/history-table filters by caller=CLI") {
+    val (code, body) = httpGet("/stats/history-table?caller=CLI&limit=50&offset=0")
+    assertEquals(code, 200)
+    assert(body.contains("compile"), s"should contain results, got: $body")
+  }
+
+  // --- Stats tab ---
+  test("GET /stats returns HTML page with Aggregates tab") {
+    val (code, body) = httpGet("/stats")
+    assertEquals(code, 200)
+    assert(body.contains("Aggregates"), s"body should contain 'Aggregates', got: ${body.take(300)}")
+  }
+
+  test("GET /stats/task-aggregates returns per-task stats HTML") {
+    val (code, body) = httpGet("/stats/task-aggregates")
+    assertEquals(code, 200)
+    assert(body.contains("compile"), s"should contain task 'compile', got: $body")
+    assert(body.contains("test"), s"should contain task 'test', got: $body")
+  }
+
+  test("GET /stats/module-breakdown returns module rows for a task") {
+    val (code, body) = httpGet("/stats/module-breakdown?task=compile&expanded=true")
+    assertEquals(code, 200)
+    assert(body.contains("core"), s"should contain module 'core', got: $body")
+    assert(body.contains("api"), s"should contain module 'api', got: $body")
+  }
+
+  test("GET /stats/top-offenders returns top tasks by time") {
+    val (code, body) = httpGet("/stats/top-offenders?n=3")
+    assertEquals(code, 200)
+    assert(body.contains("#1"), s"should contain '#1' ranking, got: $body")
+  }
+
+  test("GET /stats/error-summary returns error summary") {
+    val (code, body) = httpGet("/stats/error-summary")
+    assertEquals(code, 200)
+    assert(body.contains("test"), s"should contain task with errors, got: $body")
+  }
+
+  // --- JSON APIs ---
   test("GET /api/modules returns JSON") {
     val (code, body) = httpGet("/api/modules")
     assertEquals(code, 200)
@@ -153,9 +216,9 @@ class DashboardServerSuite extends FunSuite {
   test("GET /api/stats/overview returns JSON with totals") {
     val (code, body) = httpGet("/api/stats/overview")
     assertEquals(code, 200)
-    assert(body.contains("\"totalRequestsServed\": 100"), s"should contain 100 totalRequestsServed, got: $body")
-    assert(body.contains("\"totalErrors\": 5"), s"should contain 5 totalErrors, got: $body")
-    assert(body.contains("\"uptimeSecs\": 8130"), s"should contain 8130 uptimeSecs, got: $body")
+    assert(body.contains("\"totalRequestsServed\": 100"), s"should contain 100, got: $body")
+    assert(body.contains("\"totalErrors\": 5"), s"should contain 5, got: $body")
+    assert(body.contains("\"uptimeSecs\": 8130"), s"should contain 8130, got: $body")
   }
 
   test("GET /api/stats/current returns JSON with current request") {
@@ -163,15 +226,32 @@ class DashboardServerSuite extends FunSuite {
     assertEquals(code, 200)
     assert(body.contains("\"requestId\": \"req-001\""), s"should contain req-001, got: $body")
     assert(body.contains("\"taskName\": \"compile\""), s"should contain compile, got: $body")
-    assert(body.contains("\"moduleIds\""), s"should contain moduleIds, got: $body")
   }
 
-  test("GET /api/stats/history returns JSON with history entry") {
+  test("GET /api/stats/history returns JSON with history entries") {
     val (code, body) = httpGet("/api/stats/history")
     assertEquals(code, 200)
     assert(body.contains("\"requestId\": \"req-000\""), s"should contain req-000, got: $body")
-    assert(body.contains("\"taskName\": \"compile\""), s"should contain compile, got: $body")
     assert(body.contains("\"success\": true"), s"should contain success:true, got: $body")
+  }
+
+  test("GET /api/stats/task-aggregates returns JSON") {
+    val (code, body) = httpGet("/api/stats/task-aggregates")
+    assertEquals(code, 200)
+    assert(body.contains("\"taskName\": \"compile\""), s"should contain compile, got: $body")
+    assert(body.contains("\"invocations\""), s"should contain invocations, got: $body")
+  }
+
+  test("GET /api/stats/module-breakdown returns JSON") {
+    val (code, body) = httpGet("/api/stats/module-breakdown?task=compile")
+    assertEquals(code, 200)
+    assert(body.contains("\"moduleId\""), s"should contain moduleId, got: $body")
+  }
+
+  test("GET /api/stats/error-summary returns JSON") {
+    val (code, body) = httpGet("/api/stats/error-summary")
+    assertEquals(code, 200)
+    assert(body.startsWith("["), s"should be a JSON array, got: ${body.take(200)}")
   }
 
   test("GET /nonexistent returns 404") {

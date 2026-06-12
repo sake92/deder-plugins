@@ -7,20 +7,34 @@ import scala.jdk.DurationConverters.*
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.*
 
-object LiveStatsPage {
-  def fullPage(internals: DederProjectInternals, refreshMs: Int): Html =
+object LivePage {
+  def fullPage(internals: DederProjectInternals, refreshMs: Int, projectRoot: String): Html =
     html"""
-      <h2>Live Stats</h2>
-      <div hx-get="/stats/overview" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading overview...</p>
-      </div>
-      <h3>Current Requests</h3>
-      <div hx-get="/stats/current" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading current requests...</p>
-      </div>
-      <h3>Recent History</h3>
-      <div hx-get="/stats/history" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
-        <p>Loading recent history...</p>
+      <h2>Live</h2>
+      <div x-data="{ autoRefresh: true }">
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+          <label style="display:flex; align-items:center; gap:0.25rem; cursor:pointer;">
+            <input type="checkbox" x-model="autoRefresh">
+            <span>Auto-refresh</span>
+          </label>
+        </div>
+
+        <div id="live-overview"
+             hx-get="/stats/overview"
+             hx-trigger="load, refresh"
+             hx-swap="innerHTML"
+             :hx-trigger="autoRefresh ? 'load, every ${refreshMs}ms, refresh' : 'load, refresh'">
+          <p>Loading overview...</p>
+        </div>
+
+        <h3>Current Requests</h3>
+        <div id="live-current"
+             hx-get="/stats/current"
+             hx-trigger="load, refresh"
+             hx-swap="innerHTML"
+             :hx-trigger="autoRefresh ? 'load, every ${refreshMs}ms, refresh' : 'load, refresh'">
+          <p>Loading current requests...</p>
+        </div>
       </div>
     """
 
@@ -73,28 +87,6 @@ object LiveStatsPage {
       html"""
         <table>
           <thead><tr><th>Started</th><th>Client</th><th>Task</th><th>Modules</th><th>Elapsed</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      """
-  }
-
-  def historyTable(internals: DederProjectInternals): Html = {
-    val history = internals.recentHistory
-    if history.isEmpty then html"""<p><em>No completed requests yet.</em></p>"""
-    else
-      val rows = history.map { req =>
-        val statusClass = if req.success then "success" else "failure"
-        val statusText = if req.success then "OK" else "FAIL"
-        val startedStr = formatDateTime(req.startTime)
-        val durStr = formatElapsed(req.duration)
-        val clientStr = formatCallerType(req.caller)
-        html"""<tr><td>${startedStr}</td><td>$clientStr</td><td>${req.taskName}</td><td>${req.moduleIds.mkString(
-            ", "
-          )}</td><td>${durStr}</td><td class="${statusClass}">${statusText}</td></tr>"""
-      }
-      html"""
-        <table>
-          <thead><tr><th>Started</th><th>Client</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """
