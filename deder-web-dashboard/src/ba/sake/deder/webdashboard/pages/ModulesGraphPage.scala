@@ -20,7 +20,6 @@ object ModulesGraphPage {
       val modList = modules.asScala.toSeq
       val json = buildGraphJson(modList)
       html"""
-        <h2>Module Dependency Graph</h2>
         <div x-data="{
           showScala: true,
           showJava: true,

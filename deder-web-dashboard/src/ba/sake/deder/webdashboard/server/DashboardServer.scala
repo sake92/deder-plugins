@@ -32,11 +32,11 @@ class DashboardServer(
 
     case GET -> Path("server") =>
       val content = ServerPage.serverInfo(internals, project)
-      Response.withBody(Layout.htmlPage("Server - Deder Dashboard", "server", content, projectRoot))
+      Response.withBody(Layout.htmlPage("Info - Deder Dashboard", "server", content, projectRoot))
 
     // --- Stats tab: Live ---
     case GET -> Path("live") =>
-      val content = LivePage.fullPage(internals, refreshMs, projectRoot)
+      val content = LivePage.fullPage(refreshMs)
       Response.withBody(Layout.htmlPage("Live - Deder Dashboard", "live", content, projectRoot))
 
     // --- Stats tab: History ---
@@ -57,6 +57,32 @@ class DashboardServer(
     case GET -> Path("stats", "current") =>
       val h = LivePage.currentRequestsTable(internals)
       Response.withBody(h)
+
+    case GET -> Path("stats", "caches") =>
+      val h = LivePage.cachesTable(internals)
+      Response.withBody(h)
+
+    // --- Auto-refresh toggle endpoints ---
+    case GET -> Path("stats", "auto-refresh", "live") =>
+      val req = summon[Request]
+      val enabled = param(req, "enabled", "true").toBoolean
+      val cb = LivePage.autoRefreshCheckbox(enabled)
+      val oob = LivePage.autoRefreshOob(enabled, refreshMs)
+      Response.withBody(html"$cb$oob")
+
+    case GET -> Path("stats", "auto-refresh", "history") =>
+      val req = summon[Request]
+      val enabled = param(req, "enabled", "true").toBoolean
+      val cb = HistoryPage.autoRefreshCheckbox(enabled)
+      val oob = HistoryPage.autoRefreshOob(enabled, refreshMs)
+      Response.withBody(html"$cb$oob")
+
+    case GET -> Path("stats", "auto-refresh", "stats") =>
+      val req = summon[Request]
+      val enabled = param(req, "enabled", "true").toBoolean
+      val cb = StatsPage.autoRefreshCheckbox(enabled)
+      val oob = StatsPage.autoRefreshOob(enabled, refreshMs)
+      Response.withBody(html"$cb$oob")
 
     // --- HTMX partials for History tab ---
     case GET -> Path("stats", "history-table") =>

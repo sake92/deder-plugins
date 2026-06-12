@@ -15,50 +15,35 @@ object ServerPage {
     val maxHeapMB = Runtime.getRuntime().maxMemory() / (1024 * 1024)
     val usedHeapMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)
     val dederVersion = DederGlobals.version
-    val projectRootDir = DederGlobals.projectRootDir.toString
     val uptimeStr = formatUptime(internals.serverUptime)
     val moduleCount = if project != null && project.modules != null then project.modules.size() else 0
-    val caches = internals.inMemoryCachesStats
     val plugins = internals.loadedPlugins
 
     html"""
-      <h2>Server Properties</h2>
+      <h3>Deder</h3>
       <div style="display: flex; flex-wrap: wrap;">
-        ${statCard("Deder Version", dederVersion)}
-        ${statCard("Project Root", projectRootDir)}
+        ${statCard("Version", dederVersion)}
         ${statCard("Uptime", uptimeStr)}
         ${statCard("Modules", moduleCount.toString)}
-        ${statCard("Plugins Loaded", plugins.size.toString)}
-        ${statCard("In-Memory Caches", caches.size.toString)}
+        ${statCard("Plugins", plugins.size.toString)}
         ${statCard("Heap", s"${usedHeapMB}MB / ${maxHeapMB}MB")}
-        ${statCard("JDK", s"$jdkVersion")}
-        ${statCard("JDK Vendor", jdkVendor)}
-        ${statCard("OS / Arch", s"$osName $osArch")}
-        ${statCard("Processors", processors.toString)}
       </div>
-
       ${
         if plugins.nonEmpty then pluginsSection(plugins)
         else html""
       }
 
-      ${
-        if caches.nonEmpty then cacheSection(caches)
-        else html"""<small style="color: var(--pico-muted-color);">No in-memory caches active.</small>"""
-      }
-    """
-  }
+      <h3 style="margin-top:0.75rem;">OS</h3>
+      <div style="display: flex; flex-wrap: wrap;">
+        ${statCard("OS / Arch", s"$osName $osArch")}
+        ${statCard("Processors", processors.toString)}
+      </div>
 
-  private def cacheSection(caches: Map[String, InMemCacheStats]): Html = {
-    val rows = caches.toSeq.sortBy(_._1).map { case (name, stats) =>
-      html"""<tr><td>$name</td><td>${stats.estimatedSize}</td><td>${stats.hitCount}</td><td>${stats.missCount}</td></tr>"""
-    }
-    html"""
-      <h4 style="margin-top:0.75rem;">In-Memory Caches</h4>
-      <table style="font-size:0.85rem;">
-        <thead><tr><th>Name</th><th>Size</th><th>Hits</th><th>Misses</th></tr></thead>
-        <tbody>$rows</tbody>
-      </table>
+      <h3 style="margin-top:0.75rem;">JDK</h3>
+      <div style="display: flex; flex-wrap: wrap;">
+        ${statCard("Version", jdkVersion)}
+        ${statCard("Vendor", jdkVendor)}
+      </div>
     """
   }
 

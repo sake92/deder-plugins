@@ -10,65 +10,74 @@ import ba.sake.deder.webdashboard.server.ApiRoutes.ApiHistoryEntry
 object HistoryPage {
   def fullPage(refreshMs: Int): Html =
     html"""
-      <h2>History</h2>
-      <div x-data="{ autoRefresh: true }">
-        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-          <label style="display:flex; align-items:center; gap:0.25rem; cursor:pointer;">
-            <input type="checkbox" x-model="autoRefresh">
-            <span>Auto-refresh</span>
-          </label>
-        </div>
-
-        <form id="history-filters" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:end; margin-bottom:0.75rem;">
-          <div>
-            <label for="hist-search" style="font-size:0.75rem;">Search</label>
-            <input type="text" id="hist-search" name="search" placeholder="request/task/module..."
-                   hx-get="/stats/history-table" hx-trigger="keyup changed delay:300ms"
-                   hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML"
-                   style="width:150px;">
-          </div>
-          <div>
-            <label for="hist-caller" style="font-size:0.75rem;">Caller</label>
-            <input type="text" id="hist-caller" name="caller" placeholder="CLI, BSP..."
-                   hx-get="/stats/history-table" hx-trigger="keyup changed delay:300ms"
-                   hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML"
-                   style="width:110px;">
-          </div>
-          <div>
-            <label for="hist-status" style="font-size:0.75rem;">Status</label>
-            <select id="hist-status" name="status"
-                    hx-get="/stats/history-table" hx-trigger="change"
-                    hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML">
-              <option value="all">All</option>
-              <option value="success">Success</option>
-              <option value="failure">Failure</option>
-            </select>
-          </div>
-          <div>
-            <label for="hist-sort" style="font-size:0.75rem;">Sort</label>
-            <select id="hist-sort" name="sort"
-                    hx-get="/stats/history-table" hx-trigger="change"
-                    hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML">
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-              <option value="longest">Longest</option>
-              <option value="shortest">Shortest</option>
-            </select>
-          </div>
-          <input type="hidden" name="limit" value="50">
-          <input type="hidden" name="offset" value="0">
-        </form>
-
-        <div id="history-table-wrapper"
-             hx-get="/stats/history-table" hx-include="#history-filters" hx-swap="innerHTML"
-             hx-trigger="load, refresh"
-             :hx-trigger="autoRefresh ? 'load, every ${refreshMs}ms, refresh' : 'load, refresh'">
-          <p>Loading history...</p>
-        </div>
-
-        <div id="history-load-more" style="text-align:center; margin-top:0.5rem;"></div>
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <label style="cursor:pointer;">
+          ${autoRefreshCheckbox(true)}
+          <span>Auto-refresh</span>
+        </label>
       </div>
+
+      <form id="history-filters" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:end; margin-bottom:0.75rem;">
+        <div>
+          <label for="hist-search" style="font-size:0.75rem;">Search</label>
+          <input type="text" id="hist-search" name="search" placeholder="request/task/module..."
+                 hx-get="/stats/history-table" hx-trigger="keyup changed delay:300ms"
+                 hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML"
+                 style="width:150px;">
+        </div>
+        <div>
+          <label for="hist-caller" style="font-size:0.75rem;">Caller</label>
+          <input type="text" id="hist-caller" name="caller" placeholder="CLI, BSP..."
+                 hx-get="/stats/history-table" hx-trigger="keyup changed delay:300ms"
+                 hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML"
+                 style="width:110px;">
+        </div>
+        <div>
+          <label for="hist-status" style="font-size:0.75rem;">Status</label>
+          <select id="hist-status" name="status"
+                  hx-get="/stats/history-table" hx-trigger="change"
+                  hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML">
+            <option value="all">All</option>
+            <option value="success">Success</option>
+            <option value="failure">Failure</option>
+          </select>
+        </div>
+        <div>
+          <label for="hist-sort" style="font-size:0.75rem;">Sort</label>
+          <select id="hist-sort" name="sort"
+                  hx-get="/stats/history-table" hx-trigger="change"
+                  hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="longest">Longest</option>
+            <option value="shortest">Shortest</option>
+          </select>
+        </div>
+        <input type="hidden" name="limit" value="50">
+        <input type="hidden" name="offset" value="0">
+      </form>
+
+      <div id="history-table-wrapper"
+           hx-get="/stats/history-table" hx-include="#history-filters" hx-swap="innerHTML"
+           hx-trigger="load, every ${refreshMs}ms, refresh">
+        <p>Loading history...</p>
+      </div>
+
+      <div id="history-load-more" style="text-align:center; margin-top:0.5rem;"></div>
     """
+
+  def autoRefreshCheckbox(enabled: Boolean): Html =
+    if enabled then
+      html"""<input type="checkbox" id="auto-refresh-cb" checked
+                     hx-get="/stats/auto-refresh/history?enabled=false" hx-trigger="change" hx-swap="outerHTML">"""
+    else
+      html"""<input type="checkbox" id="auto-refresh-cb"
+                     hx-get="/stats/auto-refresh/history?enabled=true" hx-trigger="change" hx-swap="outerHTML">"""
+
+  def autoRefreshOob(enabled: Boolean, refreshMs: Int): Html = {
+    val trigger = if enabled then s"load, every ${refreshMs}ms, refresh" else "load, refresh"
+    html"""<div id="history-table-wrapper" hx-get="/stats/history-table" hx-include="#history-filters" hx-swap="innerHTML" hx-trigger="${trigger}" hx-swap-oob="true"></div>"""
+  }
 
   /** Render full table (including thead) for a page of history entries. */
   def historyTable(entries: Seq[ApiHistoryEntry]): Html = {
@@ -142,7 +151,6 @@ object HistoryPage {
           </tr>
         """
       }
-      // Wrap multiple row elements into single Html by nesting in a parent interpolation
       html"${rows}"
   }
 

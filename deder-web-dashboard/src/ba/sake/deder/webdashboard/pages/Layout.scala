@@ -45,6 +45,7 @@ object Layout {
           .subnav a { text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 4px; }
           .subnav a:hover { background: var(--pico-muted-border-color); }
           .subnav a.active { background: var(--pico-primary); color: var(--pico-primary-inverse); }
+          input[type="text"], input[type="search"], select { padding: 0.2rem 0.4rem; font-size: 0.82rem; height: auto; }
         </style>
       </head>
       <body>
@@ -60,7 +61,7 @@ object Layout {
           }">Stats</a>
           <a href="/server" class="${
             if activeTab == "server" then "active" else ""
-          }">Server</a>
+          }">Info</a>
         </nav>
         ${
           if activeTab == "live" || activeTab == "history" || activeTab == "stats" then

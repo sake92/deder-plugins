@@ -110,12 +110,12 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("Modules graph"), s"body should contain 'Modules graph', got: ${body.take(300)}")
   }
 
-  test("GET /server returns HTML page with server properties") {
+  test("GET /server returns HTML page with server info") {
     val (code, body) = httpGet("/server")
     assertEquals(code, 200)
-    assert(body.contains("Server Properties"), s"body should contain 'Server Properties', got: ${body.take(300)}")
+    assert(body.contains("Deder"), s"body should contain 'Deder', got: ${body.take(300)}")
     assert(body.contains("JDK"), s"body should contain 'JDK', got: ${body.take(300)}")
-    assert(body.contains("Project Root"), s"body should contain 'Project Root', got: ${body.take(300)}")
+    assert(body.contains("OS"), s"body should contain 'OS', got: ${body.take(300)}")
   }
 
   // --- Live tab ---

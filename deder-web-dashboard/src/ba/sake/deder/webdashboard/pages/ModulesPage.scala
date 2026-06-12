@@ -2,7 +2,7 @@ package ba.sake.deder.webdashboard.pages
 
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.config.DederProject
-import ba.sake.deder.config.DederProject.{DederModule, JavaModule, JavaTestModule, ScalaModule, ScalaTestModule}
+import ba.sake.deder.config.DederProject.{DederModule, JavaModule, JavaTestModule, ScalaModule, ScalaTestModule, ScalaJsModule, ScalaJsTestModule, ScalaNativeModule, ScalaNativeTestModule}
 import scala.jdk.CollectionConverters.*
 
 object ModulesPage {
@@ -15,18 +15,22 @@ object ModulesPage {
       val rows = modList.map(buildRow)
       val total = modList.size
       html"""
-        <h2>Project Modules</h2>
         <div x-data="{ filter: '' }">
           <input type="search" x-model="filter" placeholder="Filter modules..."
-                 style="max-width: 300px; margin-bottom: 0.5rem;"
+                  style="max-width: 220px; margin-bottom: 0.5rem;"
                  aria-label="Filter modules">
           <span style="font-size: 0.8rem; color: var(--pico-muted-color);">$total modules</span>
           <table class="module-table" style="font-size:0.85rem; margin-top:0.25rem;">
-            <thead><tr><th>Module ID</th><th>Type</th><th>Language</th><th>#Deps</th></tr></thead>
+            <thead><tr><th>Module ID</th><th>Type</th><th>Version</th><th>#Deps</th></tr></thead>
             <tbody>$rows</tbody>
           </table>
         </div>
       """
+  }
+
+  private def versionStr(scalaVer: Option[String], platformVer: Option[String]): String = {
+    val sv = scalaVer.filter(_.nonEmpty).getOrElse("-")
+    platformVer.filter(_.nonEmpty).map(pv => s"$sv / $pv").getOrElse(sv)
   }
 
   private def buildRow(m: DederModule): Html = {
@@ -37,6 +41,10 @@ object ModulesPage {
       case _: JavaModule => ("JAVA", "pico-color-blue-400")
       case _ => (if m.`type` != null then m.`type`.name().toLowerCase else "unknown", "")
     val lang = m match
+      case sm: ScalaJsTestModule => versionStr(Option(sm.scalaVersion), Option(sm.scalaJsVersion))
+      case sm: ScalaJsModule => versionStr(Option(sm.scalaVersion), Option(sm.scalaJsVersion))
+      case sm: ScalaNativeTestModule => versionStr(Option(sm.scalaVersion), Option(sm.scalaNativeVersion))
+      case sm: ScalaNativeModule => versionStr(Option(sm.scalaVersion), Option(sm.scalaNativeVersion))
       case sm: ScalaTestModule => Option(sm.scalaVersion).filter(_.nonEmpty).getOrElse("Scala 3")
       case sm: ScalaModule => Option(sm.scalaVersion).filter(_.nonEmpty).getOrElse("Scala 3")
       case _: JavaModule | _: JavaTestModule => "Java"

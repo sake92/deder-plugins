@@ -9,40 +9,51 @@ object StatsPage {
 
   def fullPage(refreshMs: Int): Html =
     html"""
-      <h2>Aggregates</h2>
-      <div x-data="{ autoRefresh: true }">
-        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-          <label style="display:flex; align-items:center; gap:0.25rem; cursor:pointer;">
-            <input type="checkbox" x-model="autoRefresh">
-            <span>Auto-refresh</span>
-          </label>
-        </div>
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <label style="cursor:pointer;">
+          ${autoRefreshCheckbox(true)}
+          <span>Auto-refresh</span>
+        </label>
+      </div>
 
-        <h3>Per-Task Statistics</h3>
-        <div id="task-aggregates-container"
-             hx-get="/stats/task-aggregates" hx-swap="innerHTML"
-             hx-trigger="load, refresh"
-             :hx-trigger="autoRefresh ? 'load, every ${refreshMs}ms, refresh' : 'load, refresh'">
-          <p>Loading stats...</p>
-        </div>
+      <h3>Per-Task Statistics</h3>
+      <div id="task-aggregates-container"
+           hx-get="/stats/task-aggregates" hx-swap="innerHTML"
+           hx-trigger="load, every ${refreshMs}ms, refresh">
+        <p>Loading stats...</p>
+      </div>
 
-        <h3>Top Time Consumers</h3>
-        <div id="top-offenders-container"
-             hx-get="/stats/top-offenders" hx-swap="innerHTML"
-             hx-trigger="load, refresh"
-             :hx-trigger="autoRefresh ? 'load, every ${refreshMs}ms, refresh' : 'load, refresh'">
-          <p>Loading...</p>
-        </div>
+      <h3>Top Time Consumers</h3>
+      <div id="top-offenders-container"
+           hx-get="/stats/top-offenders" hx-swap="innerHTML"
+           hx-trigger="load, every ${refreshMs}ms, refresh">
+        <p>Loading...</p>
+      </div>
 
-        <h3>Error Summary</h3>
-        <div id="error-summary-container"
-             hx-get="/stats/error-summary" hx-swap="innerHTML"
-             hx-trigger="load, refresh"
-             :hx-trigger="autoRefresh ? 'load, every ${refreshMs}ms, refresh' : 'load, refresh'">
-          <p>Loading...</p>
-        </div>
+      <h3>Error Summary</h3>
+      <div id="error-summary-container"
+           hx-get="/stats/error-summary" hx-swap="innerHTML"
+           hx-trigger="load, every ${refreshMs}ms, refresh">
+        <p>Loading...</p>
       </div>
     """
+
+  def autoRefreshCheckbox(enabled: Boolean): Html =
+    if enabled then
+      html"""<input type="checkbox" id="auto-refresh-cb" checked
+                     hx-get="/stats/auto-refresh/stats?enabled=false" hx-trigger="change" hx-swap="outerHTML">"""
+    else
+      html"""<input type="checkbox" id="auto-refresh-cb"
+                     hx-get="/stats/auto-refresh/stats?enabled=true" hx-trigger="change" hx-swap="outerHTML">"""
+
+  def autoRefreshOob(enabled: Boolean, refreshMs: Int): Html = {
+    val trigger = if enabled then s"load, every ${refreshMs}ms, refresh" else "load, refresh"
+    html"""
+      <div id="task-aggregates-container" hx-get="/stats/task-aggregates" hx-swap="innerHTML" hx-trigger="${trigger}" hx-swap-oob="true"></div>
+      <div id="top-offenders-container" hx-get="/stats/top-offenders" hx-swap="innerHTML" hx-trigger="${trigger}" hx-swap-oob="true"></div>
+      <div id="error-summary-container" hx-get="/stats/error-summary" hx-swap="innerHTML" hx-trigger="${trigger}" hx-swap-oob="true"></div>
+    """
+  }
 
   /** Render the per-task aggregates table. */
   def taskAggregatesTable(aggregates: Seq[ApiTaskAggregate]): Html = {
