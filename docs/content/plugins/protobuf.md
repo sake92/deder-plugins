@@ -12,7 +12,7 @@ Generates protobuf and gRPC Java/Scala code from `.proto` files.
 
 Add it to your plugins list:
 ```pkl
-import "https://sake92.github.io/deder-plugins/config/v0.2.0/ProtobufPlugin.pkl" as PB
+import "https://sake92.github.io/deder-plugins/config/v0.4.0/ProtobufPlugin.pkl" as PB
 
 plugins {
   new PB.ProtobufPlugin {}
