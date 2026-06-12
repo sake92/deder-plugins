@@ -241,6 +241,7 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
           val icon = if h.success then "+".color(Color.Green) else "x".color(Color.Red)
           rowTight(
             icon,
+            Text(s" [${h.caller}]"),
             Text(s" ${h.taskName}"),
             Text(s"  ${h.durationMs}ms"),
             Text(s"  [${h.moduleIds.mkString(", ")}]")

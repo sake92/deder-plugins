@@ -11,8 +11,8 @@ object ApiRoutes {
   // --- existing data types ---
   case class ApiModule(id: String, `type`: String, deps: Int) derives JsonRW
   case class StatsOverview(totalRequestsServed: Long, totalErrors: Long, uptimeSecs: Long) derives JsonRW
-  case class ApiCurrentRequest(requestId: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long) derives JsonRW
-  case class ApiHistoryEntry(requestId: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long, durationMs: Long, success: Boolean) derives JsonRW
+  case class ApiCurrentRequest(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long) derives JsonRW
+  case class ApiHistoryEntry(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long, durationMs: Long, success: Boolean) derives JsonRW
 
   // --- new data types ---
   case class ApiTaskAggregate(
@@ -82,6 +82,7 @@ object ApiRoutes {
     val requests = internals.currentRequests.map { r =>
       ApiCurrentRequest(
         requestId = r.requestId,
+        caller = formatCallerType(r.caller),
         taskName = r.taskName,
         moduleIds = r.moduleIds,
         startTimeMs = r.startTime.toEpochMilli
@@ -94,6 +95,7 @@ object ApiRoutes {
     val entries = internals.recentHistory.map { r =>
       ApiHistoryEntry(
         requestId = r.requestId,
+        caller = formatCallerType(r.caller),
         taskName = r.taskName,
         moduleIds = r.moduleIds,
         startTimeMs = r.startTime.toEpochMilli,
@@ -246,6 +248,7 @@ object ApiRoutes {
     page.map { r =>
       ApiHistoryEntry(
         requestId = r.requestId,
+        caller = formatCallerType(r.caller),
         taskName = r.taskName,
         moduleIds = r.moduleIds,
         startTimeMs = r.startTime.toEpochMilli,
@@ -254,4 +257,9 @@ object ApiRoutes {
       )
     }
   }
+
+  private def formatCallerType(ct: CallerType): String = ct match
+    case CallerType.Cli => "CLI"
+    case CallerType.Bsp => "BSP"
+    case null           => ct.toString
 }

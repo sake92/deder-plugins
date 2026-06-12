@@ -151,6 +151,7 @@ class DashboardServerSuite extends FunSuite {
     val (code, body) = httpGet("/stats/history-table?limit=50&offset=0")
     assertEquals(code, 200)
     assert(body.contains("compile"), s"should contain task name 'compile', got: $body")
+    assert(body.contains("Client"), s"should contain Client column header, got: $body")
     assert(body.contains("OK"), s"should contain success marker, got: $body")
   }
 
@@ -225,6 +226,7 @@ class DashboardServerSuite extends FunSuite {
     val (code, body) = httpGet("/api/stats/current")
     assertEquals(code, 200)
     assert(body.contains("\"requestId\": \"req-001\""), s"should contain req-001, got: $body")
+    assert(body.contains("\"caller\": \"CLI\""), s"should contain caller CLI, got: $body")
     assert(body.contains("\"taskName\": \"compile\""), s"should contain compile, got: $body")
   }
 
@@ -232,6 +234,7 @@ class DashboardServerSuite extends FunSuite {
     val (code, body) = httpGet("/api/stats/history")
     assertEquals(code, 200)
     assert(body.contains("\"requestId\": \"req-000\""), s"should contain req-000, got: $body")
+    assert(body.contains("\"caller\": \"CLI\""), s"should contain caller CLI, got: $body")
     assert(body.contains("\"success\": true"), s"should contain success:true, got: $body")
   }
 

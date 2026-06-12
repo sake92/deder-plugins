@@ -42,10 +42,12 @@ class DashboardStateSuite extends FunSuite {
   test("update parses history JSON") {
     val app = DashboardApp("http://localhost:9292", 1000)
     val state = DashboardState()
-    val json = """[{"requestId":"r1","taskName":"compile","moduleIds":["a"],"startTimeMs":1,"durationMs":100,"success":true},{"requestId":"r2","taskName":"test","moduleIds":[],"startTimeMs":2,"durationMs":50,"success":false}]"""
+    val json = """[{"requestId":"r1","caller":"CLI","taskName":"compile","moduleIds":["a"],"startTimeMs":1,"durationMs":100,"success":true},{"requestId":"r2","caller":"BSP","taskName":"test","moduleIds":[],"startTimeMs":2,"durationMs":50,"success":false}]"""
     val (newState, _) = app.update(HistoryResp(Right(json)), state)
     assertEquals(newState.history.length, 2)
+    assertEquals(newState.history(0).caller, "CLI")
     assertEquals(newState.history(0).success, true)
+    assertEquals(newState.history(1).caller, "BSP")
     assertEquals(newState.history(1).success, false)
   }
 

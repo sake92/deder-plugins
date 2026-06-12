@@ -91,17 +91,19 @@ object HistoryPage {
         html"""
           <tr>
             <td>${startedStr}</td>
+            <td>${entry.caller}</td>
             <td>${entry.taskName}</td>
             <td>${entry.moduleIds.mkString(", ")}</td>
             <td>${durStr}</td>
             <td class="${statusClass}">${statusText}</td>
           </tr>
           <tr>
-            <td colspan="5" style="padding:0;">
+            <td colspan="6" style="padding:0;">
               <details style="margin:0.2rem 0.5rem; font-size:0.8rem;">
                 <summary style="cursor:pointer; color:var(--pico-muted-color);">Details</summary>
                 <div style="padding:0.3rem 0.5rem; background:var(--pico-muted-border-color); border-radius:4px;">
                   Request ID: ${entry.requestId}<br>
+                  Caller: ${entry.caller}<br>
                   Modules: ${entry.moduleIds.mkString(", ")}<br>
                   Started: ${startedStr}<br>
                   Duration: ${durStr}
@@ -113,7 +115,7 @@ object HistoryPage {
       }
       html"""
         <table>
-          <thead><tr><th>Started</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
+          <thead><tr><th>Started</th><th>Client</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """
@@ -131,17 +133,19 @@ object HistoryPage {
         html"""
           <tr>
             <td>${startedStr}</td>
+            <td>${entry.caller}</td>
             <td>${entry.taskName}</td>
             <td>${entry.moduleIds.mkString(", ")}</td>
             <td>${durStr}</td>
             <td class="${statusClass}">${statusText}</td>
           </tr>
           <tr>
-            <td colspan="5" style="padding:0;">
+            <td colspan="6" style="padding:0;">
               <details style="margin:0.2rem 0.5rem; font-size:0.8rem;">
                 <summary style="cursor:pointer; color:var(--pico-muted-color);">Details</summary>
                 <div style="padding:0.3rem 0.5rem; background:var(--pico-muted-border-color); border-radius:4px;">
                   Request ID: ${entry.requestId}<br>
+                  Caller: ${entry.caller}<br>
                   Modules: ${entry.moduleIds.mkString(", ")}<br>
                   Started: ${startedStr}<br>
                   Duration: ${durStr}
