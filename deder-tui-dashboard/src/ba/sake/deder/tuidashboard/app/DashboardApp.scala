@@ -134,6 +134,10 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       banner(s"  $err").color(Color.Red).bg(Color.BrightBlack)
     }
 
+    val folderFooter = state.serverInfo.map { si =>
+      s"  ${si.projectRoot}".color(Color.BrightBlack)
+    }
+
     layout(
       banner(s"Deder TUI Dashboard — ${state.serverUrl} (q to quit)")
         .border(Border.Double)
@@ -141,7 +145,8 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
         .style(Style.Bold),
       tabBar,
       errorBanner.getOrElse(empty),
-      content
+      content,
+      folderFooter.getOrElse(empty)
     )
   }
 
