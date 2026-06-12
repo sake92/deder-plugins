@@ -2,6 +2,7 @@ amends "https://sake92.github.io/deder/config/v0.18.0/DederProject.pkl"
 
 import "../../resources/WebDashboardPlugin.pkl" as WD
 
+/*
 tools {
   ["tui"] {
     deps {
@@ -9,10 +10,11 @@ tools {
     }
   }
 }
+*/
 
 plugins {
   new WD.WebDashboardPlugin {
-    version = "0.3.1-SNAPSHOT"
+   // version = "0.3.1-SNAPSHOT"
     config = new {
 //      enabled = false
       statsRefreshIntervalMs = 1000
