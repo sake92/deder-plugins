@@ -1,0 +1,37 @@
+module ba.sake.deder.plugins.buildinfo
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class BuildInfoPlugin extends P.DederPlugin {
+  id = "build-info"
+  version: String = "0.3.0"
+  deps {
+    "ba.sake::deder-build-info:\(version)"
+  }
+  config: BuildInfoPluginConfig = new {}
+}
+
+class BuildInfoPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {}
+}
+
+class ModuleDefaults {
+  enabled: Boolean = true
+  packageName: String? = null
+  objectName: String = "BuildInfo"
+  includeGitHash: Boolean = false
+  includeTimestamp: Boolean = false
+  extra: Mapping<String, String> = new Mapping {}
+}
+
+class ModuleOverride {
+  enabled: Boolean? = null
+  packageName: String? = null
+  objectName: String? = null
+  includeGitHash: Boolean? = null
+  includeTimestamp: Boolean? = null
+  extra: Mapping<String, String>? = null
+}
+
+config: BuildInfoPluginConfig = new {}
