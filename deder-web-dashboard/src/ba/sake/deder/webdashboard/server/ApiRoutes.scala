@@ -42,6 +42,24 @@ object ApiRoutes {
     errorCount: Long
   ) derives JsonRW
 
+  case class ApiPluginInfo(id: String, taskCount: Int, taskNames: Seq[String]) derives JsonRW
+
+  case class ApiServerInfo(
+    dederVersion: String,
+    jdkVersion: String,
+    jdkVendor: String,
+    osName: String,
+    osArch: String,
+    processors: Int,
+    maxHeapMB: Long,
+    usedHeapMB: Long,
+    uptimeSecs: Long,
+    moduleCount: Int,
+    pluginCount: Int,
+    projectRoot: String,
+    plugins: Seq[ApiPluginInfo]
+  ) derives JsonRW
+
   // --- existing JSON endpoints ---
   def modulesJson(project: DederProject): String = {
     val modules = project.modules.asScala.toSeq.map { m =>
@@ -154,6 +172,38 @@ object ApiRoutes {
 
   def errorSummaryJson(internals: DederProjectInternals): String =
     errorSummary(internals).toJson
+
+  def serverInfoJson(internals: DederProjectInternals, project: DederProject): String = {
+    val jdkVersion = System.getProperty("java.version")
+    val jdkVendor = System.getProperty("java.vendor")
+    val osName = System.getProperty("os.name")
+    val osArch = System.getProperty("os.arch")
+    val processors = Runtime.getRuntime().availableProcessors()
+    val maxHeapMB = Runtime.getRuntime().maxMemory() / (1024 * 1024)
+    val usedHeapMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)
+    val dederVersion = DederGlobals.version
+    val uptimeSecs = internals.serverUptime.getSeconds
+    val moduleCount = project.modules.size()
+    val projectRoot = DederGlobals.projectRootDir.toString
+    val plugins = internals.loadedPlugins.map { p =>
+      ApiPluginInfo(p.id, p.taskNames.size, p.taskNames)
+    }
+    ApiServerInfo(
+      dederVersion = dederVersion,
+      jdkVersion = jdkVersion,
+      jdkVendor = jdkVendor,
+      osName = osName,
+      osArch = osArch,
+      processors = processors,
+      maxHeapMB = maxHeapMB,
+      usedHeapMB = usedHeapMB,
+      uptimeSecs = uptimeSecs,
+      moduleCount = moduleCount,
+      pluginCount = plugins.size,
+      projectRoot = projectRoot,
+      plugins = plugins
+    ).toJson
+  }
 
   // --- history filtering ---
 

@@ -191,6 +191,10 @@ class DashboardServer(
     case GET -> Path("api", "stats", "error-summary") =>
       Response.withBody(ApiRoutes.errorSummaryJson(internals))
         .settingHeader("Content-Type", "application/json")
+
+    case GET -> Path("api", "server") =>
+      Response.withBody(ApiRoutes.serverInfoJson(internals, project))
+        .settingHeader("Content-Type", "application/json")
   }
 
   private def param(req: Request, name: String, default: String): String =
