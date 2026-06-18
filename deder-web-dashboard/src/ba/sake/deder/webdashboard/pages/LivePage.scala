@@ -156,7 +156,7 @@ object LivePage {
               hx-post="/stats/cancel?requestId=$requestId"
               hx-swap="outerHTML"
               title="Cancel request">
-        ✕
+        Cancel
       </button>
     """
 
