@@ -14,6 +14,49 @@ object ApiRoutes {
   case class ApiCurrentRequest(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long) derives JsonRW
   case class ApiHistoryEntry(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long, durationMs: Long, success: Boolean) derives JsonRW
 
+  // --- 0.19.2 cancellation & progress data types ---
+
+  enum ApiRequestState(val label: String):
+    case Queued extends ApiRequestState("QUEUED")
+    case AcquiringLocks extends ApiRequestState("ACQUIRING_LOCKS")
+    case Executing extends ApiRequestState("EXECUTING")
+    case Unknown extends ApiRequestState("UNKNOWN")
+
+  object ApiRequestState:
+    def fromDeder(state: RequestState): ApiRequestState = state match
+      case RequestState.QUEUED          => Queued
+      case RequestState.ACQUIRING_LOCKS => AcquiringLocks
+      case RequestState.EXECUTING       => Executing
+      case _                            => Unknown
+
+  case class ApiLockProgress(
+      acquired: Int,
+      total: Int,
+      blockingOn: Option[String],
+      heldBy: Option[String]
+  ) derives JsonRW
+
+  case class ApiTaskStageProgress(
+      currentStage: Int,
+      totalStages: Int,
+      completed: Int,
+      failed: Int,
+      skipped: Int,
+      running: Int,
+      pending: Int
+  ) derives JsonRW
+
+  case class ApiRequestStatus(
+      requestId: String,
+      caller: String,
+      taskName: String,
+      moduleIds: Seq[String],
+      startTimeMs: Long,
+      state: ApiRequestState,
+      lockProgress: Option[ApiLockProgress],
+      taskProgress: Option[ApiTaskStageProgress]
+  ) derives JsonRW
+
   // --- new data types ---
   case class ApiTaskAggregate(
     taskName: String,
