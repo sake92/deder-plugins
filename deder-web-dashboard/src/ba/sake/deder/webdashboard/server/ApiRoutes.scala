@@ -250,6 +250,29 @@ object ApiRoutes {
     ).toJson
   }
 
+  // --- 0.19.2 request statuses ---
+
+  def requestStatuses(internals: DederProjectInternals): Seq[ApiRequestStatus] = {
+    internals.allRequestStatuses
+      .filter(_.state != RequestState.COMPLETED)
+      .map { r =>
+        ApiRequestStatus(
+          requestId = r.requestId,
+          caller = formatCallerType(r.caller),
+          taskName = r.taskName,
+          moduleIds = r.moduleIds,
+          startTimeMs = r.startTime.toEpochMilli,
+          state = ApiRequestState.fromDeder(r.state),
+          lockProgress = r.lockProgress.map(l => ApiLockProgress(l.acquired, l.total, l.blockingOn, l.heldBy)),
+          taskProgress = r.taskProgress.map(t => ApiTaskStageProgress(t.currentStage, t.totalStages,
+            t.completed.size, t.failed.size, t.skipped.size, t.running.size, t.pending.size))
+        )
+      }
+  }
+
+  def requestStatusesJson(internals: DederProjectInternals): String =
+    requestStatuses(internals).toJson
+
   // --- history filtering ---
 
   /** Filter and paginate recent history, returning a page of ApiHistoryEntry. */
