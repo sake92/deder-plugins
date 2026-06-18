@@ -21,12 +21,12 @@ class DashboardServerSuite extends FunSuite {
       Seq(LiveRequest("req-001", CallerType.Cli, "compile", Seq("my-module"), now))
     def recentHistory: Seq[CompletedRequest] =
       Seq(
-        CompletedRequest("req-000", CallerType.Cli, "compile", Seq("my-module"), now.minusSeconds(10), Duration.ofSeconds(5), true),
-        CompletedRequest("req-001", CallerType.Bsp, "test", Seq("core-test"), now.minusSeconds(20), Duration.ofSeconds(12), false),
-        CompletedRequest("req-002", CallerType.Cli, "compile", Seq("core"), now.minusSeconds(30), Duration.ofSeconds(2), true),
-        CompletedRequest("req-003", CallerType.Cli, "compile", Seq("api"), now.minusSeconds(40), Duration.ofMillis(800), true),
-        CompletedRequest("req-004", CallerType.Bsp, "compile", Seq("core", "api"), now.minusSeconds(50), Duration.ofSeconds(45), true),
-        CompletedRequest("req-005", CallerType.Cli, "test", Seq("core-test"), now.minusSeconds(60), Duration.ofSeconds(1), false),
+        CompletedRequest("req-000", CallerType.Cli, "compile", Seq("my-module"), now.minusSeconds(10), Duration.ofSeconds(5), true, None),
+        CompletedRequest("req-001", CallerType.Bsp, "test", Seq("core-test"), now.minusSeconds(20), Duration.ofSeconds(12), false, Some("test failed")),
+        CompletedRequest("req-002", CallerType.Cli, "compile", Seq("core"), now.minusSeconds(30), Duration.ofSeconds(2), true, None),
+        CompletedRequest("req-003", CallerType.Cli, "compile", Seq("api"), now.minusSeconds(40), Duration.ofMillis(800), true, None),
+        CompletedRequest("req-004", CallerType.Bsp, "compile", Seq("core", "api"), now.minusSeconds(50), Duration.ofSeconds(45), true, None),
+        CompletedRequest("req-005", CallerType.Cli, "test", Seq("core-test"), now.minusSeconds(60), Duration.ofSeconds(1), false, Some("assertion error")),
       )
     def taskStats(taskName: String): Option[TaskStats] = None
     def allTaskStats: Seq[(String, TaskStats)] = Seq.empty
@@ -37,6 +37,21 @@ class DashboardServerSuite extends FunSuite {
     def inMemoryCachesStats: Map[String, InMemCacheStats] = Map.empty
     def loadedPlugins: Seq[LoadedPluginInfo] = Seq(
       LoadedPluginInfo("web-dashboard", Seq())
+    )
+    def cancelRequest(requestId: String): Boolean = requestId != "nonexistent"
+    def requestStatus(requestId: String): Option[RequestStatus] = None
+    def allRequestStatuses: Seq[RequestStatus] = Seq(
+      RequestStatus("req-q1", CallerType.Cli, "compile", Seq("core"), now,
+        RequestState.QUEUED, None, None),
+      RequestStatus("req-l1", CallerType.Bsp, "test", Seq("core-test"), now.minusSeconds(5),
+        RequestState.ACQUIRING_LOCKS,
+        Some(LockProgress(1, 3, Some("core.compile"), Some("req-042"))),
+        None),
+      RequestStatus("req-e1", CallerType.Cli, "compile", Seq("app"), now.minusSeconds(10),
+        RequestState.EXECUTING, None,
+        Some(TaskStageProgress(2, 5, Seq("a", "b"), Seq.empty, Seq.empty, Seq("c", "d"), Seq("e", "f", "g")))),
+      RequestStatus("req-e2", CallerType.Bsp, "run", Seq("app"), now.minusSeconds(20),
+        RequestState.EXECUTING, None, None)
     )
   }
 
@@ -93,6 +108,27 @@ class DashboardServerSuite extends FunSuite {
     }
   }
 
+  private def httpPost(path: String): (Int, String) = {
+    val url = s"$baseUrl$path"
+    val conn = URL(url).openConnection().asInstanceOf[HttpURLConnection]
+    conn.setRequestMethod("POST")
+    conn.setDoOutput(true)
+    conn.setInstanceFollowRedirects(false)
+    conn.setConnectTimeout(2000)
+    conn.setReadTimeout(2000)
+    try {
+      val code = conn.getResponseCode
+      val stream = if code >= 400 then conn.getErrorStream else conn.getInputStream
+      val body = if stream != null then scala.io.Source.fromInputStream(stream).mkString else ""
+      conn.disconnect()
+      (code, body)
+    } catch {
+      case e: Exception =>
+        conn.disconnect()
+        throw e
+    }
+  }
+
   test("GET / redirects to /modules") {
     val (code, _) = httpGet("/")
     assertEquals(code, 301)
@@ -124,6 +160,7 @@ class DashboardServerSuite extends FunSuite {
     assertEquals(code, 200)
     assert(body.contains("Live"), s"body should contain 'Live', got: ${body.take(300)}")
     assert(body.contains("Auto-refresh"), s"body should contain auto-refresh toggle, got: ${body.take(300)}")
+    assert(body.contains("Requests"), s"body should contain 'Requests' section, got: ${body.take(300)}")
   }
 
   test("GET /stats/overview returns stat cards HTML fragment") {
@@ -133,10 +170,25 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("5"), s"should contain total errors (5), got: $body")
   }
 
-  test("GET /stats/current returns current requests HTML fragment") {
-    val (code, body) = httpGet("/stats/current")
+  test("GET /stats/current redirects to /stats/requests") {
+    val (code, _) = httpGet("/stats/current")
+    assertEquals(code, 301)
+  }
+
+  test("GET /stats/requests returns state-grouped request sections") {
+    val (code, body) = httpGet("/stats/requests")
     assertEquals(code, 200)
-    assert(body.contains("compile"), s"should contain task name 'compile', got: $body")
+    assert(body.contains("Queued"), s"should contain Queued section, got: $body")
+    assert(body.contains("Acquiring Locks"), s"should contain Acquiring Locks section, got: $body")
+    assert(body.contains("Executing"), s"should contain Executing section, got: $body")
+    assert(body.contains("Lock 1/3"), s"should contain lock progress, got: $body")
+    assert(body.contains("Stage 2/5"), s"should contain stage progress, got: $body")
+  }
+
+  test("POST /stats/cancel with valid requestId returns cancelled badge") {
+    val (code, body) = httpPost("/stats/cancel?requestId=req-q1")
+    assertEquals(code, 200)
+    assert(body.contains("Cancelled"), s"should contain 'Cancelled', got: $body")
   }
 
   // --- History tab ---
@@ -255,6 +307,27 @@ class DashboardServerSuite extends FunSuite {
     val (code, body) = httpGet("/api/stats/error-summary")
     assertEquals(code, 200)
     assert(body.startsWith("["), s"should be a JSON array, got: ${body.take(200)}")
+  }
+
+  test("GET /api/stats/request-statuses returns JSON with state field") {
+    val (code, body) = httpGet("/api/stats/request-statuses")
+    assertEquals(code, 200)
+    assert(body.contains("\"state\":"), s"should contain state field, got: $body")
+    assert(body.contains("\"Queued\""), s"should contain Queued state, got: $body")
+    assert(body.contains("\"AcquiringLocks\""), s"should contain AcquiringLocks state, got: $body")
+    assert(body.contains("\"Executing\""), s"should contain Executing state, got: $body")
+  }
+
+  test("POST /api/cancel with valid requestId returns cancelled true") {
+    val (code, body) = httpPost("/api/cancel?requestId=req-q1")
+    assertEquals(code, 200)
+    assert(body.contains("\"cancelled\": true"), s"should be cancelled true, got: $body")
+  }
+
+  test("POST /api/cancel with invalid requestId returns cancelled false") {
+    val (code, body) = httpPost("/api/cancel?requestId=nonexistent")
+    assertEquals(code, 200)
+    assert(body.contains("\"cancelled\": false"), s"should be cancelled false, got: $body")
   }
 
   test("GET /nonexistent returns 404") {
