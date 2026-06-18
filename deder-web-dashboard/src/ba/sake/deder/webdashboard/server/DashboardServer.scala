@@ -55,12 +55,27 @@ class DashboardServer(
       Response.withBody(h)
 
     case GET -> Path("stats", "current") =>
-      val h = LivePage.currentRequestsTable(internals)
+      // kept for backward compatibility — redirect to new requests
+      Response.redirect("/stats/requests")
+
+    case GET -> Path("stats", "requests") =>
+      val statuses = ApiRoutes.requestStatuses(internals)
+      val h = LivePage.requestSections(statuses)
       Response.withBody(h)
 
     case GET -> Path("stats", "caches") =>
       val h = LivePage.cachesTable(internals)
       Response.withBody(h)
+
+    case POST -> Path("stats", "cancel") =>
+      val req = summon[Request]
+      val requestId = param(req, "requestId", "")
+      if requestId.nonEmpty then
+        val cancelled = internals.cancelRequest(requestId)
+        if cancelled then Response.withBody(LivePage.cancelledBadge)
+        else Response.withBody(LivePage.cancelButton(requestId))
+      else
+        Response.withBody(html"<span style='color:red'>Invalid request</span>")
 
     // --- Auto-refresh toggle endpoints ---
     case GET -> Path("stats", "auto-refresh", "live") =>
@@ -168,6 +183,17 @@ class DashboardServer(
 
     case GET -> Path("api", "stats", "overview") =>
       Response.withBody(ApiRoutes.overviewJson(internals))
+        .settingHeader("Content-Type", "application/json")
+
+    case GET -> Path("api", "stats", "request-statuses") =>
+      Response.withBody(ApiRoutes.requestStatusesJson(internals))
+        .settingHeader("Content-Type", "application/json")
+
+    case POST -> Path("api", "cancel") =>
+      val req = summon[Request]
+      val requestId = param(req, "requestId", "")
+      val cancelled = if requestId.nonEmpty then internals.cancelRequest(requestId) else false
+      Response.withBody(s"""{"cancelled": $cancelled}""")
         .settingHeader("Content-Type", "application/json")
 
     case GET -> Path("api", "stats", "current") =>
