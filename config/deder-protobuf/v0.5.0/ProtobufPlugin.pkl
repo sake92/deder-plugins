@@ -1,0 +1,106 @@
+module ba.sake.deder.plugins.protobuf
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+typealias ResolverKind = "system-path" | "path" | "binary-maven" | "jvm-maven"
+
+class ProtobufPlugin extends P.DederPlugin {
+  id = "protobuf"
+  version: String = "0.4.0"
+  deps {
+    "ba.sake::deder-protobuf:\(version)"
+  }
+  config: ProtobufPluginConfig = new {}
+}
+
+class ProtobufPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {}
+}
+
+class ModuleDefaults {
+  enabled: Boolean = true
+  protoc: ResolverConfig = new {}
+  builtins: Listing<BuiltinLanguageTarget> = new {}
+  plugins: Listing<PluginTarget> = new {}
+  imports: ImportConfig = new ImportConfig {}
+  descriptor: DescriptorConfig?
+  main: SourceSetConfig = new {}
+  test: SourceSetConfig = new {}
+}
+
+class ModuleOverride {
+  enabled: Boolean?
+  protoc: ResolverConfig?
+  builtins: Listing<BuiltinLanguageTarget>?
+  plugins: Listing<PluginTarget>?
+  imports: ImportConfig?
+  descriptor: DescriptorConfig?
+  main: SourceSetOverride?
+  test: SourceSetOverride?
+}
+
+class SourceSetConfig {
+  enabled: Boolean = true
+  sourceDirs: Listing<String> = new {}
+  includeGlobs: Listing<String> = new {
+    "**/*.proto"
+  }
+  excludeGlobs: Listing<String> = new {}
+  extraImportPaths: Listing<String> = new {}
+  extraImportDeps: Listing<String> = new {}
+  extraArgs: Listing<String> = new {}
+  env: Mapping<String, String> = new Mapping {}
+}
+
+class SourceSetOverride {
+  enabled: Boolean?
+  sourceDirs: Listing<String>?
+  includeGlobs: Listing<String>?
+  excludeGlobs: Listing<String>?
+  extraImportPaths: Listing<String>?
+  extraImportDeps: Listing<String>?
+  extraArgs: Listing<String>?
+  env: Mapping<String, String>?
+}
+
+class ResolverConfig {
+  kind: ResolverKind = "system-path"
+  command: String?
+  path: String?
+  dependency: String?
+  mainClass: String?
+  jvmArgs: Listing<String> = new {}
+  executableSubpath: String?
+  url: String?
+  digest: String?
+  sanctionedExecutablePath: String?
+  skipOnUnsupportedPlatform: Boolean = false
+}
+
+class BuiltinLanguageTarget {
+  name: String(!isEmpty)
+  options: String?
+  outputDir: String?
+}
+
+class PluginTarget {
+  name: String(!isEmpty)
+  options: String?
+  outputDir: String?
+  resolver: ResolverConfig = new {}
+}
+
+class ImportConfig {
+  includeProjectDependencies: Boolean = true
+  dependencyArtifacts: Listing<String> = new {}
+  paths: Listing<String> = new {}
+}
+
+class DescriptorConfig {
+  fileName: String(!isEmpty) = "descriptor-set.pb"
+  includeImports: Boolean = true
+  includeSourceInfo: Boolean = false
+}
+
+config: ProtobufPluginConfig = new {}
