@@ -146,6 +146,13 @@ class DashboardServer(
       val h = StatsPage.topOffenders(offenders)
       Response.withBody(h)
 
+    case GET -> Path("stats", "module-aggregates") =>
+      val req = summon[Request]
+      val n = param(req, "n", "5").toInt
+      val aggregates = ApiRoutes.moduleAggregates(internals, n)
+      val h = StatsPage.moduleAggregatesSection(aggregates)
+      Response.withBody(h)
+
     case GET -> Path("stats", "error-summary") =>
       val errors = ApiRoutes.errorSummary(internals)
       val h = StatsPage.errorSummary(errors)
@@ -216,6 +223,12 @@ class DashboardServer(
 
     case GET -> Path("api", "stats", "error-summary") =>
       Response.withBody(ApiRoutes.errorSummaryJson(internals))
+        .settingHeader("Content-Type", "application/json")
+
+    case GET -> Path("api", "stats", "module-aggregates") =>
+      val req = summon[Request]
+      val n = param(req, "n", "5").toInt
+      Response.withBody(ApiRoutes.moduleAggregatesJson(internals, n))
         .settingHeader("Content-Type", "application/json")
 
     case GET -> Path("api", "server") =>

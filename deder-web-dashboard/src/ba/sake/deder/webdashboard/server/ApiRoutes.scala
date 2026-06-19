@@ -192,6 +192,25 @@ object ApiRoutes {
     pairs.groupBy(_._1).view.mapValues(_.map(_._2).sum).toMap
   }
 
+  /** Top N modules by total accumulated time across all tasks, descending. */
+  def moduleAggregates(internals: DederProjectInternals, n: Int): Seq[ApiModuleAggregate] = {
+    val grouped = internals.recentHistory.flatMap { r =>
+      r.moduleIds.map(m => (m, r))
+    }.groupBy(_._1)
+
+    grouped.toSeq.map { case (moduleId, pairs) =>
+      val requests = pairs.map(_._2)
+      val totalTimeMs = requests.map(_.duration.toMillis).sum
+      val invocations = requests.size.toLong
+      val errors = requests.count(!_.success).toLong
+      val durations = requests.map(_.duration.toMillis)
+      val avgTimeMs = if invocations > 0 then totalTimeMs / invocations else 0L
+      val minTimeMs = if durations.nonEmpty then durations.min else 0L
+      val maxTimeMs = if durations.nonEmpty then durations.max else 0L
+      ApiModuleAggregate(moduleId, invocations, errors, totalTimeMs, avgTimeMs, minTimeMs, maxTimeMs)
+    }.sortBy(-_.totalTimeMs).take(n)
+  }
+
   /** Top N tasks by total accumulated time, descending. */
   def topOffenders(internals: DederProjectInternals, n: Int): Seq[ApiTaskAggregate] =
     taskAggregates(internals).sortBy(-_.totalTimeMs).take(n)
@@ -211,6 +230,9 @@ object ApiRoutes {
 
   def moduleBreakdownJson(internals: DederProjectInternals, taskName: String): String =
     moduleBreakdown(internals, taskName).toJson
+
+  def moduleAggregatesJson(internals: DederProjectInternals, n: Int): String =
+    moduleAggregates(internals, n).toJson
 
   def topOffendersJson(internals: DederProjectInternals, n: Int): String =
     topOffenders(internals, n).toJson

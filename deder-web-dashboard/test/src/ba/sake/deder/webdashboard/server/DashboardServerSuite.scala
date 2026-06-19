@@ -253,6 +253,15 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("#1"), s"should contain '#1' ranking, got: $body")
   }
 
+  test("GET /stats/module-aggregates returns heaviest modules HTML") {
+    val (code, body) = httpGet("/stats/module-aggregates?n=3")
+    assertEquals(code, 200)
+    // core has 2+45=47s, api has 0.8+45=45.8s, core-test has 12+1=13s
+    assert(body.contains("#1"), s"should contain '#1' ranking, got: $body")
+    assert(body.contains("core"), s"should contain 'core' as heaviest, got: $body")
+    assert(body.contains("api"), s"should contain 'api', got: $body")
+  }
+
   test("GET /stats/error-summary returns error summary") {
     val (code, body) = httpGet("/stats/error-summary")
     assertEquals(code, 200)
@@ -307,6 +316,14 @@ class DashboardServerSuite extends FunSuite {
     val (code, body) = httpGet("/api/stats/error-summary")
     assertEquals(code, 200)
     assert(body.startsWith("["), s"should be a JSON array, got: ${body.take(200)}")
+  }
+
+  test("GET /api/stats/module-aggregates returns JSON with modules ranked by time") {
+    val (code, body) = httpGet("/api/stats/module-aggregates?n=3")
+    assertEquals(code, 200)
+    assert(body.contains("\"moduleId\": \"core\""), s"should contain core as heaviest, got: $body")
+    assert(body.contains("\"moduleId\": \"api\""), s"should contain api second, got: $body")
+    assert(body.contains("\"totalTimeMs\""), s"should contain totalTimeMs, got: $body")
   }
 
   test("GET /api/stats/request-statuses returns JSON with state field") {
