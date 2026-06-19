@@ -23,6 +23,13 @@ object StatsPage {
         <p>Loading stats...</p>
       </div>
 
+      <h3>Heaviest Modules</h3>
+      <div id="module-aggregates-container"
+           hx-get="/stats/module-aggregates" hx-swap="innerHTML"
+           hx-trigger="load, every ${refreshMs}ms, refresh">
+        <p>Loading...</p>
+      </div>
+
       <h3>Top Time Consumers</h3>
       <div id="top-offenders-container"
            hx-get="/stats/top-offenders" hx-swap="innerHTML"
@@ -50,6 +57,7 @@ object StatsPage {
     val trigger = if enabled then s"load, every ${refreshMs}ms, refresh" else "load, refresh"
     html"""
       <div id="task-aggregates-container" hx-get="/stats/task-aggregates" hx-swap="innerHTML" hx-trigger="${trigger}" hx-swap-oob="true"></div>
+      <div id="module-aggregates-container" hx-get="/stats/module-aggregates" hx-swap="innerHTML" hx-trigger="${trigger}" hx-swap-oob="true"></div>
       <div id="top-offenders-container" hx-get="/stats/top-offenders" hx-swap="innerHTML" hx-trigger="${trigger}" hx-swap-oob="true"></div>
       <div id="error-summary-container" hx-get="/stats/error-summary" hx-swap="innerHTML" hx-trigger="${trigger}" hx-swap-oob="true"></div>
     """
@@ -131,6 +139,28 @@ object StatsPage {
         </tr>
       </tbody>
     """
+  }
+
+  /** Render heaviest modules as a compact card list (cross-task). */
+  def moduleAggregatesSection(aggregates: Seq[ApiModuleAggregate]): Html = {
+    if aggregates.isEmpty then html"""<p><em>No completed tasks yet.</em></p>"""
+    else
+      val cards = aggregates.zipWithIndex.map { case (agg, idx) =>
+        val num = idx + 1
+        html"""
+          <div class="stat-card" style="text-align:left; min-width:200px;">
+            <div class="label">#$num</div>
+            <div><strong>${agg.moduleId}</strong></div>
+            <div style="font-size:0.8rem;">
+              ${formatMs(agg.totalTimeMs)} total &middot;
+              ${agg.invocations} invoc &middot;
+              avg ${formatMs(agg.avgTimeMs)} &middot;
+              ${agg.errors} errors
+            </div>
+          </div>
+        """
+      }
+      html"""<div style="display:flex; flex-wrap:wrap; gap:0.5rem;">${cards}</div>"""
   }
 
   /** Render top offenders as a compact card list. */
