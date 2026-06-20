@@ -38,6 +38,7 @@ class DashboardServerSuite extends FunSuite {
     def loadedPlugins: Seq[LoadedPluginInfo] = Seq(
       LoadedPluginInfo("web-dashboard", Seq())
     )
+    def purgeInMemoryCaches(): PurgeCachesResult = PurgeCachesResult(0, 0, 0, false)
     def cancelRequest(requestId: String): Boolean = requestId != "nonexistent"
     def requestStatus(requestId: String): Option[RequestStatus] = None
     def allRequestStatuses: Seq[RequestStatus] = Seq(
