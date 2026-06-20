@@ -1,22 +1,27 @@
 package ba.sake.deder.webdashboard.server
 
+import java.time.Instant
 import ba.sake.sharaf.*, ba.sake.sharaf.jdkhttp.*
 import ba.sake.sharaf.given_ResponseWritable_Html
 import ba.sake.deder.*
 import ba.sake.deder.config.DederProject
-import ba.sake.deder.webdashboard.pages.{Layout, ModulesPage, ModulesGraphPage, ServerPage, LivePage, HistoryPage, StatsPage}
+import ba.sake.deder.webdashboard.pages.{Layout, ModulesPage, ModulesGraphPage, ServerPage, LivePage, HistoryPage, StatsPage, TasksPage}
 import ba.sake.deder.plugins.WebDashboard.WebDashboardPluginConfig
 import ba.sake.deder.webdashboard.server.ApiRoutes.{ApiTaskAggregate, ApiModuleAggregate}
 
 class DashboardServer(
     config: WebDashboardPluginConfig,
     project: DederProject,
-    internals: DederProjectInternals
+    internals: DederProjectInternals,
+    taskInvoker: TaskInvokerApi
 ) {
   private var jdkServer: Option[JdkHttpServerSharafServer] = None
 
   private val refreshMs = config.statsRefreshIntervalMs.toInt
   private lazy val projectRoot = DederGlobals.projectRootDir.toString
+
+  private val executionLog = TaskExecutionLog(config.tasksMaxHistory.toInt)
+  private val taskRunner = TaskRunner(taskInvoker, internals, executionLog, config.tasksMaxConcurrent.toInt)
 
   private val routes = Routes {
     case GET -> Path() =>
@@ -182,6 +187,72 @@ class DashboardServer(
           Response.withBody(StatsPage.collapsedTaskRow(agg))
         case None =>
           Response.withBody(html"""<tr><td colspan="7">Task not found: $task</td></tr>""")
+
+    // --- Tasks tab ---
+    case GET -> Path("tasks") =>
+      val content = TasksPage.fullPage(executionLog, internals, project, refreshMs)
+      Response.withBody(Layout.htmlPage("Tasks - Deder Dashboard", "tasks", content, projectRoot))
+
+    case GET -> Path("tasks", "run") =>
+      val req = summon[Request]
+      val taskName = param(req, "taskName", "")
+      val moduleIdsRaw = param(req, "moduleIds", "*")
+      if taskName.isEmpty then
+        Response.withBody(html"""<tr><td colspan="7" style="color:red">Task name is required</td></tr>""")
+      else
+        val moduleIds = if moduleIdsRaw == "*" || moduleIdsRaw.isBlank then Seq.empty[String]
+                        else moduleIdsRaw.split(",").map(_.trim).filter(_.nonEmpty).toSeq
+        taskRunner.trigger(taskName, moduleIds)
+        val table = TasksPage.logTable(executionLog)
+        Response.withBody(table)
+
+    case POST -> Path("tasks", "cancel") =>
+      val req = summon[Request]
+      val execId = param(req, "execId", "")
+      if execId.nonEmpty then
+        executionLog.get(execId).flatMap(_.requestId).foreach { requestId =>
+          internals.cancelRequest(requestId)
+        }
+        executionLog.update(execId)(_.copy(status = ExecStatus.CANCELLED, endTime = Some(Instant.now())))
+      val table = TasksPage.logTable(executionLog)
+      Response.withBody(table)
+
+    case GET -> Path("tasks", "log-table") =>
+      val table = TasksPage.logTable(executionLog)
+      Response.withBody(table)
+
+    // --- Task runner JSON APIs ---
+    case GET -> Path("api", "tasks") =>
+      Response.withBody(ApiRoutes.tasksJson(executionLog))
+        .settingHeader("Content-Type", "application/json")
+
+    case POST -> Path("api", "tasks", "run") =>
+      val req = summon[Request]
+      val taskName = param(req, "taskName", "")
+      val moduleIdsRaw = param(req, "moduleIds", "*")
+      if taskName.nonEmpty then
+        val moduleIds = if moduleIdsRaw == "*" || moduleIdsRaw.isBlank then Seq.empty[String]
+                        else moduleIdsRaw.split(",").map(_.trim).filter(_.nonEmpty).toSeq
+        val entry = taskRunner.trigger(taskName, moduleIds)
+        val status = entry.status.toString
+        val err = entry.error.map(e => s""","error":"$e"""").getOrElse("")
+        val json = s"""{"execId":"${entry.execId}","status":"$status","taskName":"${entry.taskName}"$err}"""
+        Response.withBody(json)
+          .settingHeader("Content-Type", "application/json")
+      else
+        Response.withBody("""{"error": "taskName is required"}""")
+          .settingHeader("Content-Type", "application/json")
+
+    case GET -> Path("api", "tasks", "exec") =>
+      val req = summon[Request]
+      val execId = param(req, "execId", "")
+      ApiRoutes.taskExecJson(executionLog, execId) match
+        case Some(json) =>
+          Response.withBody(json)
+            .settingHeader("Content-Type", "application/json")
+        case None =>
+          Response.withBody("""{"error": "not found"}""")
+            .settingHeader("Content-Type", "application/json")
 
     // --- JSON APIs (existing + new) ---
     case GET -> Path("api", "modules") =>

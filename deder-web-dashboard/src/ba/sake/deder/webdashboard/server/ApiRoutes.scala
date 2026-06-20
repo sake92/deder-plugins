@@ -103,6 +103,38 @@ object ApiRoutes {
     plugins: Seq[ApiPluginInfo]
   ) derives JsonRW
 
+  // --- Task runner API types ---
+  case class ApiExecEntry(
+    execId: String,
+    taskName: String,
+    moduleIds: Seq[String],
+    startTimeMs: Long,
+    endTimeMs: Option[Long],
+    status: String,
+    output: String,
+    error: Option[String]
+  ) derives JsonRW
+
+  // --- Task runner JSON endpoints ---
+
+  def tasksJson(log: TaskExecutionLog): String =
+    log.recent(200).map(toApi).toJson
+
+  def taskExecJson(log: TaskExecutionLog, execId: String): Option[String] =
+    log.get(execId).map(e => toApi(e).toJson)
+
+  private def toApi(e: ExecEntry): ApiExecEntry =
+    ApiExecEntry(
+      execId = e.execId,
+      taskName = e.taskName,
+      moduleIds = e.moduleIds,
+      startTimeMs = e.startTime.toEpochMilli,
+      endTimeMs = e.endTime.map(_.toEpochMilli),
+      status = e.status.toString,
+      output = e.output,
+      error = e.error
+    )
+
   // --- existing JSON endpoints ---
   def modulesJson(project: DederProject): String = {
     val modules = project.modules.asScala.toSeq.map { m =>

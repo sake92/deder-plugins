@@ -36,7 +36,8 @@ class DashboardServerSuite extends FunSuite {
     def workerThreadPoolSize: Int = 10
     def inMemoryCachesStats: Map[String, InMemCacheStats] = Map.empty
     def loadedPlugins: Seq[LoadedPluginInfo] = Seq(
-      LoadedPluginInfo("web-dashboard", Seq())
+      LoadedPluginInfo("web-dashboard", Seq()),
+      LoadedPluginInfo("core", Seq("compile", "test", "run", "jar", "publishLocal"))
     )
     def purgeInMemoryCaches(): PurgeCachesResult = PurgeCachesResult(0, 0, 0, false)
     def cancelRequest(requestId: String): Boolean = requestId != "nonexistent"
@@ -70,7 +71,23 @@ class DashboardServerSuite extends FunSuite {
     )
 
   private val config = WebDashboardPluginConfig(true, testHost, testPort.toLong, testRefreshMs.toLong, 3L, 200L, 500L)
-  private val server = DashboardServer(config, stubProject, stubInternals)
+
+  private val stubTaskInvoker: TaskInvokerApi = new TaskInvokerApi {
+    def invoke(
+        taskName: String,
+        moduleIds: Seq[String],
+        args: Seq[String],
+        onNotification: ServerNotification => Unit
+    ): TaskInvokeResult = {
+      onNotification(ServerNotification.Output(s"Running $taskName..."))
+      val outcomes = moduleIds.map { m =>
+        TaskInvokeOutcome(m, success = true, None, fromCache = false)
+      }
+      TaskInvokeResult(outcomes, None)
+    }
+  }
+
+  private val server = DashboardServer(config, stubProject, stubInternals, stubTaskInvoker)
   private val baseUrl = s"http://$testHost:$testPort"
   private val projectRootProperty = "DEDER_PROJECT_ROOT_DIR"
   private var previousProjectRoot: Option[String] = None
@@ -347,6 +364,74 @@ class DashboardServerSuite extends FunSuite {
     assertEquals(code, 200)
     assert(body.contains("\"cancelled\": false"), s"should be cancelled false, got: $body")
   }
+
+  // --- Tasks tab tests ---
+  test("GET /tasks returns HTML page with trigger form") {
+    val (code, body) = httpGet("/tasks")
+    assertEquals(code, 200)
+    assert(body.contains("Tasks"), s"body should contain 'Tasks', got: ${body.take(300)}")
+    assert(body.contains("task-list"), s"body should contain task datalist, got: ${body.take(300)}")
+    assert(body.contains("Run"), s"body should contain Run button, got: ${body.take(300)}")
+  }
+
+  test("GET /tasks/run with valid task returns log table") {
+    val (code, body) = httpGet("/tasks/run?taskName=compile")
+    assertEquals(code, 200)
+    assert(body.contains("compile"), s"should contain task name 'compile', got: $body")
+  }
+
+  test("GET /tasks/log-table returns log table HTML") {
+    val (code, body) = httpGet("/tasks/log-table")
+    assertEquals(code, 200)
+    assert(body.contains("<table"), s"should return a table, got: ${body.take(200)}")
+  }
+
+  test("GET /api/tasks returns JSON array") {
+    // trigger a task first
+    httpGet("/tasks/run?taskName=compile")
+    Thread.sleep(600) // wait for stub to complete
+    val (code, body) = httpGet("/api/tasks")
+    assertEquals(code, 200)
+    assert(body.startsWith("["), s"should be JSON array, got: ${body.take(200)}")
+    assert(body.contains("\"taskName\": \"compile\""), s"should contain compile entry, got: $body")
+  }
+
+  test("GET /api/tasks/exec returns JSON for valid execId") {
+    httpGet("/tasks/run?taskName=compile")
+    Thread.sleep(600)
+    val (_, tasksBody) = httpGet("/api/tasks")
+    // extract execId from JSON array
+    val execId = extractExecId(tasksBody)
+    assert(execId.nonEmpty, s"should have an execId")
+
+    val (code, body) = httpGet(s"/api/tasks/exec?execId=$execId")
+    assertEquals(code, 200)
+    assert(body.contains(execId), s"should contain the execId, got: $body")
+    assert(body.contains("compile"), s"should contain task name 'compile', got: $body")
+  }
+
+  test("POST /api/tasks/run with valid task returns execId JSON") {
+    val (code, body) = httpPost("/api/tasks/run?taskName=compile")
+    assertEquals(code, 200)
+    assert(body.contains("\"execId\""), s"should contain execId field, got: $body")
+    assert(body.contains("\"status\""), s"should contain status field, got: $body")
+  }
+
+  test("POST /api/tasks/run with unknown task returns error") {
+    val (code, body) = httpPost("/api/tasks/run?taskName=nonexistent19999")
+    assertEquals(code, 200)
+    assert(body.contains("\"error\""), s"should contain error field, got: $body")
+  }
+
+  private def extractExecId(json: String): String =
+    try
+      val idx = json.indexOf("\"execId\": \"")
+      if idx >= 0 then
+        val start = idx + 11
+        val end = json.indexOf("\"", start)
+        json.substring(start, end)
+      else ""
+    catch case _: Exception => ""
 
   test("GET /nonexistent returns 404") {
     val (code, _) = httpGet("/nonexistent")
