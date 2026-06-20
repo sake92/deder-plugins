@@ -131,29 +131,53 @@ public final class WebDashboard {
 
     public final long statsRefreshIntervalMs;
 
+    public final long tasksMaxConcurrent;
+
+    public final long tasksMaxHistory;
+
+    public final long tasksOutputLineLimit;
+
     public WebDashboardPluginConfig(@Named("enabled") boolean enabled,
         @Named("host") @NonNull String host, @Named("port") long port,
-        @Named("statsRefreshIntervalMs") long statsRefreshIntervalMs) {
+        @Named("statsRefreshIntervalMs") long statsRefreshIntervalMs,
+        @Named("tasksMaxConcurrent") long tasksMaxConcurrent,
+        @Named("tasksMaxHistory") long tasksMaxHistory,
+        @Named("tasksOutputLineLimit") long tasksOutputLineLimit) {
       this.enabled = enabled;
       this.host = host;
       this.port = port;
       this.statsRefreshIntervalMs = statsRefreshIntervalMs;
+      this.tasksMaxConcurrent = tasksMaxConcurrent;
+      this.tasksMaxHistory = tasksMaxHistory;
+      this.tasksOutputLineLimit = tasksOutputLineLimit;
     }
 
     public WebDashboardPluginConfig withEnabled(boolean enabled) {
-      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs);
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs, tasksMaxConcurrent, tasksMaxHistory, tasksOutputLineLimit);
     }
 
     public WebDashboardPluginConfig withHost(@NonNull String host) {
-      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs);
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs, tasksMaxConcurrent, tasksMaxHistory, tasksOutputLineLimit);
     }
 
     public WebDashboardPluginConfig withPort(long port) {
-      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs);
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs, tasksMaxConcurrent, tasksMaxHistory, tasksOutputLineLimit);
     }
 
     public WebDashboardPluginConfig withStatsRefreshIntervalMs(long statsRefreshIntervalMs) {
-      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs);
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs, tasksMaxConcurrent, tasksMaxHistory, tasksOutputLineLimit);
+    }
+
+    public WebDashboardPluginConfig withTasksMaxConcurrent(long tasksMaxConcurrent) {
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs, tasksMaxConcurrent, tasksMaxHistory, tasksOutputLineLimit);
+    }
+
+    public WebDashboardPluginConfig withTasksMaxHistory(long tasksMaxHistory) {
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs, tasksMaxConcurrent, tasksMaxHistory, tasksOutputLineLimit);
+    }
+
+    public WebDashboardPluginConfig withTasksOutputLineLimit(long tasksOutputLineLimit) {
+      return new WebDashboardPluginConfig(enabled, host, port, statsRefreshIntervalMs, tasksMaxConcurrent, tasksMaxHistory, tasksOutputLineLimit);
     }
 
     @Override
@@ -166,6 +190,9 @@ public final class WebDashboard {
       if (!Objects.equals(this.host, other.host)) return false;
       if (!Objects.equals(this.port, other.port)) return false;
       if (!Objects.equals(this.statsRefreshIntervalMs, other.statsRefreshIntervalMs)) return false;
+      if (!Objects.equals(this.tasksMaxConcurrent, other.tasksMaxConcurrent)) return false;
+      if (!Objects.equals(this.tasksMaxHistory, other.tasksMaxHistory)) return false;
+      if (!Objects.equals(this.tasksOutputLineLimit, other.tasksOutputLineLimit)) return false;
       return true;
     }
 
@@ -176,17 +203,23 @@ public final class WebDashboard {
       result = 31 * result + Objects.hashCode(this.host);
       result = 31 * result + Objects.hashCode(this.port);
       result = 31 * result + Objects.hashCode(this.statsRefreshIntervalMs);
+      result = 31 * result + Objects.hashCode(this.tasksMaxConcurrent);
+      result = 31 * result + Objects.hashCode(this.tasksMaxHistory);
+      result = 31 * result + Objects.hashCode(this.tasksOutputLineLimit);
       return result;
     }
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(250);
+      StringBuilder builder = new StringBuilder(400);
       builder.append(WebDashboardPluginConfig.class.getSimpleName()).append(" {");
       appendProperty(builder, "enabled", this.enabled);
       appendProperty(builder, "host", this.host);
       appendProperty(builder, "port", this.port);
       appendProperty(builder, "statsRefreshIntervalMs", this.statsRefreshIntervalMs);
+      appendProperty(builder, "tasksMaxConcurrent", this.tasksMaxConcurrent);
+      appendProperty(builder, "tasksMaxHistory", this.tasksMaxHistory);
+      appendProperty(builder, "tasksOutputLineLimit", this.tasksOutputLineLimit);
       builder.append("\n}");
       return builder.toString();
     }

@@ -68,7 +68,7 @@ class DashboardServerSuite extends FunSuite {
       java.util.Map.of()
     )
 
-  private val config = WebDashboardPluginConfig(true, testHost, testPort.toLong, testRefreshMs.toLong)
+  private val config = WebDashboardPluginConfig(true, testHost, testPort.toLong, testRefreshMs.toLong, 3L, 200L, 500L)
   private val server = DashboardServer(config, stubProject, stubInternals)
   private val baseUrl = s"http://$testHost:$testPort"
   private val projectRootProperty = "DEDER_PROJECT_ROOT_DIR"

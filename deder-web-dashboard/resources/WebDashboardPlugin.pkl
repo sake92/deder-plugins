@@ -16,6 +16,9 @@ class WebDashboardPluginConfig {
   host: String = "localhost"
   port: Int = 9292
   statsRefreshIntervalMs: Int = 1000
+  tasksMaxConcurrent: Int = 3
+  tasksMaxHistory: Int = 200
+  tasksOutputLineLimit: Int = 500
 }
 
 config: WebDashboardPluginConfig = new {}
