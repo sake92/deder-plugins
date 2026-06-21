@@ -38,7 +38,7 @@ class DashboardServer(
 
     case GET -> Path("server") =>
       val content = ServerPage.serverInfo(internals, project)
-      Response.withBody(Layout.htmlPage("Info - Deder Dashboard", "server", content, projectRoot))
+      Response.withBody(Layout.htmlPage("Home - Deder Dashboard", "server", content, projectRoot))
 
     // --- Stats tab: Live ---
     case GET -> Path("live") =>
