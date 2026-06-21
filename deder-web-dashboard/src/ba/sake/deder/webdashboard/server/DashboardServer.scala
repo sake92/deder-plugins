@@ -219,7 +219,7 @@ class DashboardServer(
       Response.withBody(table)
 
     case GET -> Path("tasks", "log-table") =>
-      val table = TasksPage.logTable(executionLog)
+      val table = TasksPage.logTableContainer(executionLog, refreshMs)
       Response.withBody(table)
 
     // --- Task runner JSON APIs ---

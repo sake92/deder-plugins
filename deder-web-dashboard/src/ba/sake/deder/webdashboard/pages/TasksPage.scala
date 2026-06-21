@@ -18,9 +18,7 @@ object TasksPage {
     html"""
       <h3>Tasks</h3>
       ${triggerForm(taskRegistry, project)}
-      <div id="log-table" hx-get="/tasks/log-table" hx-trigger="every ${refreshMs}ms" hx-swap="outerHTML">
-        ${logTable(log)}
-      </div>
+      ${logTableContainer(log, refreshMs)}
     """
 
   def triggerForm(taskRegistry: TasksRegistryApi, project: DederProject): Html =
@@ -38,20 +36,34 @@ object TasksPage {
 
     html"""
       <form hx-get="/tasks/run" hx-target="#log-table" hx-swap="afterbegin"
-            style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap;">
-        <input list="task-list" name="taskName" placeholder="Search task..." autocomplete="off" required
-               style="flex: 2; min-width: 200px;" />
-        <datalist id="task-list">$taskOpts</datalist>
-        <input name="moduleIds" value="*" placeholder="* (all) or comma-separated IDs" autocomplete="off"
-               style="flex: 2; min-width: 200px;"
-               title="Leave empty or * for all modules, or type module IDs separated by commas" />
-        <button type="submit" style="white-space: nowrap;">Run</button>
+            style="display: flex; gap: 0.5rem; align-items: end; margin-bottom: 0.75rem; flex-wrap: wrap;">
+        <div style="flex: 2; min-width: 180px;">
+          <label for="task-input" style="font-size: 0.75rem; display: block; margin-bottom: 0.15rem;">Task</label>
+          <input list="task-list" id="task-input" name="taskName" placeholder="Search..." autocomplete="off" required
+                 style="width: 100%;" />
+          <datalist id="task-list">$taskOpts</datalist>
+        </div>
+        <div style="flex: 2; min-width: 180px;">
+          <label for="module-input" style="font-size: 0.75rem; display: block; margin-bottom: 0.15rem;">Modules</label>
+          <input list="module-list" id="module-input" name="moduleIds" value="*"
+                 placeholder="* (all) or comma-separated" autocomplete="off"
+                 style="width: 100%;" />
+          <datalist id="module-list">$moduleOpts</datalist>
+        </div>
+        <button type="submit" style="white-space: nowrap; margin-bottom: 0px;">Run</button>
       </form>
       ${if moduleIds.nonEmpty then
         html"""<div style="font-size: 0.75rem; color: var(--pico-muted-color); margin-bottom: 0.5rem;">
-          Modules: ${moduleIds.map(m => html"""<code style="font-size:0.72rem; margin-right:0.2rem;">$m</code>""")}
+          Known modules: ${moduleIds.map(m => html"""<code style="font-size:0.72rem; margin-right:0.2rem;">$m</code>""")}
         </div>"""
       else Html("")}
+    """
+
+  def logTableContainer(log: TaskExecutionLog, refreshMs: Int): Html =
+    html"""
+      <div id="log-table" hx-get="/tasks/log-table" hx-trigger="every ${refreshMs}ms" hx-swap="outerHTML">
+        ${logTable(log)}
+      </div>
     """
 
   def logTable(log: TaskExecutionLog): Html =
