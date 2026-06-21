@@ -24,6 +24,23 @@ object TasksPage {
       </div>
       ${triggerForm(taskRegistry, project)}
       ${logTableContainer(log, refreshMs)}
+      <script>
+        function filterLogLines(preId, level) {
+          var pre = document.getElementById(preId);
+          if (!pre.getAttribute('data-original')) pre.setAttribute('data-original', pre.textContent);
+          var original = pre.getAttribute('data-original');
+          if (level === 'ALL') { pre.textContent = original; return; }
+          var weights = { DEBUG:0, INFO:1, WARN:2, ERROR:3 };
+          var threshold = weights[level];
+          var lines = original.split('\n');
+          pre.textContent = lines.filter(function(line) {
+            for (var l in weights) {
+              if (line.indexOf('[' + l + ']') === 0) return weights[l] >= threshold;
+            }
+            return true;
+          }).join('\n');
+        }
+      </script>
     """
 
   def autoRefreshCheckbox(enabled: Boolean): Html =
@@ -152,10 +169,26 @@ object TasksPage {
 
   private def expandedRow(e: ExecEntry): Html =
     val rowId = s"exec-${e.execId}-detail"
+    val preId = s"exec-${e.execId}-log"
     val combinedOutput = e.output.trim + e.renderedSummary.map(s => s"\n\n$s").getOrElse("")
 
+    val logFilter = if combinedOutput.contains("[") then
+      html"""
+        <div style="display:flex; align-items:center; gap:0.3rem; margin-bottom:0.15rem;">
+          <label style="font-size:0.7rem;">Log level:</label>
+          <select onchange="filterLogLines('$preId', this.value)" style="font-size:0.7rem; padding:0.05rem 0.2rem;">
+            <option value="ALL">ALL</option>
+            <option value="DEBUG">DEBUG</option>
+            <option value="INFO" selected>INFO</option>
+            <option value="WARN">WARN</option>
+            <option value="ERROR">ERROR</option>
+          </select>
+        </div>
+      """
+    else Html("")
+
     val outputSection = if combinedOutput.nonEmpty then
-      html"""<pre style="max-height: 200px; overflow-y: auto; background: var(--pico-code-background-color);
+      html"""<pre id="$preId" data-original style="max-height: 200px; overflow-y: auto; background: var(--pico-code-background-color);
                padding: 0.3rem; font-family: monospace; font-size: 0.75rem; margin-top: 0.25rem;">
 ${combinedOutput.takeRight(10000)}</pre>"""
     else Html("")
@@ -184,6 +217,7 @@ ${combinedOutput.takeRight(10000)}</pre>"""
     html"""
       <tr id="$rowId" style="display: none;">
         <td colspan="7" style="padding: 0.3rem 0.6rem;">
+          $logFilter
           $outputSection
           $resultSection
           $errorSection
