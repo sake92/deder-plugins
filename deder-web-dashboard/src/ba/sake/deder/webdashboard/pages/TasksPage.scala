@@ -152,10 +152,12 @@ object TasksPage {
 
   private def expandedRow(e: ExecEntry): Html =
     val rowId = s"exec-${e.execId}-detail"
-    val outputSection = if e.output.nonEmpty then
+    val combinedOutput = (e.output.trim + e.renderedSummary.map(s => s"\n$s").getOrElse("")).trim
+
+    val outputSection = if combinedOutput.nonEmpty then
       html"""<div style="max-height: 200px; overflow-y: auto; background: var(--pico-code-background-color);
              padding: 0.3rem; font-family: monospace; font-size: 0.75rem; white-space: pre-wrap; margin-top: 0.25rem;">
-             ${e.output.takeRight(10000)}</div>"""
+             ${combinedOutput.takeRight(10000)}</div>"""
     else Html("")
 
     val resultSection = if e.outcomes.nonEmpty then
@@ -179,20 +181,11 @@ object TasksPage {
       html"""<div style="color: var(--pico-color-red-400); margin-top: 0.25rem;">Error: $msg</div>"""
     }.getOrElse(Html(""))
 
-    val summarySection = e.renderedSummary.map { s =>
-      html"""
-        <div style="margin-top: 0.5rem; padding-top: 0.3rem; border-top: 1px solid var(--pico-muted-border-color); font-size: 0.75rem; white-space: pre-wrap;">
-          $s
-        </div>
-      """
-    }.getOrElse(Html(""))
-
     html"""
       <tr id="$rowId" style="display: none;">
         <td colspan="7" style="padding: 0.3rem 0.6rem;">
           $outputSection
           $resultSection
-          $summarySection
           $errorSection
         </td>
       </tr>
