@@ -69,9 +69,10 @@ class TaskRunner(
           args = Seq.empty,
           onNotification = notif =>
             val line = formatNotification(notif)
-            outputLock.synchronized {
-              output.append(line).append('\n')
-            }
+            if line.nonEmpty then
+              outputLock.synchronized {
+                output.append(line).append('\n')
+              }
             // capture requestId from currentRequests if available
             if idHolder.get() == null then
               internals.currentRequests.find(r =>
@@ -108,4 +109,4 @@ class TaskRunner(
     case ServerNotification.Log(level, _, message, moduleId, _) =>
       val modStr = moduleId.map(m => s"[$m] ").getOrElse("")
       s"[$level] ${modStr}$message"
-    case _ => notif.toString
+    case _ => "" // skip RunSubprocess, CompileStarted, TaskProgress etc.
