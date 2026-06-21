@@ -35,8 +35,8 @@ object TasksPage {
                      hx-get="/tasks/auto-refresh?enabled=true" hx-trigger="change" hx-swap="outerHTML">"""
 
   def autoRefreshOob(enabled: Boolean, refreshMs: Int): Html =
-    val trigger = if enabled then s"every ${refreshMs}ms" else "refresh"
-    html"""<div id="log-table" hx-get="/tasks/log-table" hx-trigger="${trigger}" hx-swap="outerHTML" hx-swap-oob="true"></div>"""
+    val trigger = if enabled then s"load, every ${refreshMs}ms" else "load, refresh"
+    html"""<div id="log-table" hx-get="/tasks/log-table" hx-trigger="${trigger}" hx-swap="innerHTML" hx-swap-oob="true"></div>"""
 
   def triggerForm(taskRegistry: TasksRegistryApi, project: DederProject): Html =
     val allTasks = taskRegistry.allTasks
@@ -78,7 +78,7 @@ object TasksPage {
 
   def logTableContainer(log: TaskExecutionLog, refreshMs: Int): Html =
     html"""
-      <div id="log-table" hx-get="/tasks/log-table" hx-trigger="every ${refreshMs}ms" hx-swap="outerHTML">
+      <div id="log-table" hx-get="/tasks/log-table" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
         ${logTable(log)}
       </div>
     """
