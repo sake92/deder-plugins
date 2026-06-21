@@ -22,7 +22,6 @@ object TasksPage {
           <span>Auto-refresh</span>
         </label>
       </div>
-      <h3>Tasks</h3>
       ${triggerForm(taskRegistry, project)}
       ${logTableContainer(log, refreshMs)}
     """
