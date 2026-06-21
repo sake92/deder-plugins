@@ -379,7 +379,8 @@ object ApiRoutes {
   }
 
   private def formatCallerType(ct: CallerType): String = ct match
-    case CallerType.Cli => "CLI"
-    case CallerType.Bsp => "BSP"
-    case null           => ct.toString
+    case CallerType.Cli    => "CLI"
+    case CallerType.Bsp    => "BSP"
+    case null              => "unknown"
+    case _                 => ct.toString
 }
