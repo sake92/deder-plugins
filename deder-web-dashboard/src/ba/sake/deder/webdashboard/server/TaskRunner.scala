@@ -118,5 +118,5 @@ class TaskRunner(
       s"[$level] ${modStr}$message"
     case ServerNotification.RunSubprocess(cmd, _, _) =>
       runSubprocessSeen = true
-      s"[WARN] Running processes via web dashboard is not supported (${cmd.mkString(" ")})"
+      ""
     case _ => ""
