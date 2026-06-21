@@ -61,6 +61,7 @@ class TaskRunner(
       semaphore.acquire()
       log.update(execId)(_.copy(status = ExecStatus.RUNNING))
       try
+        runSubprocessSeen = false
         val output = new StringBuilder()
         val idHolder = new java.util.concurrent.atomic.AtomicReference[String](null)
         val result = taskInvoker.invoke(
@@ -79,6 +80,10 @@ class TaskRunner(
                 r.taskName == taskName && r.moduleIds.toSet.subsetOf(moduleIds.toSet)
               ).foreach(r => idHolder.set(r.requestId))
         )
+        if runSubprocessSeen then
+          outputLock.synchronized {
+            output.append("\n[WARN] Running processes via web dashboard is not supported\n")
+          }
         val outcomes = result.outcomes.map(o =>
           ExecModuleOutcome(o.moduleId, o.success, o.error, o.fromCache)
         )
@@ -104,9 +109,14 @@ class TaskRunner(
 
     entry
 
+  private var runSubprocessSeen = false
+
   private def formatNotification(notif: ServerNotification): String = notif match
     case ServerNotification.Output(text) => text
     case ServerNotification.Log(level, _, message, moduleId, _) =>
       val modStr = moduleId.map(m => s"[$m] ").getOrElse("")
       s"[$level] ${modStr}$message"
-    case _ => "" // skip RunSubprocess, CompileStarted, TaskProgress etc.
+    case ServerNotification.RunSubprocess(cmd, _, _) =>
+      runSubprocessSeen = true
+      s"[WARN] Running processes via web dashboard is not supported (${cmd.mkString(" ")})"
+    case _ => ""
