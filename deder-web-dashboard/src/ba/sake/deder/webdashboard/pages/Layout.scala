@@ -27,7 +27,10 @@ object Layout {
           }
           body { max-width: 1100px; margin: 0 auto; padding: 0.6rem 0.75rem; }
           body > nav { margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--pico-muted-border-color); font-size: 0.85rem; }
-          nav a.active { background: var(--pico-primary); color: var(--pico-primary-inverse); border-radius: var(--pico-border-radius); }
+          nav li a { text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600; }
+          nav li a:hover { background: var(--pico-muted-border-color); }
+          nav li a.active { background: var(--pico-primary); color: var(--pico-primary-inverse); }
+          nav.sub-nav li a { padding: 0.2rem 0.5rem; font-weight: 400; }
           .stat-card { display: inline-block; border: 1px solid var(--pico-muted-border-color); border-radius: 4px; padding: 0.4rem 0.6rem; margin: 0.2rem; min-width: 140px; text-align: center; }
           .stat-card .label { font-size: 0.7rem; color: var(--pico-muted-color); text-transform: uppercase; letter-spacing: 0.5px; }
           .stat-card .value { font-size: 1.1rem; font-weight: 700; }
@@ -70,7 +73,7 @@ object Layout {
         ${
           if activeTab == "modules" || activeTab == "graph" then
             html"""
-            <nav hx-boost="true">
+            <nav class="sub-nav" hx-boost="true">
               <ul>
                 <li><a href="/modules"       class="${if activeTab == "modules" then "active" else ""}">List</a></li>
                 <li><a href="/modules/graph" class="${if activeTab == "graph"   then "active" else ""}">Graph</a></li>
@@ -79,7 +82,7 @@ object Layout {
             """
           else if activeTab == "live" || activeTab == "history" || activeTab == "stats" then
             html"""
-            <nav hx-boost="true">
+            <nav class="sub-nav" hx-boost="true">
               <ul>
                 <li><a href="/live" class="${if activeTab == "live" then "active" else ""}">Live</a></li>
                 <li><a href="/history" class="${if activeTab == "history" then "active" else ""}">History</a></li>
