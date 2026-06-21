@@ -17,6 +17,7 @@ class TaskExecutionLogSuite extends FunSuite {
       status = status,
       output = "",
       outcomes = Seq.empty,
+      renderedSummary = None,
       error = None,
       requestId = None
     )

@@ -33,6 +33,7 @@ class TaskRunner(
         status = ExecStatus.FAILURE,
         output = "",
         outcomes = Seq.empty,
+        renderedSummary = None,
         error = Some(s"Task '$taskName' not found. Available: ${knownTasks.toSeq.sorted.mkString(", ")}"),
         requestId = None
       )
@@ -49,6 +50,7 @@ class TaskRunner(
       status = ExecStatus.PENDING,
       output = "",
       outcomes = Seq.empty,
+      renderedSummary = None,
       error = None,
       requestId = None
     )
@@ -85,6 +87,7 @@ class TaskRunner(
           endTime = Some(Instant.now()),
           outcomes = outcomes,
           output = output.toString(),
+          renderedSummary = result.renderedSummary,
           requestId = Option(idHolder.get())
         ))
       catch

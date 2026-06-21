@@ -23,6 +23,7 @@ case class ExecEntry(
     status: ExecStatus,
     output: String,
     outcomes: Seq[ExecModuleOutcome],
+    renderedSummary: Option[String],
     error: Option[String],
     requestId: Option[String]
 )
