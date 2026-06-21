@@ -16,10 +16,28 @@ object TasksPage {
       taskRegistry: TasksRegistryApi
   ): Html =
     html"""
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <label style="cursor:pointer;">
+          ${autoRefreshCheckbox(true)}
+          <span>Auto-refresh</span>
+        </label>
+      </div>
       <h3>Tasks</h3>
       ${triggerForm(taskRegistry, project)}
       ${logTableContainer(log, refreshMs)}
     """
+
+  def autoRefreshCheckbox(enabled: Boolean): Html =
+    if enabled then
+      html"""<input type="checkbox" id="tasks-auto-refresh-cb" checked
+                     hx-get="/tasks/auto-refresh?enabled=false" hx-trigger="change" hx-swap="outerHTML">"""
+    else
+      html"""<input type="checkbox" id="tasks-auto-refresh-cb"
+                     hx-get="/tasks/auto-refresh?enabled=true" hx-trigger="change" hx-swap="outerHTML">"""
+
+  def autoRefreshOob(enabled: Boolean, refreshMs: Int): Html =
+    val trigger = if enabled then s"every ${refreshMs}ms" else "refresh"
+    html"""<div id="log-table" hx-get="/tasks/log-table" hx-trigger="${trigger}" hx-swap="outerHTML" hx-swap-oob="true"></div>"""
 
   def triggerForm(taskRegistry: TasksRegistryApi, project: DederProject): Html =
     val allTasks = taskRegistry.allTasks

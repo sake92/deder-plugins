@@ -105,6 +105,13 @@ class DashboardServer(
       val oob = StatsPage.autoRefreshOob(enabled, refreshMs)
       Response.withBody(html"$cb$oob")
 
+    case GET -> Path("tasks", "auto-refresh") =>
+      val req = summon[Request]
+      val enabled = param(req, "enabled", "true").toBoolean
+      val cb = TasksPage.autoRefreshCheckbox(enabled)
+      val oob = TasksPage.autoRefreshOob(enabled, refreshMs)
+      Response.withBody(html"$cb$oob")
+
     // --- HTMX partials for History tab ---
     case GET -> Path("stats", "history-table") =>
       val req = summon[Request]
