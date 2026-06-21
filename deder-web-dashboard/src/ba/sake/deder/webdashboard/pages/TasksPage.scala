@@ -29,7 +29,6 @@ object TasksPage {
           var pre = document.getElementById(preId);
           if (!pre.getAttribute('data-original')) pre.setAttribute('data-original', pre.textContent);
           var original = pre.getAttribute('data-original');
-          if (level === 'ALL') { pre.textContent = original; return; }
           var weights = { DEBUG:0, INFO:1, WARN:2, ERROR:3 };
           var threshold = weights[level];
           var lines = original.split('\n');
@@ -161,10 +160,11 @@ object TasksPage {
 
   private def expandBtn(e: ExecEntry): Html =
     val rowId = s"exec-${e.execId}-detail"
+    val preId = s"exec-${e.execId}-log"
     val hasContent = e.output.nonEmpty || e.outcomes.nonEmpty || e.error.isDefined
     if hasContent then
       html"""<span style="cursor: pointer; font-size: 0.75rem;"
-             onclick="var r=document.getElementById('$rowId');r.style.display=r.style.display==='none'?'':'none'">📋</span>"""
+             onclick="var r=document.getElementById('${rowId}');var v=r.style.display==='none';r.style.display=v?'':'none';if(v)filterLogLines('${preId}','INFO')">📋</span>"""
     else Html("")
 
   private def expandedRow(e: ExecEntry): Html =
@@ -177,7 +177,6 @@ object TasksPage {
         <div style="display:flex; align-items:center; gap:0.3rem; margin-bottom:0.15rem;">
           <label style="font-size:0.7rem;">Log level:</label>
           <select onchange="filterLogLines('$preId', this.value)" style="font-size:0.7rem; padding:0.05rem 0.2rem;">
-            <option value="ALL">ALL</option>
             <option value="DEBUG">DEBUG</option>
             <option value="INFO" selected>INFO</option>
             <option value="WARN">WARN</option>
