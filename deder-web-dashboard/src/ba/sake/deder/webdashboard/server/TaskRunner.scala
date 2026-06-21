@@ -93,7 +93,7 @@ class TaskRunner(
           endTime = Some(Instant.now()),
           outcomes = outcomes,
           output = output.toString(),
-          renderedSummary = result.renderedSummary,
+          renderedSummary = if runSubprocessSeen then None else result.renderedSummary,
           requestId = Option(idHolder.get())
         ))
       catch
