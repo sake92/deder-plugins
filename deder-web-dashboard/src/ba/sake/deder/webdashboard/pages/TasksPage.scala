@@ -152,12 +152,12 @@ object TasksPage {
 
   private def expandedRow(e: ExecEntry): Html =
     val rowId = s"exec-${e.execId}-detail"
-    val combinedOutput = (e.output.trim + e.renderedSummary.map(s => s"\n$s").getOrElse("")).trim
+    val combinedOutput = e.output.trim + e.renderedSummary.map(s => s"\n\n$s").getOrElse("")
 
     val outputSection = if combinedOutput.nonEmpty then
-      html"""<div style="max-height: 200px; overflow-y: auto; background: var(--pico-code-background-color);
-             padding: 0.3rem; font-family: monospace; font-size: 0.75rem; white-space: pre-wrap; margin-top: 0.25rem;">
-             ${combinedOutput.takeRight(10000)}</div>"""
+      html"""<pre style="max-height: 200px; overflow-y: auto; background: var(--pico-code-background-color);
+               padding: 0.3rem; font-family: monospace; font-size: 0.75rem; margin-top: 0.25rem;">
+${combinedOutput.takeRight(10000)}</pre>"""
     else Html("")
 
     val resultSection = if e.outcomes.nonEmpty then
