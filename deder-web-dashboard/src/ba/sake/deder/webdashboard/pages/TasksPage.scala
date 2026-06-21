@@ -179,23 +179,13 @@ object TasksPage {
       html"""<div style="color: var(--pico-color-red-400); margin-top: 0.25rem;">Error: $msg</div>"""
     }.getOrElse(Html(""))
 
-    val summarySection = if e.outcomes.nonEmpty then
-      val successCount = e.outcomes.count(_.success)
-      val total = e.outcomes.size
-      val summaryLine = if successCount == total then
-        s"✅ All $total modules succeeded"
-      else
-        s"❌ ${total - successCount}/$total modules failed"
-      val rendered = e.renderedSummary.map { s =>
-        html"""<div style="margin-top: 0.2rem; font-size: 0.75rem; white-space: pre-wrap;">$s</div>"""
-      }.getOrElse(Html(""))
+    val summarySection = e.renderedSummary.map { s =>
       html"""
-        <div style="margin-top: 0.5rem; padding-top: 0.3rem; border-top: 1px solid var(--pico-muted-border-color); font-weight: bold;">
-          $summaryLine
+        <div style="margin-top: 0.5rem; padding-top: 0.3rem; border-top: 1px solid var(--pico-muted-border-color); font-size: 0.75rem; white-space: pre-wrap;">
+          $s
         </div>
-        $rendered
       """
-    else Html("")
+    }.getOrElse(Html(""))
 
     html"""
       <tr id="$rowId" style="display: none;">
