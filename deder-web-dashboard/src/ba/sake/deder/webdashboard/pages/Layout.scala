@@ -64,11 +64,8 @@ object Layout {
       <body>
         <nav class="navbar" hx-boost="true">
           <a href="/modules" class="${
-            if activeTab == "modules" then "active" else ""
-          }">Modules list</a>
-          <a href="/modules/graph" class="${
-            if activeTab == "graph" then "active" else ""
-          }">Modules graph</a>
+            if activeTab == "modules" || activeTab == "graph" then "active" else ""
+          }">Modules</a>
           <a href="/tasks" class="${
             if activeTab == "tasks" then "active" else ""
           }">Tasks</a>
@@ -80,7 +77,14 @@ object Layout {
           }">Info</a>
         </nav>
         ${
-          if activeTab == "live" || activeTab == "history" || activeTab == "stats" then
+          if activeTab == "modules" || activeTab == "graph" then
+            html"""
+            <nav class="subnav" hx-boost="true">
+              <a href="/modules"       class="${if activeTab == "modules" then "active" else ""}">List</a>
+              <a href="/modules/graph" class="${if activeTab == "graph"   then "active" else ""}">Graph</a>
+            </nav>
+            """
+          else if activeTab == "live" || activeTab == "history" || activeTab == "stats" then
             html"""
             <nav class="subnav" hx-boost="true">
               <a href="/live" class="${if activeTab == "live" then "active" else ""}">Live</a>
