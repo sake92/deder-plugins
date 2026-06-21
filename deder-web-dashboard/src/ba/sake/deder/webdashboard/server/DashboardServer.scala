@@ -26,7 +26,7 @@ class DashboardServer(
 
   private val routes = Routes {
     case GET -> Path() =>
-      Response.redirect("/modules")
+      Response.redirect("/server")
 
     case GET -> Path("modules") =>
       val content = ModulesPage.modulesTable(project)

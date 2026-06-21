@@ -41,10 +41,13 @@ object Layout {
           .graph-controls input[type="checkbox"] { margin: 0; }
           .highlighted { border-width: 3px !important; border-color: var(--pico-color-yellow-300) !important; }
           .dimmed { opacity: 0.15; }
-          .subnav { display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--pico-muted-border-color); font-size: 0.85rem; }
-          .subnav a { text-decoration: none; padding: 0.2rem 0.5rem; border-radius: 4px; }
+          .subnav { display: flex; align-items: center; margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--pico-muted-border-color); font-size: 0.85rem; }
+          .subnav a { text-decoration: none; padding: 0.2rem 0.5rem; border: 1px solid var(--pico-muted-border-color); }
+          .subnav a:first-child { border-radius: 4px 0 0 4px; }
+          .subnav a:last-child  { border-radius: 0 4px 4px 0; }
+          .subnav a + a { border-left: none; }
           .subnav a:hover { background: var(--pico-muted-border-color); }
-          .subnav a.active { background: var(--pico-primary); color: var(--pico-primary-inverse); }
+          .subnav a.active { background: var(--pico-primary); color: var(--pico-primary-inverse); border-color: var(--pico-primary); }
           input[type="text"], input[type="search"], select { padding: 0.2rem 0.4rem; font-size: 0.82rem; height: auto; }
           .request-section { margin-bottom: 1rem; }
           .section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }

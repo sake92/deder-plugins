@@ -156,7 +156,7 @@ class DashboardServerSuite extends FunSuite {
     }
   }
 
-  test("GET / redirects to /modules") {
+  test("GET / redirects to /server") {
     val (code, _) = httpGet("/")
     assertEquals(code, 301)
   }
