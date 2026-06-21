@@ -56,7 +56,7 @@ object TasksPage {
 
   def triggerForm(taskRegistry: TasksRegistryApi, project: DederProject): Html =
     val allTasks = taskRegistry.allTasks
-      .filter(t => !t.internal && !t.singleton)
+      .filter(t => !t.internal)
       .sortBy(t => t.name)
     val taskOpts = allTasks.map { t =>
       html"""<option value="${t.name}">${t.name} — ${t.description}</option>"""

@@ -26,8 +26,9 @@ class TaskRunner(
     val validationError: Option[String] =
       if !knownTasks.contains(taskName) then
         Some(s"Task '$taskName' not found. Available: ${knownTasks.toSeq.sorted.mkString(", ")}")
-      else if allTasks.exists(t => t.name == taskName && t.singleton) then
-        Some(s"Task '$taskName' is singleton — cannot run from web dashboard")
+      else if allTasks.exists(t => t.name == taskName && t.singleton) && moduleIds.lengthIs != 1 then
+        val hint = if moduleIds.isEmpty then "pick a single module" else "pick only 1 module"
+        Some(s"Task '$taskName' is singleton — $hint")
       else None
 
     validationError match
