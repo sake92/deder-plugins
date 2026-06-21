@@ -13,7 +13,8 @@ class DashboardServer(
     config: WebDashboardPluginConfig,
     project: DederProject,
     internals: DederProjectInternals,
-    taskInvoker: TaskInvokerApi
+    taskInvoker: TaskInvokerApi,
+    taskRegistry: TasksRegistryApi
 ) {
   private var jdkServer: Option[JdkHttpServerSharafServer] = None
 
@@ -21,7 +22,7 @@ class DashboardServer(
   private lazy val projectRoot = DederGlobals.projectRootDir.toString
 
   private val executionLog = TaskExecutionLog(config.tasksMaxHistory.toInt)
-  private val taskRunner = TaskRunner(taskInvoker, internals, executionLog, config.tasksMaxConcurrent.toInt)
+  private val taskRunner = TaskRunner(taskInvoker, internals, executionLog, config.tasksMaxConcurrent.toInt, taskRegistry)
 
   private val routes = Routes {
     case GET -> Path() =>
@@ -190,7 +191,7 @@ class DashboardServer(
 
     // --- Tasks tab ---
     case GET -> Path("tasks") =>
-      val content = TasksPage.fullPage(executionLog, internals, project, refreshMs)
+      val content = TasksPage.fullPage(executionLog, internals, project, refreshMs, taskRegistry)
       Response.withBody(Layout.htmlPage("Tasks - Deder Dashboard", "tasks", content, projectRoot))
 
     case GET -> Path("tasks", "run") =>

@@ -10,7 +10,8 @@ class TaskRunner(
     taskInvoker: TaskInvokerApi,
     internals: DederProjectInternals,
     log: TaskExecutionLog,
-    maxConcurrent: Int
+    maxConcurrent: Int,
+    taskRegistry: TasksRegistryApi
 ):
   private val executor = Executors.newVirtualThreadPerTaskExecutor()
   private val semaphore = new Semaphore(maxConcurrent)
@@ -21,7 +22,7 @@ class TaskRunner(
     */
   def trigger(taskName: String, moduleIds: Seq[String]): ExecEntry =
     // Validate task name
-    val knownTasks = internals.loadedPlugins.flatMap(_.taskNames).toSet
+    val knownTasks = taskRegistry.allTasks.map(t => t.name).toSet
     if !knownTasks.contains(taskName) then
       val entry = ExecEntry(
         execId = UUID.randomUUID().toString,

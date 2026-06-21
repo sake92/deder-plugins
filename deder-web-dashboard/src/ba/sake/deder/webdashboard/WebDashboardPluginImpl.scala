@@ -25,7 +25,7 @@ class WebDashboardPluginImpl extends DederPluginApi {
       }
 
       if config.enabled then
-        val srv = DashboardServer(config, params.project, params.internals, params.taskInvoker)
+        val srv = DashboardServer(config, params.project, params.internals, params.taskInvoker, params.taskRegistry)
         val thread = new Thread(() => srv.start())
         thread.setDaemon(true)
         thread.setName("deder-web-dashboard-server")

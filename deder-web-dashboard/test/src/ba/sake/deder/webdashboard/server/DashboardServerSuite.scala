@@ -83,11 +83,20 @@ class DashboardServerSuite extends FunSuite {
       val outcomes = moduleIds.map { m =>
         TaskInvokeOutcome(m, success = true, None, fromCache = false)
       }
-      TaskInvokeResult(outcomes, None)
+      TaskInvokeResult(outcomes, None, None)
     }
   }
 
-  private val server = DashboardServer(config, stubProject, stubInternals, stubTaskInvoker)
+  private val stubTaskRegistry: TasksRegistryApi = new TasksRegistryApi {
+    def allTasks: Seq[TaskInfo] = Seq(
+      TaskInfo("compile", "Compile Scala/Java sources", "Build", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
+      TaskInfo("test", "Run tests", "Test", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
+      TaskInfo("run", "Run main class", "Run", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
+    )
+    def tasksFor(moduleType: ba.sake.deder.config.DederProject.ModuleType): Seq[TaskInfo] = Seq.empty
+  }
+
+  private val server = DashboardServer(config, stubProject, stubInternals, stubTaskInvoker, stubTaskRegistry)
   private val baseUrl = s"http://$testHost:$testPort"
   private val projectRootProperty = "DEDER_PROJECT_ROOT_DIR"
   private var previousProjectRoot: Option[String] = None

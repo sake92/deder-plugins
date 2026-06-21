@@ -12,40 +12,46 @@ object TasksPage {
       log: TaskExecutionLog,
       internals: DederProjectInternals,
       project: DederProject,
-      refreshMs: Int
+      refreshMs: Int,
+      taskRegistry: TasksRegistryApi
   ): Html =
     html"""
       <h3>Tasks</h3>
-      ${triggerForm(internals, project)}
+      ${triggerForm(taskRegistry, project)}
       <div id="log-table" hx-get="/tasks/log-table" hx-trigger="every ${refreshMs}ms" hx-swap="outerHTML">
         ${logTable(log)}
       </div>
     """
 
-  def triggerForm(internals: DederProjectInternals, project: DederProject): Html =
-    val taskNames = internals.loadedPlugins
-      .flatMap(_.taskNames)
-      .distinct
-      .sorted
+  def triggerForm(taskRegistry: TasksRegistryApi, project: DederProject): Html =
+    val allTasks = taskRegistry.allTasks
+      .filter(t => !t.internal)
+      .sortBy(t => t.name)
+    val taskOpts = allTasks.map { t =>
+      html"""<option value="${t.name}">${t.name} — ${t.description}</option>"""
+    }
     val moduleIds = if project != null && project.modules != null then
       import scala.jdk.CollectionConverters.*
       project.modules.asScala.toSeq.map(_.id).sorted
     else Seq.empty
-
-    val taskOpts = taskNames.map(n => html"""<option value="$n" />""")
     val moduleOpts = moduleIds.map(m => html"""<option value="$m" />""")
 
     html"""
       <form hx-get="/tasks/run" hx-target="#log-table" hx-swap="afterbegin"
-            style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;">
+            style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap;">
         <input list="task-list" name="taskName" placeholder="Search task..." autocomplete="off" required
-               style="flex: 2;" />
+               style="flex: 2; min-width: 200px;" />
         <datalist id="task-list">$taskOpts</datalist>
-        <input list="module-list" name="moduleIds" value="*" placeholder="* (all modules)" autocomplete="off"
-               style="flex: 1;" />
-        <datalist id="module-list">$moduleOpts</datalist>
-        <button type="submit">Run</button>
+        <input name="moduleIds" value="*" placeholder="* (all) or comma-separated IDs" autocomplete="off"
+               style="flex: 2; min-width: 200px;"
+               title="Leave empty or * for all modules, or type module IDs separated by commas" />
+        <button type="submit" style="white-space: nowrap;">Run</button>
       </form>
+      ${if moduleIds.nonEmpty then
+        html"""<div style="font-size: 0.75rem; color: var(--pico-muted-color); margin-bottom: 0.5rem;">
+          Modules: ${moduleIds.map(m => html"""<code style="font-size:0.72rem; margin-right:0.2rem;">$m</code>""")}
+        </div>"""
+      else Html("")}
     """
 
   def logTable(log: TaskExecutionLog): Html =
@@ -144,7 +150,6 @@ object TasksPage {
       html"""<div style="color: var(--pico-color-red-400); margin-top: 0.25rem;">Error: $msg</div>"""
     }.getOrElse(Html(""))
 
-    val showRow = e.output.nonEmpty || e.outcomes.nonEmpty || e.error.isDefined
     html"""
       <tr id="$rowId" style="display: none;">
         <td colspan="7" style="padding: 0.3rem 0.6rem;">
