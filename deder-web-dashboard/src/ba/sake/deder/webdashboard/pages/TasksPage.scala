@@ -52,7 +52,7 @@ object TasksPage {
     val moduleOpts = moduleIds.map(m => html"""<option value="$m" />""")
 
     html"""
-      <form hx-get="/tasks/run" hx-target="#log-table" hx-swap="afterbegin"
+      <form hx-get="/tasks/run" hx-target="#log-table" hx-swap="innerHTML"
             style="display: flex; gap: 0.5rem; align-items: end; margin-bottom: 0.75rem; flex-wrap: wrap;">
         <div style="flex: 2; min-width: 180px;">
           <label for="task-input" style="font-size: 0.75rem; display: block; margin-bottom: 0.15rem;">Task</label>
@@ -146,8 +146,8 @@ object TasksPage {
     val rowId = s"exec-${e.execId}-detail"
     val hasContent = e.output.nonEmpty || e.outcomes.nonEmpty || e.error.isDefined
     if hasContent then
-      html"""<span style="cursor: pointer; font-size: 0.8rem;"
-             onclick="var r=document.getElementById('$rowId');r.style.display=r.style.display==='none'?'':'none'">▶</span>"""
+      html"""<span style="cursor: pointer; font-size: 0.75rem;"
+             onclick="var r=document.getElementById('$rowId');r.style.display=r.style.display==='none'?'':'none'">📋</span>"""
     else Html("")
 
   private def expandedRow(e: ExecEntry): Html =
