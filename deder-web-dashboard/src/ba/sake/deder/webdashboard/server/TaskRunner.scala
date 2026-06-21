@@ -16,30 +16,44 @@ class TaskRunner(
   private val executor = Executors.newVirtualThreadPerTaskExecutor()
   private val semaphore = new Semaphore(maxConcurrent)
   private val outputLock = new Object()
+  private var runSubprocessSeen = false
 
-  /** Triggers a task execution. Returns immediately with a PENDING ExecEntry.
-    * The task runs on a virtual thread and updates the log on completion.
-    */
+  /** Triggers a task execution. Returns immediately with a PENDING or FAILURE ExecEntry. */
   def trigger(taskName: String, moduleIds: Seq[String]): ExecEntry =
-    // Validate task name
-    val knownTasks = taskRegistry.allTasks.map(t => t.name).toSet
-    if !knownTasks.contains(taskName) then
-      val entry = ExecEntry(
-        execId = UUID.randomUUID().toString,
-        taskName = taskName,
-        moduleIds = moduleIds,
-        startTime = Instant.now(),
-        endTime = Some(Instant.now()),
-        status = ExecStatus.FAILURE,
-        output = "",
-        outcomes = Seq.empty,
-        renderedSummary = None,
-        error = Some(s"Task '$taskName' not found. Available: ${knownTasks.toSeq.sorted.mkString(", ")}"),
-        requestId = None
-      )
-      log.add(entry)
-      return entry
+    val allTasks = taskRegistry.allTasks
+    val knownTasks = allTasks.map(t => t.name).toSet
 
+    val validationError: Option[String] =
+      if !knownTasks.contains(taskName) then
+        Some(s"Task '$taskName' not found. Available: ${knownTasks.toSeq.sorted.mkString(", ")}")
+      else if allTasks.exists(t => t.name == taskName && t.singleton) then
+        Some(s"Task '$taskName' is singleton — cannot run from web dashboard")
+      else None
+
+    validationError match
+      case Some(msg) =>
+        val entry = failEntry(taskName, moduleIds, msg)
+        log.add(entry)
+        entry
+      case None =>
+        submitTask(taskName, moduleIds)
+
+  private def failEntry(taskName: String, moduleIds: Seq[String], msg: String): ExecEntry =
+    ExecEntry(
+      execId = UUID.randomUUID().toString,
+      taskName = taskName,
+      moduleIds = moduleIds,
+      startTime = Instant.now(),
+      endTime = Some(Instant.now()),
+      status = ExecStatus.FAILURE,
+      output = "",
+      outcomes = Seq.empty,
+      renderedSummary = None,
+      error = Some(msg),
+      requestId = None
+    )
+
+  private def submitTask(taskName: String, moduleIds: Seq[String]): ExecEntry =
     val execId = UUID.randomUUID().toString
     val entry = ExecEntry(
       execId = execId,
@@ -56,7 +70,6 @@ class TaskRunner(
     )
     log.add(entry)
 
-    // Submit to virtual thread executor
     executor.submit(new Runnable { def run(): Unit = {
       semaphore.acquire()
       log.update(execId)(_.copy(status = ExecStatus.RUNNING))
@@ -74,7 +87,6 @@ class TaskRunner(
               outputLock.synchronized {
                 output.append(line).append('\n')
               }
-            // capture requestId from currentRequests if available
             if idHolder.get() == null then
               internals.currentRequests.find(r =>
                 r.taskName == taskName && r.moduleIds.toSet.subsetOf(moduleIds.toSet)
@@ -109,14 +121,12 @@ class TaskRunner(
 
     entry
 
-  private var runSubprocessSeen = false
-
   private def formatNotification(notif: ServerNotification): String = notif match
     case ServerNotification.Output(text) => text
     case ServerNotification.Log(level, _, message, moduleId, _) =>
       val modStr = moduleId.map(m => s"[$m] ").getOrElse("")
       s"[$level] ${modStr}$message"
-    case ServerNotification.RunSubprocess(cmd, _, _) =>
+    case ServerNotification.RunSubprocess(_, _, _) =>
       runSubprocessSeen = true
       ""
     case _ => ""
