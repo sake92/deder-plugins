@@ -95,7 +95,7 @@ object StatsPage {
   def expandedTaskRow(agg: ApiTaskAggregate, modules: Seq[ApiModuleAggregate]): Html = {
     val moduleRows = modules.map { m =>
       html"""
-        <tr class="module-row">
+        <tr>
           <td class="module-id-col">${m.moduleId}</td>
           <td>${m.invocations}</td>
           <td>${m.errors}</td>
@@ -148,19 +148,19 @@ object StatsPage {
       val cards = aggregates.zipWithIndex.map { case (agg, idx) =>
         val num = idx + 1
         html"""
-          <div class="stat-card left">
-            <div class="label">#$num</div>
+          <article>
+            <small>#$num</small>
             <div><strong>${agg.moduleId}</strong></div>
-            <div class="detail">
+            <small>
               ${formatMs(agg.totalTimeMs)} total &middot;
               ${agg.invocations} invoc &middot;
               avg ${formatMs(agg.avgTimeMs)} &middot;
               ${agg.errors} errors
-            </div>
-          </div>
+            </small>
+          </article>
         """
       }
-      html"""<div class="card-grid">${cards}</div>"""
+      html"""<div class="grid">${cards}</div>"""
   }
 
   /** Render top offenders as a compact card list. */
@@ -170,24 +170,24 @@ object StatsPage {
       val cards = offenders.zipWithIndex.map { case (agg, idx) =>
         val num = idx + 1
         html"""
-          <div class="stat-card left">
-            <div class="label">#$num</div>
+          <article>
+            <small>#$num</small>
             <div><strong>${agg.taskName}</strong></div>
-            <div class="detail">
+            <small>
               ${formatMs(agg.totalTimeMs)} total &middot;
               ${agg.invocations} invoc &middot;
               avg ${formatMs(agg.avgTimeMs)} &middot;
               ${agg.errors} errors
-            </div>
-          </div>
+            </small>
+          </article>
         """
       }
-      html"""<div class="card-grid">${cards}</div>"""
+      html"""<div class="grid">${cards}</div>"""
   }
 
   /** Render error summary table. */
   def errorSummary(errors: Seq[ApiErrorSummaryEntry]): Html = {
-    if errors.isEmpty then html"""<p class="no-errors">No errors recorded.</p>"""
+    if errors.isEmpty then html"""<p><em>No errors recorded.</em></p>"""
     else
       val rows = errors.map { e =>
         html"""<tr><td>${e.taskName}</td><td>${e.errorCount}</td><td>${e.moduleIds.mkString(", ")}</td></tr>"""

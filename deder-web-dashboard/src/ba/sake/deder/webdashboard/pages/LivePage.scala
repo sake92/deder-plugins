@@ -31,7 +31,7 @@ object LivePage {
         <p>Loading requests...</p>
       </div>
 
-      <div class="cache-header">
+      <div class="flex-row section-header">
         <h3>In-Memory Caches</h3>
         <button class="outline secondary"
                 hx-post="/stats/caches/clear"
@@ -73,9 +73,9 @@ object LivePage {
     if statuses.isEmpty then html"""<p><em>No requests in progress.</em></p>"""
     else
       html"""
-        ${renderSection(queued, "Queued", "queued", renderQueuedRow)}
-        ${renderSection(acquiring, "Acquiring Locks", "locks", renderAcquiringRow)}
-        ${renderSection(executing, "Executing", "executing", renderExecutingRow)}
+        ${renderSection(queued, "Queued", "pico-color-grey-400", renderQueuedRow)}
+        ${renderSection(acquiring, "Acquiring Locks", "pico-color-yellow-400", renderAcquiringRow)}
+        ${renderSection(executing, "Executing", "pico-color-green-400", renderExecutingRow)}
       """
   }
 
@@ -89,15 +89,15 @@ object LivePage {
     else
       val rows = reqs.map(rowRenderer)
       html"""
-        <div class="request-section">
+        <section>
           <div class="section-header">
-            <span class="state-badge $badgeClass">${title} (${reqs.size})</span>
+            <mark class="$badgeClass">${title} (${reqs.size})</mark>
           </div>
           <table>
             <thead><tr><th>Started</th><th>Client</th><th>Task</th><th class="col-modules">Modules</th><th>Details</th><th></th></tr></thead>
             <tbody>$rows</tbody>
           </table>
-        </div>
+        </section>
       """
   }
 
@@ -122,10 +122,10 @@ object LivePage {
       val waitingOn = l.blockingOn.map(w => s"waiting on: $w").getOrElse("")
       val heldBy = l.heldBy.map(h => s" [held by $h]").getOrElse("")
       html"""
-        <progress class="locks" value="${l.acquired}" max="${l.total}"></progress>
-        <div class="progress-detail">Lock ${l.acquired}/${l.total}${if waitingOn.nonEmpty then s" — $waitingOn$heldBy" else ""}</div>
+        <progress value="${l.acquired}" max="${l.total}"></progress>
+        <small>Lock ${l.acquired}/${l.total}${if waitingOn.nonEmpty then s" — $waitingOn$heldBy" else ""}</small>
       """
-    }.getOrElse(html"""<div class="progress-detail">Acquiring locks...</div>""")
+    }.getOrElse(html"""<small>Acquiring locks...</small>""")
     html"""
       <tr>
         <td class="nowrap">$startedStr</td>
@@ -143,10 +143,10 @@ object LivePage {
     val stageInfo = req.taskProgress.map { p =>
       val pct = if p.totalStages > 0 then (p.currentStage * 100) / p.totalStages else 100
       html"""
-        <progress class="stages" value="${p.currentStage}" max="${p.totalStages}"></progress>
-        <div class="progress-detail">Stage ${p.currentStage}/${p.totalStages} — done: ${p.completed}, fail: ${p.failed}, run: ${p.running}, pending: ${p.pending}</div>
+        <progress value="${p.currentStage}" max="${p.totalStages}"></progress>
+        <small>Stage ${p.currentStage}/${p.totalStages} — done: ${p.completed}, fail: ${p.failed}, run: ${p.running}, pending: ${p.pending}</small>
       """
-    }.getOrElse(html"""<div class="progress-detail">Executing...</div>""")
+    }.getOrElse(html"""<small>Executing...</small>""")
     html"""
       <tr>
         <td class="nowrap">$startedStr</td>
@@ -161,7 +161,7 @@ object LivePage {
 
   def cancelButton(requestId: String): Html =
     html"""
-      <button class="cancel-btn"
+      <button class="outline cancel-btn"
               hx-post="/stats/cancel?requestId=$requestId"
               hx-swap="outerHTML"
               title="Cancel request">
@@ -170,7 +170,7 @@ object LivePage {
     """
 
   def cancelledBadge: Html =
-    html"""<span class="cancelled">Cancelled</span>"""
+    html"""<mark class="pico-color-red-400">Cancelled</mark>"""
 
   def overviewCards(internals: DederProjectInternals): Html = {
     val uptime = internals.serverUptime
@@ -186,19 +186,19 @@ object LivePage {
     ).flatten
     val uptimeStr = parts.mkString(" ")
     html"""
-      <div class="stat-row">
-        <div class="stat-card">
+      <div class="grid">
+        <article>
           <b>Total Requests: </b>
           <span>${internals.totalRequestsServed}</span>
-        </div>
-        <div class="stat-card">
+        </article>
+        <article>
           <b>Total Errors: </b>
-          <span class="${if internals.totalErrors > 0 then "failure" else "success"}">${internals.totalErrors}</span>
-        </div>
-        <div class="stat-card">
+          <span class="${if internals.totalErrors > 0 then "pico-color-red-400" else "pico-color-green-400"}">${internals.totalErrors}</span>
+        </article>
+        <article>
           <b>Uptime: </b>
-          <span class="uptime">$uptimeStr</span>
-        </div>
+          <span>$uptimeStr</span>
+        </article>
       </div>
     """
   }
@@ -227,7 +227,7 @@ object LivePage {
         if result.bspEntriesRemoved > 0 then Some(s"${result.bspEntriesRemoved} BSP entries removed.") else None,
         if result.historyEntriesRemoved > 0 then Some(s"${result.historyEntriesRemoved} history entries removed.") else None
       ).flatten
-      html"""<p class="success">✅ ${parts.mkString(" ")}</p>"""
+      html"""<p class="pico-color-green-400">✅ ${parts.mkString(" ")}</p>"""
     val table = cachesTable(internals)
     html"""$summary$table"""
   }

@@ -55,7 +55,7 @@ object TasksPage {
 
     html"""
       <form hx-get="/tasks/run" hx-target="#log-table" hx-swap="innerHTML"
-            class="trigger-form">
+            class="flex-row" style="margin-bottom:0.75rem">
         <fieldset class="grid">
           <label>
             Task
@@ -83,7 +83,7 @@ object TasksPage {
   def logTable(log: TaskExecutionLog): Html =
     val entries = log.recent(50)
     if entries.isEmpty then
-      html"""<p class="no-requests">No web-triggered executions yet.</p>"""
+      html"""<p><em>No web-triggered executions yet.</em></p>"""
     else
       val rows = entries.zipWithIndex.map { case (e, idx) => logRow(e, idx + 1) }
       html"""
@@ -106,15 +106,15 @@ object TasksPage {
     val modulesStr = if e.moduleIds.isEmpty then "*" else e.moduleIds.mkString(", ")
 
     val statusClass = e.status match
-      case ExecStatus.SUCCESS  => "success"
-      case ExecStatus.FAILURE  => "failure"
-      case ExecStatus.RUNNING  => "running"
-      case ExecStatus.PENDING  => "pending"
-      case ExecStatus.CANCELLED => "failure"
+      case ExecStatus.SUCCESS  => "pico-color-green-400"
+      case ExecStatus.FAILURE  => "pico-color-red-400"
+      case ExecStatus.RUNNING  => "pico-color-blue-400"
+      case ExecStatus.PENDING  => "pico-color-yellow-400"
+      case ExecStatus.CANCELLED => "pico-color-red-400"
 
     val cancelBtn = e.status match
       case ExecStatus.RUNNING | ExecStatus.PENDING =>
-        html"""<button class="cancel-btn compact" hx-post="/tasks/cancel?execId=${e.execId}"
+        html"""<button class="outline compact cancel-btn" hx-post="/tasks/cancel?execId=${e.execId}"
                hx-target="#log-table" hx-swap="outerHTML">Cancel</button>"""
       case _ => Html("")
 
@@ -126,9 +126,9 @@ object TasksPage {
           <td>$modulesStr</td>
           <td>$startStr</td>
           <td>
-            <span class="state-badge compact $statusClass">
+            <mark class="$statusClass">
               ${e.status.toString}
-            </span>
+            </mark>
             $cancelBtn
           </td>
           <td>$durationStr</td>
@@ -143,7 +143,7 @@ object TasksPage {
 
     val logFilter = if combinedOutput.contains("[") then
       html"""
-        <div class="log-toolbar">
+        <div class="flex-row" style="margin-bottom:0.15rem">
           <label>Log level:</label>
           <select x-model="level">
             <option value="DEBUG">DEBUG</option>
@@ -165,11 +165,11 @@ ${combinedOutput.takeRight(10000)}</pre>"""
         val status = if o.success then "OK" else "FAIL"
         val cached = if o.fromCache then " (cached)" else ""
         val err = o.error.map(msg => s": $msg").getOrElse("")
-        html"""<tr><td>${o.moduleId}</td><td>$status$cached</td><td class="note">$err</td></tr>"""
+        html"""<tr><td>${o.moduleId}</td><td>$status$cached</td><td><small>$err</small></td></tr>"""
       }
       html"""
-        <div class="outcomes-section">
-          <table class="outcomes-table">
+        <div>
+          <table class="compact">
             <thead><tr><th>Module</th><th>Outcome</th><th>Error</th></tr></thead>
             <tbody>$outcomeRows</tbody>
           </table>
@@ -178,13 +178,13 @@ ${combinedOutput.takeRight(10000)}</pre>"""
     else Html("")
 
     val errorSection = e.error.map { msg =>
-      html"""<div class="error-msg">Error: $msg</div>"""
+      html"""<p class="pico-color-red-400">Error: $msg</p>"""
     }.getOrElse(Html(""))
 
     html"""
       <tr>
         <td colspan="7" class="expand-pad">
-          <details class="details-box">
+          <details>
             <summary>Details</summary>
             $logFilter
             $outputSection

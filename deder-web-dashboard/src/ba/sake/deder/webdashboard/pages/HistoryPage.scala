@@ -17,7 +17,7 @@ object HistoryPage {
         </label>
       </div>
 
-      <form id="history-filters" class="history-filters">
+      <form id="history-filters" class="grid">
         <div>
           <label for="hist-search">Search</label>
           <input type="text" id="hist-search" name="search" placeholder="request/task/module..."
@@ -84,7 +84,7 @@ object HistoryPage {
     if entries.isEmpty then html"""<p><em>No matching requests found.</em></p>"""
     else
       val rows = entries.map { entry =>
-        val statusClass = if entry.success then "success" else "failure"
+        val statusClass = if entry.success then "pico-color-green-400" else "pico-color-red-400"
         val statusText = if entry.success then "OK" else "FAIL"
         val startedStr = formatDateTime(Instant.ofEpochMilli(entry.startTimeMs))
         val durStr = formatElapsed(Duration.ofMillis(entry.durationMs))
@@ -99,9 +99,9 @@ object HistoryPage {
           </tr>
           <tr>
             <td colspan="6" class="no-pad">
-              <details class="details-box">
+              <details>
                 <summary>Details</summary>
-                <div class="details-content">
+                <div>
                   Request ID: ${entry.requestId}<br>
                   Caller: ${entry.caller}<br>
                   Modules: ${entry.moduleIds.mkString(", ")}<br>
@@ -126,7 +126,7 @@ object HistoryPage {
     if entries.isEmpty then Html("")
     else
       val rows = entries.map { entry =>
-        val statusClass = if entry.success then "success" else "failure"
+        val statusClass = if entry.success then "pico-color-green-400" else "pico-color-red-400"
         val statusText = if entry.success then "OK" else "FAIL"
         val startedStr = formatDateTime(Instant.ofEpochMilli(entry.startTimeMs))
         val durStr = formatElapsed(Duration.ofMillis(entry.durationMs))
@@ -141,9 +141,9 @@ object HistoryPage {
           </tr>
           <tr>
             <td colspan="6" class="no-pad">
-              <details class="details-box">
+              <details>
                 <summary>Details</summary>
-                <div class="details-content">
+                <div>
                   Request ID: ${entry.requestId}<br>
                   Caller: ${entry.caller}<br>
                   Modules: ${entry.moduleIds.mkString(", ")}<br>
@@ -167,7 +167,7 @@ object HistoryPage {
                 hx-include="#history-filters" hx-swap-oob="true"
                 hx-target="#history-table-wrapper table tbody" hx-swap="beforeend"
                 hx-vals='{"offset": "${nextOffset}"}'
-                class="load-more-btn">
+                class="outline secondary">
           Load more...
         </button>
       """

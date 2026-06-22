@@ -34,14 +34,14 @@ object ServerPage {
 
       
       <article>
-        <header><h3 class="section-head">System</h3></header>
+        <header><h3>System</h3></header>
         ${statCard("OS / Arch", s"$osName $osArch")}
         ${statCard("Processors", processors.toString)}
       </article>
 
       
       <article>
-        <header><h3 class="section-head">JDK</h3></header>
+        <header><h3>JDK</h3></header>
         ${statCard("Version", jdkVersion)}
         ${statCard("Vendor", jdkVendor)}
       </article>
@@ -54,7 +54,7 @@ object ServerPage {
     }
     html"""
       <hr>
-      <h4 class="section-head">Loaded Plugins</h4>
+      <h4>Loaded Plugins</h4>
       <table class="compact">
         <thead><tr><th>Plugin ID</th><th>#Tasks</th><th>Task Names</th></tr></thead>
         <tbody>$rows</tbody>

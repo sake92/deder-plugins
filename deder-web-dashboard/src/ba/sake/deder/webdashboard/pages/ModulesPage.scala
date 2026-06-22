@@ -19,8 +19,8 @@ object ModulesPage {
           <input type="search" x-model="filter" autofocus placeholder="Filter modules..."
                   class="module-filter"
                  aria-label="Filter modules">
-          <span class="module-count">$total modules</span>
-          <table class="module-table compact">
+           <small>$total modules</small>
+          <table class="striped compact">
             <thead><tr><th>Module ID</th><th>Type</th><th>Version</th><th>#Deps</th></tr></thead>
             <tbody>$rows</tbody>
           </table>

@@ -88,7 +88,7 @@ object ModulesGraphPage {
             <label><input type="checkbox" x-model="showJava" @change="applyFilters()"> Java</label>
             <label><input type="checkbox" x-model="showTest" @change="applyFilters()"> Test</label>
             <input type="search" @input="search($$el.value)" placeholder="Search module..." class="graph-search" aria-label="Search graph">
-            <button type="button" class="outline secondary graph-reset-btn" @click="reset()">Reset</button>
+            <button type="button" class="outline secondary" @click="reset()">Reset</button>
           </div>
           <div id="cy"></div>
           <div class="graph-legend">
@@ -96,7 +96,7 @@ object ModulesGraphPage {
             <span><img src="${scalaJsIcon}" class="legend-icon"> Scala.js</span>
             <span><img src="${scalaNativeIcon}" class="legend-icon"> Scala Native</span>
             <span><img src="${javaIcon}" class="legend-icon"> Java</span>
-            <span class="legend-icon test"></span> Test
+            <span class="legend-icon-test"></span> Test
             &mdash; Arrow = depends on. Click a node to highlight its neighborhood.
           </div>
         </div>

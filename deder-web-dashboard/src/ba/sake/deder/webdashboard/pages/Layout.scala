@@ -13,6 +13,7 @@ object Layout {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>$title</title>
         <link rel="stylesheet" href="/pico.zinc.min.css">
+        <link rel="stylesheet" href="/dashboard.css">
         
         <script src="/htmx.min.js"></script>
         <script src="/alpine.min.js" defer></script>
@@ -58,7 +59,7 @@ object Layout {
         <main class="container">$content</main>
         ${
           if projectRoot.nonEmpty then
-            html"""<footer class="dashboard-footer">📁 $projectRoot</footer>"""
+            html"""<footer><small>📁 $projectRoot</small></footer>"""
           else Html("")
         }
       </body>
