@@ -16,8 +16,8 @@ object TasksPage {
       allTasks: Seq[TaskInfo]
   ): Html =
     html"""
-      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-        <label style="cursor:pointer;">
+      <div class="controls-bar">
+        <label>
           ${autoRefreshCheckbox(true)}
           <span>Auto-refresh</span>
         </label>
@@ -69,25 +69,23 @@ object TasksPage {
 
     html"""
       <form hx-get="/tasks/run" hx-target="#log-table" hx-swap="innerHTML"
-            style="display: flex; gap: 0.5rem; align-items: end; margin-bottom: 0.75rem; flex-wrap: wrap;">
-        <div style="flex: 2; min-width: 180px;">
-          <label for="task-input" style="font-size: 0.75rem; display: block; margin-bottom: 0.15rem;">Task</label>
-          <input list="task-list" id="task-input" name="taskName" placeholder="Search..." autocomplete="off" required
-                 style="width: 100%;" />
+            class="trigger-form">
+        <div class="field">
+          <label for="task-input">Task</label>
+          <input list="task-list" id="task-input" name="taskName" placeholder="Search..." autocomplete="off" required />
           <datalist id="task-list">$taskOpts</datalist>
         </div>
-        <div style="flex: 2; min-width: 180px;">
-          <label for="module-input" style="font-size: 0.75rem; display: block; margin-bottom: 0.15rem;">Modules</label>
+        <div class="field">
+          <label for="module-input">Modules</label>
           <input list="module-list" id="module-input" name="moduleIds" value="*"
-                 placeholder="* (all) or comma-separated" autocomplete="off"
-                 style="width: 100%;" />
+                 placeholder="* (all) or comma-separated" autocomplete="off" />
           <datalist id="module-list">$moduleOpts</datalist>
         </div>
-        <button type="submit" style="white-space: nowrap; margin-bottom: 0px;">Run</button>
+        <button type="submit">Run</button>
       </form>
       ${if moduleIds.nonEmpty then
-        html"""<div style="font-size: 0.75rem; color: var(--pico-muted-color); margin-bottom: 0.5rem;">
-          Known modules: ${moduleIds.map(m => html"""<code style="font-size:0.72rem; margin-right:0.2rem;">$m</code>""")}
+        html"""<div class="known-modules">
+          Known modules: ${moduleIds.map(m => html"""<code>$m</code>""")}
         </div>"""
       else Html("")}
     """
@@ -102,11 +100,11 @@ object TasksPage {
   def logTable(log: TaskExecutionLog): Html =
     val entries = log.recent(50)
     if entries.isEmpty then
-      html"""<p style="color: var(--pico-muted-color); font-style: italic;">No web-triggered executions yet.</p>"""
+      html"""<p class="no-requests">No web-triggered executions yet.</p>"""
     else
       val rows = entries.zipWithIndex.map { case (e, idx) => logRow(e, idx + 1) }
       html"""
-        <table style="font-size: 0.85rem;">
+        <table class="compact">
           <thead><tr>
             <th>#</th><th>Task</th><th>Modules</th><th>Start</th><th>Status</th><th>Duration</th><th></th>
           </tr></thead>
@@ -133,10 +131,11 @@ object TasksPage {
 
     val cancelBtn = e.status match
       case ExecStatus.RUNNING | ExecStatus.PENDING =>
-        html"""<button class="cancel-btn" hx-post="/tasks/cancel?execId=${e.execId}"
-               hx-target="#log-table" hx-swap="outerHTML"
-               style="font-size: 0.7rem; padding: 0.05rem 0.4rem;">Cancel</button>"""
+        html"""<button class="cancel-btn compact" hx-post="/tasks/cancel?execId=${e.execId}"
+               hx-target="#log-table" hx-swap="outerHTML">Cancel</button>"""
       case _ => Html("")
+
+    val hasContent = e.output.nonEmpty || e.outcomes.nonEmpty || e.error.isDefined
 
     html"""
       <tr id="exec-${e.execId}">
@@ -145,38 +144,29 @@ object TasksPage {
         <td>$modulesStr</td>
         <td>$startStr</td>
         <td>
-          <span class="state-badge $statusClass" style="font-size: 0.7rem;">
+          <span class="state-badge compact $statusClass">
             ${e.status.toString}
           </span>
           $cancelBtn
         </td>
         <td>$durationStr</td>
-        <td>
-          ${expandBtn(e)}
-        </td>
+        <td></td>
       </tr>
-      ${expandedRow(e)}
+      ${
+        if hasContent then detailSection(e)
+        else Html("")
+      }
     """
 
-  private def expandBtn(e: ExecEntry): Html =
-    val rowId = s"exec-${e.execId}-detail"
-    val preId = s"exec-${e.execId}-log"
-    val hasContent = e.output.nonEmpty || e.outcomes.nonEmpty || e.error.isDefined
-    if hasContent then
-      html"""<span style="cursor: pointer; font-size: 0.75rem;"
-             onclick="var r=document.getElementById('${rowId}');var v=r.style.display==='none';r.style.display=v?'':'none';if(v)filterLogLines('${preId}','INFO')">📋</span>"""
-    else Html("")
-
-  private def expandedRow(e: ExecEntry): Html =
-    val rowId = s"exec-${e.execId}-detail"
+  private def detailSection(e: ExecEntry): Html =
     val preId = s"exec-${e.execId}-log"
     val combinedOutput = e.output.trim + e.renderedSummary.map(s => s"\n\n$s").getOrElse("")
 
     val logFilter = if combinedOutput.contains("[") then
       html"""
-        <div style="display:flex; align-items:center; gap:0.3rem; margin-bottom:0.15rem;">
-          <label style="font-size:0.7rem;">Log level:</label>
-          <select onchange="filterLogLines('$preId', this.value)" style="font-size:0.7rem; padding:0.05rem 0.2rem;">
+        <div class="log-toolbar">
+          <label>Log level:</label>
+          <select onchange="filterLogLines('$preId', this.value)">
             <option value="DEBUG">DEBUG</option>
             <option value="INFO" selected>INFO</option>
             <option value="WARN">WARN</option>
@@ -187,8 +177,7 @@ object TasksPage {
     else Html("")
 
     val outputSection = if combinedOutput.nonEmpty then
-      html"""<pre id="$preId" data-original style="max-height: 200px; overflow-y: auto; background: var(--pico-code-background-color);
-               padding: 0.3rem; font-family: monospace; font-size: 0.75rem; margin-top: 0.25rem;">
+      html"""<pre id="$preId" data-original class="log-output">
 ${combinedOutput.takeRight(10000)}</pre>"""
     else Html("")
 
@@ -197,11 +186,11 @@ ${combinedOutput.takeRight(10000)}</pre>"""
         val status = if o.success then "OK" else "FAIL"
         val cached = if o.fromCache then " (cached)" else ""
         val err = o.error.map(msg => s": $msg").getOrElse("")
-        html"""<tr><td>${o.moduleId}</td><td>$status$cached</td><td style="font-size:0.7rem;">$err</td></tr>"""
+        html"""<tr><td>${o.moduleId}</td><td>$status$cached</td><td class="note">$err</td></tr>"""
       }
       html"""
-        <div style="margin-top: 0.25rem;">
-          <table style="font-size: 0.78rem; width: 100%;">
+        <div class="outcomes-section">
+          <table class="outcomes-table">
             <thead><tr><th>Module</th><th>Outcome</th><th>Error</th></tr></thead>
             <tbody>$outcomeRows</tbody>
           </table>
@@ -210,16 +199,19 @@ ${combinedOutput.takeRight(10000)}</pre>"""
     else Html("")
 
     val errorSection = e.error.map { msg =>
-      html"""<div style="color: var(--pico-color-red-400); margin-top: 0.25rem;">Error: $msg</div>"""
+      html"""<div class="error-msg">Error: $msg</div>"""
     }.getOrElse(Html(""))
 
     html"""
-      <tr id="$rowId" style="display: none;">
-        <td colspan="7" style="padding: 0.3rem 0.6rem;">
-          $logFilter
-          $outputSection
-          $resultSection
-          $errorSection
+      <tr>
+        <td colspan="7" class="expand-pad">
+          <details class="details-box">
+            <summary>Details</summary>
+            $logFilter
+            $outputSection
+            $resultSection
+            $errorSection
+          </details>
         </td>
       </tr>
     """

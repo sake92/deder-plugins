@@ -44,16 +44,16 @@ object ModulesGraphPage {
             <label><input type="checkbox" x-model="showScalaNative" @change="applyFilters()"> Scala Native</label>
             <label><input type="checkbox" x-model="showJava" @change="applyFilters()"> Java</label>
             <label><input type="checkbox" x-model="showTest" @change="applyFilters()"> Test</label>
-            <input type="search" @input="search($$el.value)" placeholder="Search module..." style="max-width:200px; margin-left:auto;" aria-label="Search graph">
-            <button type="button" class="outline secondary" @click="reset()" style="font-size:0.8rem; padding:0.2rem 0.5rem;">Reset</button>
+            <input type="search" @input="search($$el.value)" placeholder="Search module..." class="graph-search" aria-label="Search graph">
+            <button type="button" class="outline secondary graph-reset-btn" @click="reset()">Reset</button>
           </div>
           <div id="cy"></div>
-          <div style="font-size: 0.72rem; margin-top: 0.25rem; color: var(--pico-muted-color); display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-            <span><img src="${scalaIcon}" style="width:14px;height:14px;vertical-align:middle;"> Scala</span>
-            <span><img src="${scalaJsIcon}" style="width:14px;height:14px;vertical-align:middle;"> Scala.js</span>
-            <span><img src="${scalaNativeIcon}" style="width:14px;height:14px;vertical-align:middle;"> Scala Native</span>
-            <span><img src="${javaIcon}" style="width:14px;height:14px;vertical-align:middle;"> Java</span>
-            <span style="display:inline-block;width:14px;height:14px;border:2px dashed #999;border-radius:3px;vertical-align:middle;"></span> Test
+          <div class="graph-legend">
+            <span><img src="${scalaIcon}" class="legend-icon"> Scala</span>
+            <span><img src="${scalaJsIcon}" class="legend-icon"> Scala.js</span>
+            <span><img src="${scalaNativeIcon}" class="legend-icon"> Scala Native</span>
+            <span><img src="${javaIcon}" class="legend-icon"> Java</span>
+            <span class="legend-icon test"></span> Test
             &mdash; Arrow = depends on. Click a node to highlight its neighborhood.
           </div>
         </div>

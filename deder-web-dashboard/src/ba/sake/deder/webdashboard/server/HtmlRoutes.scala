@@ -80,7 +80,7 @@ class HtmlRoutes(
         val cancelled = internals.cancelRequest(requestId)
         if cancelled then Response.withBody(LivePage.cancelledBadge)
         else Response.withBody(LivePage.cancelButton(requestId))
-      else Response.withBody(html"<span style='color:red'>Invalid request</span>")
+      else Response.withBody(html"<span class='failure'>Invalid request</span>")
 
     // --- Auto-refresh toggle endpoints ---
     case GET -> Path("stats", "auto-refresh", "live") =>
@@ -231,7 +231,7 @@ class HtmlRoutes(
       val taskName = qp.taskName
       val moduleIdsRaw = qp.moduleIds
       if taskName.isEmpty then
-        Response.withBody(html"""<tr><td colspan="7" style="color:red">Task name is required</td></tr>""")
+        Response.withBody(html"""<tr><td colspan="7" class="failure">Task name is required</td></tr>""")
       else
         val moduleIds = qp.moduleIds
         // if moduleIdsRaw == "*" || moduleIdsRaw.isBlank then Seq.empty[String]

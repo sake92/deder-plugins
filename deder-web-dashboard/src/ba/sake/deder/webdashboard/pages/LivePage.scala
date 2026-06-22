@@ -8,8 +8,8 @@ import ba.sake.deder.webdashboard.{ApiRequestStatus, ApiLockProgress, ApiTaskSta
 object LivePage {
   def fullPage(refreshMs: Int): Html =
     html"""
-      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-        <label style="cursor:pointer;">
+      <div class="controls-bar">
+        <label>
           ${autoRefreshCheckbox(true)}
           <span>Auto-refresh</span>
         </label>
@@ -30,8 +30,8 @@ object LivePage {
         <p>Loading requests...</p>
       </div>
 
-      <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.5rem;">
-        <h3 style="margin:0">In-Memory Caches</h3>
+      <div class="cache-header">
+        <h3>In-Memory Caches</h3>
         <button class="outline secondary"
                 hx-post="/stats/caches/clear"
                 hx-target="#live-caches"
@@ -93,7 +93,7 @@ object LivePage {
             <span class="state-badge $badgeClass">${title} (${reqs.size})</span>
           </div>
           <table>
-            <thead><tr><th>Started</th><th>Client</th><th>Task</th><th style="width:20%">Modules</th><th>Details</th><th></th></tr></thead>
+            <thead><tr><th>Started</th><th>Client</th><th>Task</th><th class="col-modules">Modules</th><th>Details</th><th></th></tr></thead>
             <tbody>$rows</tbody>
           </table>
         </div>
@@ -104,10 +104,10 @@ object LivePage {
     val startedStr = formatDateTime(Instant.ofEpochMilli(req.startTimeMs))
     html"""
       <tr>
-        <td style="white-space:nowrap">$startedStr</td>
+        <td class="nowrap">$startedStr</td>
         <td>${req.caller}</td>
         <td>${req.taskName}</td>
-        <td style="font-size:0.8rem">${req.moduleIds.mkString(", ")}</td>
+        <td class="module-ids">${req.moduleIds.mkString(", ")}</td>
         <td>—</td>
         <td>${cancelButton(req.requestId)}</td>
       </tr>
@@ -121,16 +121,16 @@ object LivePage {
       val waitingOn = l.blockingOn.map(w => s"waiting on: $w").getOrElse("")
       val heldBy = l.heldBy.map(h => s" [held by $h]").getOrElse("")
       html"""
-        <div class="progress-bar"><div class="progress-bar-fill locks" style="width:${pct}%"></div></div>
+        <progress class="locks" value="${l.acquired}" max="${l.total}"></progress>
         <div class="progress-detail">Lock ${l.acquired}/${l.total}${if waitingOn.nonEmpty then s" — $waitingOn$heldBy" else ""}</div>
       """
     }.getOrElse(html"""<div class="progress-detail">Acquiring locks...</div>""")
     html"""
       <tr>
-        <td style="white-space:nowrap">$startedStr</td>
+        <td class="nowrap">$startedStr</td>
         <td>${req.caller}</td>
         <td>${req.taskName}</td>
-        <td style="font-size:0.8rem">${req.moduleIds.mkString(", ")}</td>
+        <td class="module-ids">${req.moduleIds.mkString(", ")}</td>
         <td>$lockInfo</td>
         <td>${cancelButton(req.requestId)}</td>
       </tr>
@@ -142,16 +142,16 @@ object LivePage {
     val stageInfo = req.taskProgress.map { p =>
       val pct = if p.totalStages > 0 then (p.currentStage * 100) / p.totalStages else 100
       html"""
-        <div class="progress-bar"><div class="progress-bar-fill stages" style="width:${pct}%"></div></div>
+        <progress class="stages" value="${p.currentStage}" max="${p.totalStages}"></progress>
         <div class="progress-detail">Stage ${p.currentStage}/${p.totalStages} — done: ${p.completed}, fail: ${p.failed}, run: ${p.running}, pending: ${p.pending}</div>
       """
     }.getOrElse(html"""<div class="progress-detail">Executing...</div>""")
     html"""
       <tr>
-        <td style="white-space:nowrap">$startedStr</td>
+        <td class="nowrap">$startedStr</td>
         <td>${req.caller}</td>
         <td>${req.taskName}</td>
-        <td style="font-size:0.8rem">${req.moduleIds.mkString(", ")}</td>
+        <td class="module-ids">${req.moduleIds.mkString(", ")}</td>
         <td>$stageInfo</td>
         <td>${cancelButton(req.requestId)}</td>
       </tr>
@@ -169,7 +169,7 @@ object LivePage {
     """
 
   def cancelledBadge: Html =
-    html"""<span style="font-size:0.75rem; color: var(--pico-muted-color);">Cancelled</span>"""
+    html"""<span class="cancelled">Cancelled</span>"""
 
   def overviewCards(internals: DederProjectInternals): Html = {
     val uptime = internals.serverUptime
@@ -185,20 +185,18 @@ object LivePage {
     ).flatten
     val uptimeStr = parts.mkString(" ")
     html"""
-      <div style="display: flex; flex-wrap: wrap;">
+      <div class="stat-row">
         <div class="stat-card">
           <div class="label">Total Requests</div>
           <div class="value">${internals.totalRequestsServed}</div>
         </div>
         <div class="stat-card">
           <div class="label">Total Errors</div>
-          <div class="value" style="color: ${
-        if internals.totalErrors > 0 then "var(--pico-color-red-400)" else "var(--pico-color-green-400)"
-      }">${internals.totalErrors}</div>
+          <div class="value ${if internals.totalErrors > 0 then "failure" else "success"}">${internals.totalErrors}</div>
         </div>
         <div class="stat-card">
           <div class="label">Uptime</div>
-          <div class="value" style="font-size:1rem">$uptimeStr</div>
+          <div class="value uptime">$uptimeStr</div>
         </div>
       </div>
     """
@@ -228,7 +226,7 @@ object LivePage {
         if result.bspEntriesRemoved > 0 then Some(s"${result.bspEntriesRemoved} BSP entries removed.") else None,
         if result.historyEntriesRemoved > 0 then Some(s"${result.historyEntriesRemoved} history entries removed.") else None
       ).flatten
-      html"""<p style="color: var(--pico-color-green-400);">✅ ${parts.mkString(" ")}</p>"""
+      html"""<p class="success">✅ ${parts.mkString(" ")}</p>"""
     val table = cachesTable(internals)
     html"""$summary$table"""
   }

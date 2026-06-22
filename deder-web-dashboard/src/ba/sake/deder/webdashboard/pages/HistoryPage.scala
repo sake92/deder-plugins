@@ -10,30 +10,30 @@ import ba.sake.deder.webdashboard.ApiHistoryEntry
 object HistoryPage {
   def fullPage(refreshMs: Int): Html =
     html"""
-      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-        <label style="cursor:pointer;">
+      <div class="controls-bar">
+        <label>
           ${autoRefreshCheckbox(true)}
           <span>Auto-refresh</span>
         </label>
       </div>
 
-      <form id="history-filters" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:end; margin-bottom:0.75rem;">
+      <form id="history-filters" class="history-filters">
         <div>
-          <label for="hist-search" style="font-size:0.75rem;">Search</label>
+          <label for="hist-search">Search</label>
           <input type="text" id="hist-search" name="search" placeholder="request/task/module..."
                  hx-get="/stats/history-table" hx-trigger="keyup changed delay:300ms"
                  hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML"
-                 style="width:150px;">
+                 class="search-box">
         </div>
         <div>
-          <label for="hist-caller" style="font-size:0.75rem;">Caller</label>
+          <label for="hist-caller">Caller</label>
           <input type="text" id="hist-caller" name="caller" placeholder="CLI, BSP..."
                  hx-get="/stats/history-table" hx-trigger="keyup changed delay:300ms"
                  hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML"
-                 style="width:110px;">
+                 class="caller-box">
         </div>
         <div>
-          <label for="hist-status" style="font-size:0.75rem;">Status</label>
+          <label for="hist-status">Status</label>
           <select id="hist-status" name="status"
                   hx-get="/stats/history-table" hx-trigger="change"
                   hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML">
@@ -43,7 +43,7 @@ object HistoryPage {
           </select>
         </div>
         <div>
-          <label for="hist-sort" style="font-size:0.75rem;">Sort</label>
+          <label for="hist-sort">Sort</label>
           <select id="hist-sort" name="sort"
                   hx-get="/stats/history-table" hx-trigger="change"
                   hx-include="#history-filters" hx-target="#history-table-wrapper" hx-swap="innerHTML">
@@ -63,7 +63,7 @@ object HistoryPage {
         <p>Loading history...</p>
       </div>
 
-      <div id="history-load-more" style="text-align:center; margin-top:0.5rem;"></div>
+      <div id="history-load-more" class="load-more"></div>
     """
 
   def autoRefreshCheckbox(enabled: Boolean): Html =
@@ -98,10 +98,10 @@ object HistoryPage {
             <td class="${statusClass}">${statusText}</td>
           </tr>
           <tr>
-            <td colspan="6" style="padding:0;">
-              <details style="margin:0.2rem 0.5rem; font-size:0.8rem;">
-                <summary style="cursor:pointer; color:var(--pico-muted-color);">Details</summary>
-                <div style="padding:0.3rem 0.5rem; background:var(--pico-muted-border-color); border-radius:4px;">
+            <td colspan="6" class="no-pad">
+              <details class="details-box">
+                <summary>Details</summary>
+                <div class="details-content">
                   Request ID: ${entry.requestId}<br>
                   Caller: ${entry.caller}<br>
                   Modules: ${entry.moduleIds.mkString(", ")}<br>
@@ -140,10 +140,10 @@ object HistoryPage {
             <td class="${statusClass}">${statusText}</td>
           </tr>
           <tr>
-            <td colspan="6" style="padding:0;">
-              <details style="margin:0.2rem 0.5rem; font-size:0.8rem;">
-                <summary style="cursor:pointer; color:var(--pico-muted-color);">Details</summary>
-                <div style="padding:0.3rem 0.5rem; background:var(--pico-muted-border-color); border-radius:4px;">
+            <td colspan="6" class="no-pad">
+              <details class="details-box">
+                <summary>Details</summary>
+                <div class="details-content">
                   Request ID: ${entry.requestId}<br>
                   Caller: ${entry.caller}<br>
                   Modules: ${entry.moduleIds.mkString(", ")}<br>
@@ -167,7 +167,7 @@ object HistoryPage {
                 hx-include="#history-filters" hx-swap-oob="true"
                 hx-target="#history-table-wrapper table tbody" hx-swap="beforeend"
                 hx-vals='{"offset": "${nextOffset}"}'
-                style="font-size:0.8rem; padding:0.2rem 0.5rem;">
+                class="load-more-btn">
           Load more...
         </button>
       """

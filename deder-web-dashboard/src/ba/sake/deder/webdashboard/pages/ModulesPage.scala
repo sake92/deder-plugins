@@ -17,10 +17,10 @@ object ModulesPage {
       html"""
         <div x-data="{ filter: '' }">
           <input type="search" x-model="filter" placeholder="Filter modules..."
-                  style="max-width: 220px; margin-bottom: 0.5rem;"
+                  class="module-filter"
                  aria-label="Filter modules">
-          <span style="font-size: 0.8rem; color: var(--pico-muted-color);">$total modules</span>
-          <table class="module-table" style="font-size:0.85rem; margin-top:0.25rem;">
+          <span class="module-count">$total modules</span>
+          <table class="module-table compact">>
             <thead><tr><th>Module ID</th><th>Type</th><th>Version</th><th>#Deps</th></tr></thead>
             <tbody>$rows</tbody>
           </table>

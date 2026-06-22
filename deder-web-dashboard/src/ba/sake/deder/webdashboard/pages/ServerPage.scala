@@ -21,7 +21,7 @@ object ServerPage {
 
     html"""
       <h3>Deder</h3>
-      <div style="display: flex; flex-wrap: wrap;">
+      <div class="stat-row">
         ${statCard("Version", dederVersion)}
         ${statCard("Uptime", uptimeStr)}
         ${statCard("Modules", moduleCount.toString)}
@@ -33,14 +33,14 @@ object ServerPage {
         else html""
       }
 
-      <h3 style="margin-top:0.75rem;">OS</h3>
-      <div style="display: flex; flex-wrap: wrap;">
+      <h3 class="section-head">OS</h3>
+      <div class="stat-row">
         ${statCard("OS / Arch", s"$osName $osArch")}
         ${statCard("Processors", processors.toString)}
       </div>
 
-      <h3 style="margin-top:0.75rem;">JDK</h3>
-      <div style="display: flex; flex-wrap: wrap;">
+      <h3 class="section-head">JDK</h3>
+      <div class="stat-row">
         ${statCard("Version", jdkVersion)}
         ${statCard("Vendor", jdkVendor)}
       </div>
@@ -52,8 +52,8 @@ object ServerPage {
       html"""<tr><td>${p.id}</td><td>${p.taskNames.size}</td><td>${p.taskNames.mkString(", ")}</td></tr>"""
     }
     html"""
-      <h4 style="margin-top:0.75rem;">Loaded Plugins</h4>
-      <table style="font-size:0.85rem;">
+      <h4 class="section-head">Loaded Plugins</h4>
+      <table class="compact">
         <thead><tr><th>Plugin ID</th><th>#Tasks</th><th>Task Names</th></tr></thead>
         <tbody>$rows</tbody>
       </table>
