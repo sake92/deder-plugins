@@ -26,16 +26,59 @@ object ModulesGraphPage {
           showScalaJs: true,
           showScalaNative: true,
           showTest: true,
-          applyFilters() { window.applyFilters(window.__cy) },
-          search(term) { window.graphSearch(window.__cy, term) },
+          applyFilters() {
+            const cy = window.__cy;
+            if (!cy) return;
+            cy.nodes().forEach(node => {
+              let type = node.data('type');
+              let show = false;
+              if (type === 'SCALA' || type === 'SCALA_TEST') {
+                show = this.showScala;
+              } else if (type === 'JAVA' || type === 'JAVA_TEST') {
+                show = this.showJava;
+              } else if (type === 'SCALA_JS' || type === 'SCALA_JS_TEST') {
+                show = this.showScalaJs;
+              } else if (type === 'SCALA_NATIVE' || type === 'SCALA_NATIVE_TEST') {
+                show = this.showScalaNative;
+              } else {
+                show = true;
+              }
+              if (show && !this.showTest && type.includes('_TEST')) {
+                show = false;
+              }
+              node.style('display', show ? 'element' : 'none');
+            });
+          },
+          search(term) {
+            const cy = window.__cy;
+            cy.elements().removeClass('dimmed');
+            if (!term || term.trim() === '') {
+              cy.nodes().style('display', 'element');
+              this.applyFilters();
+              cy.fit();
+              cy.center();
+              return;
+            }
+            const lower = term.toLowerCase();
+            cy.nodes().forEach(node => {
+              if (node.data('id').toLowerCase().includes(lower)) {
+                node.style('display', 'element');
+                node.removeClass('dimmed');
+              } else {
+                node.style('display', 'none');
+              }
+            });
+          },
           reset() {
-            window.graphReset(window.__cy);
-            showScala = true;
-            showJava = true;
-            showScalaJs = true;
-            showScalaNative = true;
-            showTest = true;
-            window.applyFilters(window.__cy);
+            this.showScala = true;
+            this.showJava = true;
+            this.showScalaJs = true;
+            this.showScalaNative = true;
+            this.showTest = true;
+            window.__cy.nodes().style('display', 'element');
+            this.applyFilters();
+            window.__cy.fit();
+            window.__cy.center();
           }
         }">
           <div class="graph-controls">
