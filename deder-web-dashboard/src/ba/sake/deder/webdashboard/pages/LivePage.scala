@@ -188,15 +188,15 @@ object LivePage {
     html"""
       <div class="grid">
         <article>
-          <b>Total Requests: </b>
+          <b>Total Requests</b>: 
           <span>${internals.totalRequestsServed}</span>
         </article>
         <article>
-          <b>Total Errors: </b>
+          <b>Total Errors</b>: 
           <span class="${if internals.totalErrors > 0 then "pico-color-red-400" else "pico-color-green-400"}">${internals.totalErrors}</span>
         </article>
         <article>
-          <b>Uptime: </b>
+          <b>Uptime</b>: 
           <span>$uptimeStr</span>
         </article>
       </div>
