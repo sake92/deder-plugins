@@ -24,22 +24,7 @@ object TasksPage {
       </div>
       ${triggerForm(allTasks, project)}
       ${logTableContainer(log, refreshMs)}
-      <script>
-        function filterLogLines(preId, level) {
-          var pre = document.getElementById(preId);
-          if (!pre.getAttribute('data-original')) pre.setAttribute('data-original', pre.textContent);
-          var original = pre.getAttribute('data-original');
-          var weights = { DEBUG:0, INFO:1, WARN:2, ERROR:3 };
-          var threshold = weights[level];
-          var lines = original.split('\n');
-          pre.textContent = lines.filter(function(line) {
-            for (var l in weights) {
-              if (line.indexOf('[' + l + ']') === 0) return weights[l] >= threshold;
-            }
-            return true;
-          }).join('\n');
-        }
-      </script>
+
     """
 
   def autoRefreshCheckbox(enabled: Boolean): Html =
@@ -52,7 +37,8 @@ object TasksPage {
 
   def autoRefreshOob(enabled: Boolean, refreshMs: Int): Html =
     val trigger = if enabled then s"load, every ${refreshMs}ms" else "load, refresh"
-    html"""<div id="log-table" hx-get="/tasks/log-table" hx-trigger="${trigger}" hx-swap="innerHTML" hx-swap-oob="true"></div>"""
+    html"""<div id="log-table" hx-get="/tasks/log-table" hx-trigger="${trigger}" hx-swap="innerHTML"
+           hx-on::after-swap="Alpine.initTree($$el)" hx-swap-oob="true"></div>"""
 
   def triggerForm(allTasks: Seq[TaskInfo], project: DederProject): Html =
     val tasks = allTasks
@@ -75,13 +61,13 @@ object TasksPage {
           <input list="task-list" id="task-input" name="taskName" placeholder="Search..." autocomplete="off" required />
           <datalist id="task-list">$taskOpts</datalist>
         </div>
-        <div class="field">
+        <div class="field module-field">
           <label for="module-input">Modules</label>
           <input list="module-list" id="module-input" name="moduleIds" value=""
                  placeholder="* (all) or comma-separated" autocomplete="off" />
           <datalist id="module-list">$moduleOpts</datalist>
         </div>
-        <button type="submit">Run</button>
+        <button type="submit">Run ▶</button>
       </form>
       ${if moduleIds.nonEmpty then
         html"""<div class="known-modules">
@@ -92,7 +78,8 @@ object TasksPage {
 
   def logTableContainer(log: TaskExecutionLog, refreshMs: Int): Html =
     html"""
-      <div id="log-table" hx-get="/tasks/log-table" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML">
+      <div id="log-table" hx-get="/tasks/log-table" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML"
+           hx-on::after-swap="Alpine.initTree($$el)">
         ${logTable(log)}
       </div>
     """
@@ -108,7 +95,7 @@ object TasksPage {
           <thead><tr>
             <th>#</th><th>Task</th><th>Modules</th><th>Start</th><th>Status</th><th>Duration</th><th></th>
           </tr></thead>
-          <tbody>$rows</tbody>
+          $rows
         </table>
       """
 
@@ -135,38 +122,34 @@ object TasksPage {
                hx-target="#log-table" hx-swap="outerHTML">Cancel</button>"""
       case _ => Html("")
 
-    val hasContent = e.output.nonEmpty || e.outcomes.nonEmpty || e.error.isDefined
-
     html"""
-      <tr id="exec-${e.execId}">
-        <td>$num</td>
-        <td>${e.taskName}</td>
-        <td>$modulesStr</td>
-        <td>$startStr</td>
-        <td>
-          <span class="state-badge compact $statusClass">
-            ${e.status.toString}
-          </span>
-          $cancelBtn
-        </td>
-        <td>$durationStr</td>
-        <td></td>
-      </tr>
-      ${
-        if hasContent then detailSection(e)
-        else Html("")
-      }
+      <tbody x-data="{ level: 'INFO', originalLog: '', filteredLog() { if (!this.originalLog) return ''; const weights = { DEBUG:0, INFO:1, WARN:2, ERROR:3 }; const threshold = weights[this.level]; return this.originalLog.split('\n').filter(line => { for (const l in weights) { if (line.indexOf('[' + l + ']') === 0) return weights[l] >= threshold; } return true; }).join('\n'); } }" x-init="originalLog = $$refs.logEl ? $$refs.logEl.textContent : ''">
+        <tr id="exec-${e.execId}">
+          <td>$num</td>
+          <td>${e.taskName}</td>
+          <td>$modulesStr</td>
+          <td>$startStr</td>
+          <td>
+            <span class="state-badge compact $statusClass">
+              ${e.status.toString}
+            </span>
+            $cancelBtn
+          </td>
+          <td>$durationStr</td>
+          <td></td>
+        </tr>
+        ${detailSection(e)}
+      </tbody>
     """
 
   private def detailSection(e: ExecEntry): Html =
-    val preId = s"exec-${e.execId}-log"
     val combinedOutput = e.output.trim + e.renderedSummary.map(s => s"\n\n$s").getOrElse("")
 
     val logFilter = if combinedOutput.contains("[") then
       html"""
         <div class="log-toolbar">
           <label>Log level:</label>
-          <select onchange="filterLogLines('$preId', this.value)">
+          <select x-model="level">
             <option value="DEBUG">DEBUG</option>
             <option value="INFO" selected>INFO</option>
             <option value="WARN">WARN</option>
@@ -177,7 +160,7 @@ object TasksPage {
     else Html("")
 
     val outputSection = if combinedOutput.nonEmpty then
-      html"""<pre id="$preId" data-original class="log-output">
+      html"""<pre x-ref="logEl" x-text="filteredLog()" class="log-output">
 ${combinedOutput.takeRight(10000)}</pre>"""
     else Html("")
 
