@@ -19,7 +19,6 @@ object Layout {
         <script src="/cytoscape.min.js"></script>
         <script src="/dagre.min.js"></script>
         <script src="/cytoscape-dagre.min.js"></script>
-        <script src="/dashboard.js" defer></script>
       </head>
       <body>
         <nav hx-boost="true">
