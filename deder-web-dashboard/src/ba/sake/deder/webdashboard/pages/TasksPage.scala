@@ -38,7 +38,7 @@ object TasksPage {
   def autoRefreshOob(enabled: Boolean, refreshMs: Int): Html =
     val trigger = if enabled then s"load, every ${refreshMs}ms" else "load, refresh"
     html"""<div id="log-table" hx-get="/tasks/log-table" hx-trigger="${trigger}" hx-swap="innerHTML"
-           hx-on::after-swap="Alpine.initTree($$el)" hx-swap-oob="true"></div>"""
+           hx-on::after-swap="Alpine.initTree(this)" hx-swap-oob="true"></div>"""
 
   def triggerForm(allTasks: Seq[TaskInfo], project: DederProject): Html =
     val tasks = allTasks
@@ -79,7 +79,7 @@ object TasksPage {
   def logTableContainer(log: TaskExecutionLog, refreshMs: Int): Html =
     html"""
       <div id="log-table" hx-get="/tasks/log-table" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML"
-           hx-on::after-swap="Alpine.initTree($$el)">
+           hx-on::after-swap="Alpine.initTree(this)">
         ${logTable(log)}
       </div>
     """
@@ -123,7 +123,7 @@ object TasksPage {
       case _ => Html("")
 
     html"""
-      <tbody x-data="{ level: 'INFO', originalLog: '', filteredLog() { if (!this.originalLog) return ''; const weights = { DEBUG:0, INFO:1, WARN:2, ERROR:3 }; const threshold = weights[this.level]; return this.originalLog.split('\n').filter(line => { for (const l in weights) { if (line.indexOf('[' + l + ']') === 0) return weights[l] >= threshold; } return true; }).join('\n'); } }" x-init="originalLog = $$refs.logEl ? $$refs.logEl.textContent : ''">
+      <tbody x-data="{ level: 'INFO', originalLog: '', filteredLog() { if (!this.originalLog) return ''; const weights = { DEBUG:0, INFO:1, WARN:2, ERROR:3 }; const threshold = weights[this.level]; return this.originalLog.split('\n').filter(line => { for (const l of Object.keys(weights)) { if (line.indexOf('[' + l + ']') === 0) return weights[l] >= threshold; } return true; }).join('\n'); } }" x-init="originalLog = $$refs.logEl ? $$refs.logEl.textContent : ''">
         <tr id="exec-${e.execId}">
           <td>$num</td>
           <td>${e.taskName}</td>
