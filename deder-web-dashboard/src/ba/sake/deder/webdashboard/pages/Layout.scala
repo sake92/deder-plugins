@@ -12,7 +12,7 @@ object Layout {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>$title</title>
-        <link rel="stylesheet" href="/pico.classless.zinc.min.css">
+        <link rel="stylesheet" href="/pico.zinc.min.css">
         
         <script src="/htmx.min.js"></script>
         <script src="/alpine.min.js" defer></script>

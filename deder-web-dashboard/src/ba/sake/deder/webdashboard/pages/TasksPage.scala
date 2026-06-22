@@ -45,7 +45,7 @@ object TasksPage {
       .filter(t => !t.internal)
       .sortBy(t => t.name)
     val taskOpts = tasks.map { t =>
-      html"""<option value="${t.name}">${t.name} — ${t.description}</option>"""
+      html"""<option value="${t.name}">${t.name}${if t.description.nonEmpty then s" (${t.description})" else ""}</option>"""
     }
     val moduleIds = if project != null && project.modules != null then
       import scala.jdk.CollectionConverters.*
@@ -59,7 +59,7 @@ object TasksPage {
         <fieldset class="grid">
           <label>
             Task
-            <input list="task-list" name="taskName" placeholder="Search..." autocomplete="off" required />
+            <input value="compile" list="task-list" name="taskName" placeholder="Search..." autocomplete="off" required />
             <datalist id="task-list">$taskOpts</datalist>
           </label>
           <label>
