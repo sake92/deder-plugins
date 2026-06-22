@@ -43,8 +43,9 @@ class TaskExecutionLog(maxEntries: Int):
   def get(execId: String): Option[ExecEntry] =
     entries.asScala.find(_.execId == execId)
 
-  def recent(limit: Int = 50): Seq[ExecEntry] =
+  def recent(limit: Int = 50): Seq[ExecEntry] = lock.synchronized {
     entries.asScala.toSeq.reverse.take(limit)
+  }
 
   def update(execId: String)(fn: ExecEntry => ExecEntry): Unit = lock.synchronized {
     entries.asScala.find(_.execId == execId).foreach { old =>

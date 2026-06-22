@@ -6,21 +6,34 @@ import ba.sake.deder.*
 import ba.sake.deder.config.DederProject
 
 object ServerPage {
-  def serverInfo(internals: DederProjectInternals, project: DederProject): Html = {
-    val jdkVersion = System.getProperty("java.version")
-    val jdkVendor = System.getProperty("java.vendor")
-    val osName = System.getProperty("os.name")
-    val osArch = System.getProperty("os.arch")
-    val processors = Runtime.getRuntime().availableProcessors()
-    val maxHeapMB = Runtime.getRuntime().maxMemory() / (1024 * 1024)
-    val usedHeapMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)
+
+  def fullPage(internals: DederProjectInternals, project: DederProject, refreshMs: Int): Html =
+    html"""
+      <div class="controls-bar">
+        <label>
+          ${autoRefreshCheckbox(true)}
+          <span>Auto-refresh</span>
+        </label>
+      </div>
+      <div id="deder-card"
+           hx-get="/server/deder-card"
+           hx-trigger="load, every ${refreshMs}ms, refresh"
+           hx-swap="innerHTML">
+        ${dederCard(internals, project)}
+      </div>
+      ${systemInfo}
+      ${jdkInfo}
+    """
+
+  def dederCard(internals: DederProjectInternals, project: DederProject): Html = {
     val dederVersion = DederGlobals.version
     val uptimeStr = formatUptime(internals.serverUptime)
     val moduleCount = if project != null && project.modules != null then project.modules.size() else 0
     val plugins = internals.loadedPlugins
+    val maxHeapMB = Runtime.getRuntime().maxMemory() / (1024 * 1024)
+    val usedHeapMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024)
 
     html"""
-      
       <article>
         <header><h3>Deder</h3></header>
         ${statCard("Version", dederVersion)}
@@ -30,16 +43,33 @@ object ServerPage {
         ${statCard("Heap", s"${usedHeapMB}MB / ${maxHeapMB}MB")}
         ${if plugins.nonEmpty then pluginsSection(plugins) else html""}
       </article>
-      
+    """
+  }
 
-      
+  def serverInfo(internals: DederProjectInternals, project: DederProject): Html =
+    html"""
+      ${dederCard(internals, project)}
+      ${systemInfo}
+      ${jdkInfo}
+    """
+
+  private def systemInfo: Html = {
+    val osName = System.getProperty("os.name")
+    val osArch = System.getProperty("os.arch")
+    val processors = Runtime.getRuntime().availableProcessors()
+    html"""
       <article>
         <header><h3>System</h3></header>
         ${statCard("OS / Arch", s"$osName $osArch")}
         ${statCard("Processors", processors.toString)}
       </article>
+    """
+  }
 
-      
+  private def jdkInfo: Html = {
+    val jdkVersion = System.getProperty("java.version")
+    val jdkVendor = System.getProperty("java.vendor")
+    html"""
       <article>
         <header><h3>JDK</h3></header>
         ${statCard("Version", jdkVersion)}
@@ -47,6 +77,18 @@ object ServerPage {
       </article>
     """
   }
+
+  def autoRefreshCheckbox(enabled: Boolean): Html =
+    if enabled then
+      html"""<input type="checkbox" id="server-auto-refresh-cb" checked
+                     hx-get="/server/auto-refresh?enabled=false" hx-trigger="change" hx-swap="outerHTML">"""
+    else
+      html"""<input type="checkbox" id="server-auto-refresh-cb"
+                     hx-get="/server/auto-refresh?enabled=true" hx-trigger="change" hx-swap="outerHTML">"""
+
+  def autoRefreshOob(enabled: Boolean, refreshMs: Int): Html =
+    val trigger = if enabled then s"load, every ${refreshMs}ms, refresh" else "load, refresh"
+    html"""<div id="deder-card" hx-get="/server/deder-card" hx-trigger="${trigger}" hx-swap="innerHTML" hx-swap-oob="true"></div>"""
 
   private def pluginsSection(plugins: Seq[LoadedPluginInfo]): Html = {
     val rows = plugins.sortBy(_.id).map { p =>
@@ -65,7 +107,7 @@ object ServerPage {
   private def statCard(label: String, value: String): Html =
     html"""
       <div>
-        <b>$label</b>: 
+        <b>$label</b>:
         <span>$value</span>
       </div>
     """

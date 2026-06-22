@@ -35,8 +35,22 @@ class HtmlRoutes(
       Response.withBody(Layout.htmlPage("Modules graph - Deder Dashboard", "graph", content, projectRoot))
 
     case GET -> Path("server") =>
-      val content = ServerPage.serverInfo(internals, project)
+      val content = ServerPage.fullPage(internals, project, refreshMs)
       Response.withBody(Layout.htmlPage("Home - Deder Dashboard", "server", content, projectRoot))
+
+    // --- HTMX partials for Home tab ---
+    case GET -> Path("server", "deder-card") =>
+      val h = ServerPage.dederCard(internals, project)
+      Response.withBody(h)
+
+    // --- Auto-refresh toggle for Home ---
+    case GET -> Path("server", "auto-refresh") =>
+      case class QP(enabled: Boolean = true) derives QueryStringRW
+      val qp = Request.current.queryParams[QP]
+      val enabled = qp.enabled
+      val cb = ServerPage.autoRefreshCheckbox(enabled)
+      val oob = ServerPage.autoRefreshOob(enabled, refreshMs)
+      Response.withBody(html"$cb$oob")
 
     // --- Stats tab: Live ---
     case GET -> Path("live") =>

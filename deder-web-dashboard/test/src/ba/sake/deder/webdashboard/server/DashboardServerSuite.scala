@@ -327,23 +327,23 @@ class DashboardServerSuite extends FunSuite {
   test("GET /api/stats/overview returns JSON with totals") {
     val (code, body) = httpGet("/api/stats/overview")
     assertEquals(code, 200)
-    assert(body.contains("\"totalRequestsServed\": 100"), s"should contain 100, got: $body")
-    assert(body.contains("\"totalErrors\": 5"), s"should contain 5, got: $body")
-    assert(body.contains("\"uptimeSecs\": 8130"), s"should contain 8130, got: $body")
+    assert(body.contains("\"totalRequestsServed\":100"), s"should contain 100, got: $body")
+    assert(body.contains("\"totalErrors\":5"), s"should contain 5, got: $body")
+    assert(body.contains("\"uptimeSecs\":8130"), s"should contain 8130, got: $body")
   }
 
   test("GET /api/stats/history returns JSON with history entries") {
     val (code, body) = httpGet("/api/stats/history")
     assertEquals(code, 200)
-    assert(body.contains("\"requestId\": \"req-000\""), s"should contain req-000, got: $body")
-    assert(body.contains("\"caller\": \"CLI\""), s"should contain caller CLI, got: $body")
-    assert(body.contains("\"success\": true"), s"should contain success:true, got: $body")
+    assert(body.contains("\"requestId\":\"req-000\""), s"should contain req-000, got: $body")
+    assert(body.contains("\"caller\":\"CLI\""), s"should contain caller CLI, got: $body")
+    assert(body.contains("\"success\":true"), s"should contain success:true, got: $body")
   }
 
   test("GET /api/stats/task-aggregates returns JSON") {
     val (code, body) = httpGet("/api/stats/task-aggregates")
     assertEquals(code, 200)
-    assert(body.contains("\"taskName\": \"compile\""), s"should contain compile, got: $body")
+    assert(body.contains("\"taskName\":\"compile\""), s"should contain compile, got: $body")
     assert(body.contains("\"invocations\""), s"should contain invocations, got: $body")
   }
 
@@ -362,8 +362,8 @@ class DashboardServerSuite extends FunSuite {
   test("GET /api/stats/module-aggregates returns JSON with modules ranked by time") {
     val (code, body) = httpGet("/api/stats/module-aggregates?n=3")
     assertEquals(code, 200)
-    assert(body.contains("\"moduleId\": \"core\""), s"should contain core as heaviest, got: $body")
-    assert(body.contains("\"moduleId\": \"api\""), s"should contain api second, got: $body")
+    assert(body.contains("\"moduleId\":\"core\""), s"should contain core as heaviest, got: $body")
+    assert(body.contains("\"moduleId\":\"api\""), s"should contain api second, got: $body")
     assert(body.contains("\"totalTimeMs\""), s"should contain totalTimeMs, got: $body")
   }
 
@@ -379,13 +379,13 @@ class DashboardServerSuite extends FunSuite {
   test("POST /api/cancel with valid requestId returns cancelled true") {
     val (code, body) = httpPost("/api/cancel?requestId=req-q1")
     assertEquals(code, 200)
-    assert(body.contains("\"cancelled\": true"), s"should be cancelled true, got: $body")
+    assert(body.contains("\"cancelled\":true"), s"should be cancelled true, got: $body")
   }
 
   test("POST /api/cancel with invalid requestId returns cancelled false") {
     val (code, body) = httpPost("/api/cancel?requestId=nonexistent")
     assertEquals(code, 200)
-    assert(body.contains("\"cancelled\": false"), s"should be cancelled false, got: $body")
+    assert(body.contains("\"cancelled\":false"), s"should be cancelled false, got: $body")
   }
 
   // --- Tasks tab tests ---
@@ -409,6 +409,24 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("<table"), s"should return a table, got: ${body.take(200)}")
   }
 
+  test("GET /tasks/run initial response shows fallback for pending task") {
+    val (code, body) = httpGet("/tasks/run?taskName=compile&moduleIds=mod1")
+    assertEquals(code, 200)
+    assert(body.contains("No output captured yet"), s"should contain fallback message for pending task, got: ${body.take(500)}")
+  }
+
+  test("GET /tasks/log-table shows output and outcomes after task completes") {
+    // trigger a task with moduleIds so the stub produces outcomes
+    httpGet("/tasks/run?taskName=compile&moduleIds=mod1")
+    Thread.sleep(600) // wait for stub to complete
+    val (code, body) = httpGet("/tasks/log-table")
+    assertEquals(code, 200)
+    assert(body.contains("Running compile"), s"should contain task output, got: ${body.take(500)}")
+    assert(body.contains("mod1"), s"should contain module 'mod1' in outcomes, got: ${body.take(500)}")
+    assert(body.contains("OK"), s"should contain success status in outcomes, got: ${body.take(500)}")
+    assert(!body.contains("No output captured yet"), s"should NOT contain fallback message after completion, got: ${body.take(500)}")
+  }
+
   test("GET /api/tasks returns JSON array") {
     // trigger a task first
     httpGet("/tasks/run?taskName=compile")
@@ -416,7 +434,7 @@ class DashboardServerSuite extends FunSuite {
     val (code, body) = httpGet("/api/tasks")
     assertEquals(code, 200)
     assert(body.startsWith("["), s"should be JSON array, got: ${body.take(200)}")
-    assert(body.contains("\"taskName\": \"compile\""), s"should contain compile entry, got: $body")
+    assert(body.contains("\"taskName\":\"compile\""), s"should contain compile entry, got: $body")
   }
 
   test("GET /api/tasks/exec returns JSON for valid execId") {
@@ -448,9 +466,9 @@ class DashboardServerSuite extends FunSuite {
 
   private def extractExecId(json: String): String =
     try
-      val idx = json.indexOf("\"execId\": \"")
+      val idx = json.indexOf("\"execId\":\"")
       if idx >= 0 then
-        val start = idx + 11
+        val start = idx + 10
         val end = json.indexOf("\"", start)
         json.substring(start, end)
       else ""

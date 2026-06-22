@@ -55,8 +55,8 @@ object TasksPage {
 
     html"""
       <form hx-get="/tasks/run" hx-target="#log-table" hx-swap="innerHTML"
-            class="flex-row" style="margin-bottom:0.75rem">
-        <fieldset class="grid">
+            style="margin-bottom:0.75rem">
+        <fieldset class="task-trigger-row">
           <label>
             Task
             <input value="compile" list="task-list" name="taskName" placeholder="Search..." autocomplete="off" required />
@@ -181,6 +181,10 @@ ${combinedOutput.takeRight(10000)}</pre>"""
       html"""<p class="pico-color-red-400">Error: $msg</p>"""
     }.getOrElse(Html(""))
 
+    val fallback = if combinedOutput.isEmpty && e.outcomes.isEmpty && e.error.isEmpty then
+      html"""<p><em>No output captured yet — task may still be running or produced no output.</em></p>"""
+    else Html("")
+
     html"""
       <tr>
         <td colspan="7" class="expand-pad">
@@ -190,6 +194,7 @@ ${combinedOutput.takeRight(10000)}</pre>"""
             $outputSection
             $resultSection
             $errorSection
+            $fallback
           </details>
         </td>
       </tr>

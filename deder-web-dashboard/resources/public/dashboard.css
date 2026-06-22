@@ -80,6 +80,22 @@ button {
   font-size: 0.85rem;
 }
 
+/* Tasks trigger form row */
+.task-trigger-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: end;
+  flex-wrap: nowrap;
+}
+.task-trigger-row > label {
+  flex: 2;
+  min-width: 0;
+}
+.task-trigger-row > input[type="submit"] {
+  flex: 1;
+  white-space: nowrap;
+}
+
 /* Layout helpers */
 .controls-bar {
   display: flex;
