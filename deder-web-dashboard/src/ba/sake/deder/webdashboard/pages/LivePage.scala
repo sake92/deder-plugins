@@ -14,6 +14,7 @@ object LivePage {
           <span>Auto-refresh</span>
         </label>
       </div>
+      </hr>
 
       <div id="live-overview"
            hx-get="/stats/overview"
@@ -187,16 +188,16 @@ object LivePage {
     html"""
       <div class="stat-row">
         <div class="stat-card">
-          <div class="label">Total Requests</div>
-          <div class="value">${internals.totalRequestsServed}</div>
+          <b>Total Requests: </b>
+          <span>${internals.totalRequestsServed}</span>
         </div>
         <div class="stat-card">
-          <div class="label">Total Errors</div>
-          <div class="value ${if internals.totalErrors > 0 then "failure" else "success"}">${internals.totalErrors}</div>
+          <b>Total Errors: </b>
+          <span class="${if internals.totalErrors > 0 then "failure" else "success"}">${internals.totalErrors}</span>
         </div>
         <div class="stat-card">
-          <div class="label">Uptime</div>
-          <div class="value uptime">$uptimeStr</div>
+          <b>Uptime: </b>
+          <span class="uptime">$uptimeStr</span>
         </div>
       </div>
     """

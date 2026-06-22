@@ -56,24 +56,20 @@ object TasksPage {
     html"""
       <form hx-get="/tasks/run" hx-target="#log-table" hx-swap="innerHTML"
             class="trigger-form">
-        <div class="field">
-          <label for="task-input">Task</label>
-          <input list="task-list" id="task-input" name="taskName" placeholder="Search..." autocomplete="off" required />
-          <datalist id="task-list">$taskOpts</datalist>
-        </div>
-        <div class="field module-field">
-          <label for="module-input">Modules</label>
-          <input list="module-list" id="module-input" name="moduleIds" value=""
-                 placeholder="* (all) or comma-separated" autocomplete="off" />
-          <datalist id="module-list">$moduleOpts</datalist>
-        </div>
-        <button type="submit">Run ▶</button>
+        <fieldset class="grid">
+          <label>
+            Task
+            <input list="task-list" name="taskName" placeholder="Search..." autocomplete="off" required />
+            <datalist id="task-list">$taskOpts</datalist>
+          </label>
+          <label>
+            Modules
+            <input list="module-list" name="moduleIds" placeholder="leave empty for all or comma-separated" autocomplete="off" />
+            <datalist id="module-list">$moduleOpts</datalist>
+          </label>
+          <input type="submit" value="Run ▶" />
+        </fieldset>
       </form>
-      ${if moduleIds.nonEmpty then
-        html"""<div class="known-modules">
-          Known modules: ${moduleIds.map(m => html"""<code>$m</code>""")}
-        </div>"""
-      else Html("")}
     """
 
   def logTableContainer(log: TaskExecutionLog, refreshMs: Int): Html =
@@ -123,7 +119,7 @@ object TasksPage {
       case _ => Html("")
 
     html"""
-      <tbody x-data="{ level: 'INFO', originalLog: '', filteredLog() { if (!this.originalLog) return ''; const weights = { DEBUG:0, INFO:1, WARN:2, ERROR:3 }; const threshold = weights[this.level]; return this.originalLog.split('\n').filter(line => { for (const l of Object.keys(weights)) { if (line.indexOf('[' + l + ']') === 0) return weights[l] >= threshold; } return true; }).join('\n'); } }" x-init="originalLog = $$refs.logEl ? $$refs.logEl.textContent : ''">
+      <tbody x-data="{ level: 'INFO', originalLog: '', filteredLog() { if (!this.originalLog) return ''; const weights = { DEBUG:0, INFO:1, WARN:2, ERROR:3 }; const threshold = weights[this.level]; return this.originalLog.split('\n').filter(line => { for (const l of Object.keys(weights)) { if (line.indexOf('[' + l + ']') === 0) return weights[l] >= threshold; } return true; }).join('\n'); } }" x-init="originalLog = $$refs.logEl ? ($$refs.logEl.dataset.original || '') : ''">
         <tr id="exec-${e.execId}">
           <td>$num</td>
           <td>${e.taskName}</td>
@@ -160,7 +156,7 @@ object TasksPage {
     else Html("")
 
     val outputSection = if combinedOutput.nonEmpty then
-      html"""<pre x-ref="logEl" x-text="filteredLog()" class="log-output">
+      html"""<pre x-ref="logEl" x-text="filteredLog()" class="log-output" data-original="${combinedOutput.takeRight(10000)}">
 ${combinedOutput.takeRight(10000)}</pre>"""
     else Html("")
 

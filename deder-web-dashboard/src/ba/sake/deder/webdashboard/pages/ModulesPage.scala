@@ -16,11 +16,11 @@ object ModulesPage {
       val total = modList.size
       html"""
         <div x-data="{ filter: '' }">
-          <input type="search" x-model="filter" placeholder="Filter modules..."
+          <input type="search" x-model="filter" autofocus placeholder="Filter modules..."
                   class="module-filter"
                  aria-label="Filter modules">
           <span class="module-count">$total modules</span>
-          <table class="module-table compact">>
+          <table class="module-table compact">
             <thead><tr><th>Module ID</th><th>Type</th><th>Version</th><th>#Deps</th></tr></thead>
             <tbody>$rows</tbody>
           </table>

@@ -20,30 +20,31 @@ object ServerPage {
     val plugins = internals.loadedPlugins
 
     html"""
-      <h3>Deder</h3>
-      <div class="stat-row">
+      
+      <article>
+        <header><h3>Deder</h3></header>
         ${statCard("Version", dederVersion)}
         ${statCard("Uptime", uptimeStr)}
         ${statCard("Modules", moduleCount.toString)}
         ${statCard("Plugins", plugins.size.toString)}
         ${statCard("Heap", s"${usedHeapMB}MB / ${maxHeapMB}MB")}
-      </div>
-      ${
-        if plugins.nonEmpty then pluginsSection(plugins)
-        else html""
-      }
+        ${if plugins.nonEmpty then pluginsSection(plugins) else html""}
+      </article>
+      
 
-      <h3 class="section-head">OS</h3>
-      <div class="stat-row">
+      
+      <article>
+        <header><h3 class="section-head">System</h3></header>
         ${statCard("OS / Arch", s"$osName $osArch")}
         ${statCard("Processors", processors.toString)}
-      </div>
+      </article>
 
-      <h3 class="section-head">JDK</h3>
-      <div class="stat-row">
+      
+      <article>
+        <header><h3 class="section-head">JDK</h3></header>
         ${statCard("Version", jdkVersion)}
         ${statCard("Vendor", jdkVendor)}
-      </div>
+      </article>
     """
   }
 
@@ -52,6 +53,7 @@ object ServerPage {
       html"""<tr><td>${p.id}</td><td>${p.taskNames.size}</td><td>${p.taskNames.mkString(", ")}</td></tr>"""
     }
     html"""
+      <hr>
       <h4 class="section-head">Loaded Plugins</h4>
       <table class="compact">
         <thead><tr><th>Plugin ID</th><th>#Tasks</th><th>Task Names</th></tr></thead>
@@ -62,9 +64,9 @@ object ServerPage {
 
   private def statCard(label: String, value: String): Html =
     html"""
-      <div class="stat-card">
-        <div class="label">$label</div>
-        <div class="value">$value</div>
+      <div>
+        <b>$label</b>: 
+        <span>$value</span>
       </div>
     """
 
