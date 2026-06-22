@@ -118,8 +118,8 @@ class HtmlRoutes(
     // --- HTMX partials for History tab ---
     case GET -> Path("stats", "history-table") =>
       case class QP(
-          search: String,
-          caller: String,
+          search: String = "",
+          caller: String = "",
           status: String = "all",
           sort: String = "newest",
           limit: Int = 50,
@@ -142,8 +142,8 @@ class HtmlRoutes(
 
     case GET -> Path("stats", "more-history") =>
       case class QP(
-          search: String,
-          caller: String,
+          search: String = "",
+          caller: String = "",
           status: String = "all",
           sort: String = "newest",
           limit: Int = 50,

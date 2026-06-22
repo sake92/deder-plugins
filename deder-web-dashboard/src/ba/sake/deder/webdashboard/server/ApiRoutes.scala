@@ -32,7 +32,8 @@ class ApiRoutes(
       else Response.withBody(Map("error" -> "taskName is required"))
 
     case GET -> Path("api", "tasks", "exec") =>
-      val qp = Request.current.queryParams[(execId: String)]
+      case class QP(execId: String = "") derives QueryStringRW
+      val qp = Request.current.queryParams[QP]
       val res = executionLog.get(qp.execId).map(toApi)
       Response.withBodyOpt(res, "execId")
 
@@ -53,10 +54,12 @@ class ApiRoutes(
       Response.withBody(res)
 
     case GET -> Path("api", "stats", "request-statuses") =>
-      Response.withBody(currentRequests)
+      Response.withBody(dashboardService.requestStatuses)
 
     case POST -> Path("api", "cancel") =>
-      val requestId = Request.current.queryParams[(requestId: String)].requestId
+      case class QP(requestId: String) derives QueryStringRW
+      val qp = Request.current.queryParams[QP]
+      val requestId = qp.requestId
       val cancelled = if requestId.nonEmpty then internals.cancelRequest(requestId) else false
       Response.withBody(Map("cancelled" -> cancelled))
 
@@ -79,7 +82,8 @@ class ApiRoutes(
       Response.withBody(res)
 
     case GET -> Path("api", "stats", "module-breakdown") =>
-      val qp = Request.current.queryParams[(task: String)]
+      case class QP(task: String) derives QueryStringRW
+      val qp = Request.current.queryParams[QP]
       val res = dashboardService.moduleBreakdown(qp.task)
       Response.withBody(res)
 

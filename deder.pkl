@@ -88,8 +88,7 @@ local const dashboardModules =
       scalacOptions { "-Yretain-trees" }
       deps {
         "ba.sake::deder-plugin-api:\(pluginApiVersion)"
-        "ba.sake::sharaf-jdk-httpserver:0.18.2"
-        "ba.sake::tupson:0.13.0"
+        "ba.sake::sharaf-jdk-httpserver:0.18.3-SNAPSHOT"
       }
       pomSettings =
         pom(
@@ -114,7 +113,7 @@ local const tuiModules =
     template = new ScalaModule {
       scalaVersion = scalaVer
       deps {
-        "ba.sake::tupson:0.13.0"
+        "ba.sake::tupson:0.20.0"
         "xyz.matthieucourt::layoutz:0.7.0"
       }
       mainClass = "ba.sake.deder.tuidashboard.app.TuiDashboardMain"
