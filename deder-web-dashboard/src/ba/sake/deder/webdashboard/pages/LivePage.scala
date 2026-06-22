@@ -30,7 +30,15 @@ object LivePage {
         <p>Loading requests...</p>
       </div>
 
-      <h3>In-Memory Caches</h3>
+      <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.5rem;">
+        <h3 style="margin:0">In-Memory Caches</h3>
+        <button class="outline secondary"
+                hx-post="/stats/caches/clear"
+                hx-target="#live-caches"
+                hx-swap="innerHTML">
+          Clear All
+        </button>
+      </div>
       <div id="live-caches"
            hx-get="/stats/caches"
            hx-trigger="load, every ${refreshMs}ms, refresh"
@@ -209,6 +217,20 @@ object LivePage {
           <tbody>${rows}</tbody>
         </table>
       """
+  }
+
+  def cachesClearedResponse(result: PurgeCachesResult, internals: DederProjectInternals): Html = {
+    val summary = if result.cachesCleared == 0 && result.bspEntriesRemoved == 0 && result.historyEntriesRemoved == 0 then
+      html"""<p><em>No caches were active — nothing to clear.</em></p>"""
+    else
+      val parts = Seq(
+        Some(s"Cleared ${result.cachesCleared} cache(s)."),
+        if result.bspEntriesRemoved > 0 then Some(s"${result.bspEntriesRemoved} BSP entries removed.") else None,
+        if result.historyEntriesRemoved > 0 then Some(s"${result.historyEntriesRemoved} history entries removed.") else None
+      ).flatten
+      html"""<p style="color: var(--pico-color-green-400);">✅ ${parts.mkString(" ")}</p>"""
+    val table = cachesTable(internals)
+    html"""$summary$table"""
   }
 
   private val dateTimeFormatter: java.time.format.DateTimeFormatter =

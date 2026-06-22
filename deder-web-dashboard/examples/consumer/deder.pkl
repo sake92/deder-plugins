@@ -16,7 +16,7 @@ plugins {
   new WD.WebDashboardPlugin {
     version = "0.5.1-SNAPSHOT"
     config = new {
-      // enabled = false
+//       enabled = false
     }
   }
 }

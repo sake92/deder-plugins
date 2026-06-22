@@ -218,6 +218,19 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("Cancelled"), s"should contain 'Cancelled', got: $body")
   }
 
+  test("GET /stats/caches returns caches table HTML") {
+    val (code, body) = httpGet("/stats/caches")
+    assertEquals(code, 200)
+    assert(body.contains("No in-memory caches active"), s"should show empty caches message, got: $body")
+  }
+
+  test("POST /stats/caches/clear returns result summary and updated table") {
+    val (code, body) = httpPost("/stats/caches/clear")
+    assertEquals(code, 200)
+    assert(body.contains("No caches were active"), s"should contain 'No caches were active', got: $body")
+    assert(body.contains("No in-memory caches active"), s"should show updated empty caches message, got: $body")
+  }
+
   // --- History tab ---
   test("GET /history returns HTML page with History tab") {
     val (code, body) = httpGet("/history")

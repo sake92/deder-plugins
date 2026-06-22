@@ -73,6 +73,11 @@ class DashboardServer(
       val h = LivePage.cachesTable(internals)
       Response.withBody(h)
 
+    case POST -> Path("stats", "caches", "clear") =>
+      val result = internals.purgeInMemoryCaches()
+      val h = LivePage.cachesClearedResponse(result, internals)
+      Response.withBody(h)
+
     case POST -> Path("stats", "cancel") =>
       val req = summon[Request]
       val requestId = param(req, "requestId", "")
