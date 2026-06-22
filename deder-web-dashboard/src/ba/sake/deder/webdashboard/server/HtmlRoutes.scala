@@ -234,8 +234,6 @@ class HtmlRoutes(
         Response.withBody(html"""<tr><td colspan="7" class="failure">Task name is required</td></tr>""")
       else
         val moduleIds = qp.moduleIds
-        // if moduleIdsRaw == "*" || moduleIdsRaw.isBlank then Seq.empty[String]
-        // else moduleIdsRaw.split(",").map(_.trim).filter(_.nonEmpty).toSeq
         taskRunner.trigger(taskName, moduleIds)
         val table = TasksPage.logTable(executionLog)
         Response.withBody(table)

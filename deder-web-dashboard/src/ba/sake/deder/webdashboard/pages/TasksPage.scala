@@ -77,7 +77,7 @@ object TasksPage {
         </div>
         <div class="field">
           <label for="module-input">Modules</label>
-          <input list="module-list" id="module-input" name="moduleIds" value="*"
+          <input list="module-list" id="module-input" name="moduleIds" value=""
                  placeholder="* (all) or comma-separated" autocomplete="off" />
           <datalist id="module-list">$moduleOpts</datalist>
         </div>
