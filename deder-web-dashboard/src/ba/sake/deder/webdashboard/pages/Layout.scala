@@ -22,7 +22,7 @@ object Layout {
         <script src="/cytoscape-dagre.min.js"></script>
       </head>
       <body>
-      <header>
+      <header class="container">
         <nav>
           <ul>
             <li><a href="/server" ${activePageAttrs(activeTab, Set("server"))}><strong>Home</strong></a></li>
@@ -59,7 +59,7 @@ object Layout {
         <main class="container">$content</main>
         ${
           if projectRoot.nonEmpty then
-            html"""<footer><small>📁 $projectRoot</small></footer>"""
+            html"""<footer class="container"><small>📁 $projectRoot</small></footer>"""
           else Html("")
         }
       </body>
