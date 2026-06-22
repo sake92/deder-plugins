@@ -3,7 +3,7 @@ package ba.sake.deder.webdashboard.pages
 import java.time.Duration
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.*
-import ba.sake.deder.webdashboard.server.ApiRoutes.{ApiTaskAggregate, ApiModuleAggregate, ApiErrorSummaryEntry}
+import ba.sake.deder.webdashboard.{ApiTaskAggregate, ApiModuleAggregate, ApiErrorSummaryEntry}
 
 object StatsPage {
 

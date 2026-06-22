@@ -101,7 +101,7 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
   def subscriptions(state: DashboardState): Sub[Msg] = Sub.batch(
     Sub.http.pollMs(s"${state.serverUrl}/api/modules", pollMs, ModulesResp.apply),
     Sub.http.pollMs(s"${state.serverUrl}/api/stats/overview", pollMs, OverviewResp.apply),
-    Sub.http.pollMs(s"${state.serverUrl}/api/stats/current", pollMs, CurrentResp.apply),
+    Sub.http.pollMs(s"${state.serverUrl}/api/stats/request-statuses", pollMs, CurrentResp.apply),
     Sub.http.pollMs(s"${state.serverUrl}/api/stats/history", pollMs, HistoryResp.apply),
     Sub.http.pollMs(s"${state.serverUrl}/api/stats/task-aggregates", pollMs, TaskStatsResp.apply),
     Sub.http.pollMs(s"${state.serverUrl}/api/stats/error-summary", pollMs, ErrorsResp.apply),

@@ -13,7 +13,7 @@ object TasksPage {
       internals: DederProjectInternals,
       project: DederProject,
       refreshMs: Int,
-      taskRegistry: TasksRegistryApi
+      allTasks: Seq[TaskInfo]
   ): Html =
     html"""
       <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
@@ -22,7 +22,7 @@ object TasksPage {
           <span>Auto-refresh</span>
         </label>
       </div>
-      ${triggerForm(taskRegistry, project)}
+      ${triggerForm(allTasks, project)}
       ${logTableContainer(log, refreshMs)}
       <script>
         function filterLogLines(preId, level) {
@@ -54,11 +54,11 @@ object TasksPage {
     val trigger = if enabled then s"load, every ${refreshMs}ms" else "load, refresh"
     html"""<div id="log-table" hx-get="/tasks/log-table" hx-trigger="${trigger}" hx-swap="innerHTML" hx-swap-oob="true"></div>"""
 
-  def triggerForm(taskRegistry: TasksRegistryApi, project: DederProject): Html =
-    val allTasks = taskRegistry.allTasks
+  def triggerForm(allTasks: Seq[TaskInfo], project: DederProject): Html =
+    val tasks = allTasks
       .filter(t => !t.internal)
       .sortBy(t => t.name)
-    val taskOpts = allTasks.map { t =>
+    val taskOpts = tasks.map { t =>
       html"""<option value="${t.name}">${t.name} — ${t.description}</option>"""
     }
     val moduleIds = if project != null && project.modules != null then

@@ -1,127 +1,101 @@
 package ba.sake.deder.webdashboard.server
 
-import java.time.{Duration, Instant}
+import scala.jdk.CollectionConverters.*
+import ba.sake.sharaf.*
+import ba.sake.querson.QueryStringRW
 import ba.sake.deder.*
 import ba.sake.deder.config.DederProject
-import ba.sake.tupson.*
-import scala.jdk.CollectionConverters.*
+import ba.sake.deder.webdashboard.*
 
-object ApiRoutes {
+class ApiRoutes(
+    dashboardService: DashboardService,
+    project: DederProject,
+    internals: DederProjectInternals,
+    executionLog: TaskExecutionLog,
+    taskRunner: TaskRunner
+) {
+  val routes = Routes {
+    case GET -> Path("api", "tasks") =>
+      Response.withBody(executionLog.recent(200).map(toApi))
 
-  // --- existing data types ---
-  case class ApiModule(id: String, `type`: String, deps: Int) derives JsonRW
-  case class StatsOverview(totalRequestsServed: Long, totalErrors: Long, uptimeSecs: Long) derives JsonRW
-  case class ApiCurrentRequest(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long) derives JsonRW
-  case class ApiHistoryEntry(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long, durationMs: Long, success: Boolean) derives JsonRW
+    case POST -> Path("api", "tasks", "run") =>
+      case class QP(taskName: String, moduleIds: Seq[String]) derives QueryStringRW
+      val qp = Request.current.queryParams[QP]
+      val taskName = qp.taskName
+      val moduleIds = qp.moduleIds
+      if taskName.nonEmpty then
+        val entry = taskRunner.trigger(taskName, moduleIds)
+        val status = entry.status.toString
+        val err = entry.error.map(e => Map("error" -> e)).getOrElse(Map.empty)
+        val res = Map("execId" -> entry.execId, "status" -> status, "taskName" -> entry.taskName) ++ err
+        Response.withBody(res)
+      else Response.withBody(Map("error" -> "taskName is required"))
 
-  // --- 0.19.2 cancellation & progress data types ---
+    case GET -> Path("api", "tasks", "exec") =>
+      val qp = Request.current.queryParams[(execId: String)]
+      val res = executionLog.get(qp.execId).map(toApi)
+      Response.withBodyOpt(res, "execId")
 
-  enum ApiRequestState(val label: String):
-    case Queued extends ApiRequestState("QUEUED")
-    case AcquiringLocks extends ApiRequestState("ACQUIRING_LOCKS")
-    case Executing extends ApiRequestState("EXECUTING")
-    case Unknown extends ApiRequestState("UNKNOWN")
+    case GET -> Path("api", "modules") =>
+      val modules = project.modules.asScala.toSeq.map { m =>
+        val moduleType = Option(m.`type`).map(_.name()).getOrElse("UNKNOWN")
+        ApiModule(m.id, moduleType, m.moduleDeps.size())
+      }
+      Response.withBody(modules)
 
-  object ApiRequestState:
-    def fromDeder(state: RequestState): ApiRequestState = state match
-      case RequestState.QUEUED          => Queued
-      case RequestState.ACQUIRING_LOCKS => AcquiringLocks
-      case RequestState.EXECUTING       => Executing
-      case _                            => Unknown
+    case GET -> Path("api", "stats", "overview") =>
+      val uptimeSecs = internals.serverUptime.getSeconds
+      val res = StatsOverview(
+        totalRequestsServed = internals.totalRequestsServed,
+        totalErrors = internals.totalErrors,
+        uptimeSecs = uptimeSecs
+      )
+      Response.withBody(res)
 
-  case class ApiLockProgress(
-      acquired: Int,
-      total: Int,
-      blockingOn: Option[String],
-      heldBy: Option[String]
-  ) derives JsonRW
+    case GET -> Path("api", "stats", "request-statuses") =>
+      Response.withBody(currentRequests)
 
-  case class ApiTaskStageProgress(
-      currentStage: Int,
-      totalStages: Int,
-      completed: Int,
-      failed: Int,
-      skipped: Int,
-      running: Int,
-      pending: Int
-  ) derives JsonRW
+    case POST -> Path("api", "cancel") =>
+      val requestId = Request.current.queryParams[(requestId: String)].requestId
+      val cancelled = if requestId.nonEmpty then internals.cancelRequest(requestId) else false
+      Response.withBody(Map("cancelled" -> cancelled))
 
-  case class ApiRequestStatus(
-      requestId: String,
-      caller: String,
-      taskName: String,
-      moduleIds: Seq[String],
-      startTimeMs: Long,
-      state: ApiRequestState,
-      lockProgress: Option[ApiLockProgress],
-      taskProgress: Option[ApiTaskStageProgress]
-  ) derives JsonRW
+    case GET -> Path("api", "stats", "history") =>
+      val entries = internals.recentHistory.map { r =>
+        ApiHistoryEntry(
+          requestId = r.requestId,
+          caller = formatCallerType(r.caller),
+          taskName = r.taskName,
+          moduleIds = r.moduleIds,
+          startTimeMs = r.startTime.toEpochMilli,
+          durationMs = r.duration.toMillis,
+          success = r.success
+        )
+      }
+      Response.withBody(entries)
 
-  // --- new data types ---
-  case class ApiTaskAggregate(
-    taskName: String,
-    invocations: Long,
-    errors: Long,
-    totalTimeMs: Long,
-    avgTimeMs: Long,
-    minTimeMs: Long,
-    maxTimeMs: Long,
-    longestModuleId: String
-  ) derives JsonRW
+    case GET -> Path("api", "stats", "task-aggregates") =>
+      val res = dashboardService.taskAggregates
+      Response.withBody(res)
 
-  case class ApiModuleAggregate(
-    moduleId: String,
-    invocations: Long,
-    errors: Long,
-    totalTimeMs: Long,
-    avgTimeMs: Long,
-    minTimeMs: Long,
-    maxTimeMs: Long
-  ) derives JsonRW
+    case GET -> Path("api", "stats", "module-breakdown") =>
+      val qp = Request.current.queryParams[(task: String)]
+      val res = dashboardService.moduleBreakdown(qp.task)
+      Response.withBody(res)
 
-  case class ApiErrorSummaryEntry(
-    taskName: String,
-    moduleIds: Seq[String],
-    errorCount: Long
-  ) derives JsonRW
+    case GET -> Path("api", "stats", "error-summary") =>
+      val res = dashboardService.errorSummary
+      Response.withBody(res)
 
-  case class ApiPluginInfo(id: String, taskCount: Int, taskNames: Seq[String]) derives JsonRW
+    case GET -> Path("api", "stats", "module-aggregates") =>
+      case class QP(n: Int = 5) derives QueryStringRW
+      val qp = Request.current.queryParams[QP]
+      val res = dashboardService.moduleAggregates(qp.n)
+      Response.withBody(res)
 
-  case class ApiServerInfo(
-    dederVersion: String,
-    jdkVersion: String,
-    jdkVendor: String,
-    osName: String,
-    osArch: String,
-    processors: Int,
-    maxHeapMB: Long,
-    usedHeapMB: Long,
-    uptimeSecs: Long,
-    moduleCount: Int,
-    pluginCount: Int,
-    projectRoot: String,
-    plugins: Seq[ApiPluginInfo]
-  ) derives JsonRW
-
-  // --- Task runner API types ---
-  case class ApiExecEntry(
-    execId: String,
-    taskName: String,
-    moduleIds: Seq[String],
-    startTimeMs: Long,
-    endTimeMs: Option[Long],
-    status: String,
-    output: String,
-    error: Option[String]
-  ) derives JsonRW
-
-  // --- Task runner JSON endpoints ---
-
-  def tasksJson(log: TaskExecutionLog): String =
-    log.recent(200).map(toApi).toJson
-
-  def taskExecJson(log: TaskExecutionLog, execId: String): Option[String] =
-    log.get(execId).map(e => toApi(e).toJson)
+    case GET -> Path("api", "server") =>
+      Response.withBody(serverInfoJson)
+  }
 
   private def toApi(e: ExecEntry): ApiExecEntry =
     ApiExecEntry(
@@ -135,25 +109,7 @@ object ApiRoutes {
       error = e.error
     )
 
-  // --- existing JSON endpoints ---
-  def modulesJson(project: DederProject): String = {
-    val modules = project.modules.asScala.toSeq.map { m =>
-      val moduleType = Option(m.`type`).map(_.name()).getOrElse("UNKNOWN")
-      ApiModule(m.id, moduleType, m.moduleDeps.size())
-    }
-    modules.toJson
-  }
-
-  def overviewJson(internals: DederProjectInternals): String = {
-    val uptimeSecs = internals.serverUptime.getSeconds
-    StatsOverview(
-      totalRequestsServed = internals.totalRequestsServed,
-      totalErrors = internals.totalErrors,
-      uptimeSecs = uptimeSecs
-    ).toJson
-  }
-
-  def currentRequestsJson(internals: DederProjectInternals): String = {
+  private def currentRequests = {
     val requests = internals.currentRequests.map { r =>
       ApiCurrentRequest(
         requestId = r.requestId,
@@ -163,116 +119,10 @@ object ApiRoutes {
         startTimeMs = r.startTime.toEpochMilli
       )
     }
-    requests.toJson
+    requests
   }
 
-  def historyJson(internals: DederProjectInternals): String = {
-    val entries = internals.recentHistory.map { r =>
-      ApiHistoryEntry(
-        requestId = r.requestId,
-        caller = formatCallerType(r.caller),
-        taskName = r.taskName,
-        moduleIds = r.moduleIds,
-        startTimeMs = r.startTime.toEpochMilli,
-        durationMs = r.duration.toMillis,
-        success = r.success
-      )
-    }
-    entries.toJson
-  }
-
-  // --- new aggregation logic ---
-
-  /** Per-task aggregate stats computed from recentHistory. */
-  def taskAggregates(internals: DederProjectInternals): Seq[ApiTaskAggregate] = {
-    val grouped = internals.recentHistory.groupBy(_.taskName)
-    grouped.toSeq.map { case (taskName, requests) =>
-      val invocations = requests.size.toLong
-      val errors = requests.count(!_.success).toLong
-      val durations = requests.map(_.duration.toMillis)
-      val totalTimeMs = durations.sum
-      val avgTimeMs = if invocations > 0 then totalTimeMs / invocations else 0L
-      val minTimeMs = if durations.nonEmpty then durations.min else 0L
-      val maxTimeMs = if durations.nonEmpty then durations.max else 0L
-      // find module that accumulated the most total time for this task
-      val longestModuleId = moduleTotalTimes(requests).maxByOption(_._2).map(_._1).getOrElse("-")
-      ApiTaskAggregate(taskName, invocations, errors, totalTimeMs, avgTimeMs, minTimeMs, maxTimeMs, longestModuleId)
-    }.sortBy(_.taskName)
-  }
-
-  /** Per-module breakdown for a specific task. */
-  def moduleBreakdown(internals: DederProjectInternals, taskName: String): Seq[ApiModuleAggregate] = {
-    val requests = internals.recentHistory.filter(_.taskName == taskName)
-    val moduleTimes = moduleTotalTimes(requests)
-    moduleTimes.toSeq.map { case (moduleId, totalTimeMs) =>
-      val moduleReqs = requests.filter(_.moduleIds.contains(moduleId))
-      val invocations = moduleReqs.size.toLong
-      val errors = moduleReqs.count(!_.success).toLong
-      val durations = moduleReqs.map(_.duration.toMillis)
-      val avgTimeMs = if invocations > 0 then totalTimeMs / invocations else 0L
-      val minTimeMs = if durations.nonEmpty then durations.min else 0L
-      val maxTimeMs = if durations.nonEmpty then durations.max else 0L
-      ApiModuleAggregate(moduleId, invocations, errors, totalTimeMs, avgTimeMs, minTimeMs, maxTimeMs)
-    }.sortBy(_.moduleId)
-  }
-
-  private def moduleTotalTimes(requests: Seq[CompletedRequest]): Map[String, Long] = {
-    val pairs = for {
-      req <- requests
-      mod <- req.moduleIds
-    } yield (mod, req.duration.toMillis)
-    pairs.groupBy(_._1).view.mapValues(_.map(_._2).sum).toMap
-  }
-
-  /** Top N modules by total accumulated time across all tasks, descending. */
-  def moduleAggregates(internals: DederProjectInternals, n: Int): Seq[ApiModuleAggregate] = {
-    val grouped = internals.recentHistory.flatMap { r =>
-      r.moduleIds.map(m => (m, r))
-    }.groupBy(_._1)
-
-    grouped.toSeq.map { case (moduleId, pairs) =>
-      val requests = pairs.map(_._2)
-      val totalTimeMs = requests.map(_.duration.toMillis).sum
-      val invocations = requests.size.toLong
-      val errors = requests.count(!_.success).toLong
-      val durations = requests.map(_.duration.toMillis)
-      val avgTimeMs = if invocations > 0 then totalTimeMs / invocations else 0L
-      val minTimeMs = if durations.nonEmpty then durations.min else 0L
-      val maxTimeMs = if durations.nonEmpty then durations.max else 0L
-      ApiModuleAggregate(moduleId, invocations, errors, totalTimeMs, avgTimeMs, minTimeMs, maxTimeMs)
-    }.sortBy(-_.totalTimeMs).take(n)
-  }
-
-  /** Top N tasks by total accumulated time, descending. */
-  def topOffenders(internals: DederProjectInternals, n: Int): Seq[ApiTaskAggregate] =
-    taskAggregates(internals).sortBy(-_.totalTimeMs).take(n)
-
-  /** Error summary grouped by (taskName, moduleIds). */
-  def errorSummary(internals: DederProjectInternals): Seq[ApiErrorSummaryEntry] = {
-    val failures = internals.recentHistory.filter(!_.success)
-    failures.groupBy(r => (r.taskName, r.moduleIds.sorted)).toSeq.map { case ((taskName, moduleIds), reqs) =>
-      ApiErrorSummaryEntry(taskName, moduleIds, reqs.size.toLong)
-    }.sortBy(e => (-e.errorCount, e.taskName))
-  }
-
-  // --- new JSON endpoints ---
-
-  def taskAggregatesJson(internals: DederProjectInternals): String =
-    taskAggregates(internals).toJson
-
-  def moduleBreakdownJson(internals: DederProjectInternals, taskName: String): String =
-    moduleBreakdown(internals, taskName).toJson
-
-  def moduleAggregatesJson(internals: DederProjectInternals, n: Int): String =
-    moduleAggregates(internals, n).toJson
-
-  def topOffendersJson(internals: DederProjectInternals, n: Int): String =
-    topOffenders(internals, n).toJson
-
-  def errorSummaryJson(internals: DederProjectInternals): String =
-    errorSummary(internals).toJson
-
-  def serverInfoJson(internals: DederProjectInternals, project: DederProject): String = {
+  private def serverInfoJson = {
     val jdkVersion = System.getProperty("java.version")
     val jdkVendor = System.getProperty("java.vendor")
     val osName = System.getProperty("os.name")
@@ -301,86 +151,13 @@ object ApiRoutes {
       pluginCount = plugins.size,
       projectRoot = projectRoot,
       plugins = plugins
-    ).toJson
-  }
-
-  // --- 0.19.2 request statuses ---
-
-  def requestStatuses(internals: DederProjectInternals): Seq[ApiRequestStatus] = {
-    internals.allRequestStatuses
-      .filter(_.state != RequestState.COMPLETED)
-      .map { r =>
-        ApiRequestStatus(
-          requestId = r.requestId,
-          caller = formatCallerType(r.caller),
-          taskName = r.taskName,
-          moduleIds = r.moduleIds,
-          startTimeMs = r.startTime.toEpochMilli,
-          state = ApiRequestState.fromDeder(r.state),
-          lockProgress = r.lockProgress.map(l => ApiLockProgress(l.acquired, l.total, l.blockingOn, l.heldBy)),
-          taskProgress = r.taskProgress.map(t => ApiTaskStageProgress(t.currentStage, t.totalStages,
-            t.completed.size, t.failed.size, t.skipped.size, t.running.size, t.pending.size))
-        )
-      }
-  }
-
-  def requestStatusesJson(internals: DederProjectInternals): String =
-    requestStatuses(internals).toJson
-
-  // --- history filtering ---
-
-  /** Filter and paginate recent history, returning a page of ApiHistoryEntry. */
-  def filteredHistory(
-    internals: DederProjectInternals,
-    search: String,
-    caller: String,
-    status: String,
-    sort: String,
-    limit: Int,
-    offset: Int
-  ): Seq[ApiHistoryEntry] = {
-    var filtered = internals.recentHistory
-
-    if search.nonEmpty then
-      val lower = search.toLowerCase
-      filtered = filtered.filter { r =>
-        r.requestId.toLowerCase.contains(lower) ||
-        r.taskName.toLowerCase.contains(lower) ||
-        r.moduleIds.exists(_.toLowerCase.contains(lower))
-      }
-
-    if caller.nonEmpty then
-      val cLower = caller.toLowerCase
-      filtered = filtered.filter(_.caller.toString.toLowerCase.contains(cLower))
-
-    status match
-      case "success" => filtered = filtered.filter(_.success)
-      case "failure" => filtered = filtered.filter(!_.success)
-      case _         => // "all" — no filter
-
-    filtered = sort match
-      case "oldest"   => filtered.sortBy(_.startTime.toEpochMilli)
-      case "longest"  => filtered.sortBy(-_.duration.toMillis)
-      case "shortest" => filtered.sortBy(_.duration.toMillis)
-      case _          => filtered.sortBy(-_.startTime.toEpochMilli) // newest first (default)
-
-    val page = filtered.slice(offset, offset + limit)
-    page.map { r =>
-      ApiHistoryEntry(
-        requestId = r.requestId,
-        caller = formatCallerType(r.caller),
-        taskName = r.taskName,
-        moduleIds = r.moduleIds,
-        startTimeMs = r.startTime.toEpochMilli,
-        durationMs = r.duration.toMillis,
-        success = r.success
-      )
-    }
+    )
   }
 
   private def formatCallerType(ct: CallerType): String = ct match
-    case CallerType.Cli    => "CLI"
-    case CallerType.Bsp    => "BSP"
-    case null              => "unknown"
-    case _                 => ct.toString
+    case CallerType.Cli => "CLI"
+    case CallerType.Bsp => "BSP"
+    case null           => "unknown"
+    case _              => ct.toString
+
 }

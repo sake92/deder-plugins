@@ -3,7 +3,7 @@ package ba.sake.deder.webdashboard.pages
 import java.time.{Duration, Instant}
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.*
-import ba.sake.deder.webdashboard.server.ApiRoutes.{ApiRequestStatus, ApiLockProgress, ApiTaskStageProgress, ApiRequestState}
+import ba.sake.deder.webdashboard.{ApiRequestStatus, ApiLockProgress, ApiTaskStageProgress, ApiRequestState}
 
 object LivePage {
   def fullPage(refreshMs: Int): Html =

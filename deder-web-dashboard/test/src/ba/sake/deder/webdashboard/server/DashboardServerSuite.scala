@@ -96,7 +96,20 @@ class DashboardServerSuite extends FunSuite {
     def tasksFor(moduleType: ba.sake.deder.config.DederProject.ModuleType): Seq[TaskInfo] = Seq.empty
   }
 
-  private val server = DashboardServer(config, stubProject, stubInternals, stubTaskInvoker, stubTaskRegistry)
+  val dashboardService = new DashboardService(stubInternals, stubTaskRegistry)
+  val executionLog = TaskExecutionLog(config.tasksMaxHistory.toInt)
+  val taskRunner = TaskRunner(
+    stubTaskInvoker,
+    stubInternals,
+    executionLog,
+    config.tasksMaxConcurrent.toInt,
+    stubTaskRegistry
+  )
+  val apiRoutes = new ApiRoutes(dashboardService, stubProject, stubInternals, executionLog, taskRunner)
+  val htmlRoutes =
+    new HtmlRoutes(config, dashboardService, stubProject, stubInternals, executionLog, taskRunner)
+  val server = DashboardServer(config, apiRoutes, htmlRoutes)
+  //private val server = DashboardServer(config, stubProject, stubInternals, stubTaskInvoker, stubTaskRegistry)
   private val baseUrl = s"http://$testHost:$testPort"
   private val projectRootProperty = "DEDER_PROJECT_ROOT_DIR"
   private var previousProjectRoot: Option[String] = None
@@ -116,6 +129,7 @@ class DashboardServerSuite extends FunSuite {
     }
   }
 
+  // TODO WTF use sttp..
   private def httpGet(path: String): (Int, String) = {
     val url = s"$baseUrl$path"
     val conn = URL(url).openConnection().asInstanceOf[HttpURLConnection]
@@ -195,11 +209,6 @@ class DashboardServerSuite extends FunSuite {
     assertEquals(code, 200)
     assert(body.contains("100"), s"should contain total requests (100), got: $body")
     assert(body.contains("5"), s"should contain total errors (5), got: $body")
-  }
-
-  test("GET /stats/current redirects to /stats/requests") {
-    val (code, _) = httpGet("/stats/current")
-    assertEquals(code, 301)
   }
 
   test("GET /stats/requests returns state-grouped request sections") {
@@ -321,14 +330,6 @@ class DashboardServerSuite extends FunSuite {
     assert(body.contains("\"totalRequestsServed\": 100"), s"should contain 100, got: $body")
     assert(body.contains("\"totalErrors\": 5"), s"should contain 5, got: $body")
     assert(body.contains("\"uptimeSecs\": 8130"), s"should contain 8130, got: $body")
-  }
-
-  test("GET /api/stats/current returns JSON with current request") {
-    val (code, body) = httpGet("/api/stats/current")
-    assertEquals(code, 200)
-    assert(body.contains("\"requestId\": \"req-001\""), s"should contain req-001, got: $body")
-    assert(body.contains("\"caller\": \"CLI\""), s"should contain caller CLI, got: $body")
-    assert(body.contains("\"taskName\": \"compile\""), s"should contain compile, got: $body")
   }
 
   test("GET /api/stats/history returns JSON with history entries") {

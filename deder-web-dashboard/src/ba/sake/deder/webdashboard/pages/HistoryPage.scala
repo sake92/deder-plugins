@@ -5,7 +5,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.*
-import ba.sake.deder.webdashboard.server.ApiRoutes.ApiHistoryEntry
+import ba.sake.deder.webdashboard.ApiHistoryEntry
 
 object HistoryPage {
   def fullPage(refreshMs: Int): Html =
