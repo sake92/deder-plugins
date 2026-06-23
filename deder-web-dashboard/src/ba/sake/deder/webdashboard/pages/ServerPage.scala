@@ -97,8 +97,8 @@ object ServerPage {
     html"""
       <hr>
       <h4>Loaded Plugins</h4>
-      <table class="compact">
-        <thead><tr><th>Plugin ID</th><th>#Tasks</th><th>Task Names</th></tr></thead>
+       <table class="striped compact">
+         <thead><tr><th>Plugin ID</th><th>#Tasks</th><th>Task Names</th></tr></thead>
         <tbody>$rows</tbody>
       </table>
     """

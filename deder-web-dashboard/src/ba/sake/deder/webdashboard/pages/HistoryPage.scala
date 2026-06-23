@@ -113,9 +113,9 @@ object HistoryPage {
           </tr>
         """
       }
-      html"""
-        <table>
-          <thead><tr><th>Started</th><th>Client</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
+       html"""
+         <table class="striped compact">
+           <thead><tr><th>Started</th><th>Client</th><th>Task</th><th>Modules</th><th>Duration</th><th>Status</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """

@@ -74,10 +74,10 @@ object TasksPage {
 
   def logTableContainer(log: TaskExecutionLog, refreshMs: Int): Html =
     html"""
-      <div id="log-table" hx-get="/tasks/log-table" hx-trigger="load, every ${refreshMs}ms" hx-swap="innerHTML"
-           hx-on::after-swap="Alpine.initTree(this)">
-        ${logTable(log)}
-      </div>
+       <div id="log-table" hx-get="/tasks/log-table" hx-trigger="every ${refreshMs}ms" hx-swap="innerHTML"
+            hx-on::after-swap="Alpine.initTree(this)">
+         ${logTable(log)}
+       </div>
     """
 
   def logTable(log: TaskExecutionLog): Html =
@@ -86,14 +86,14 @@ object TasksPage {
       html"""<p><em>No web-triggered executions yet.</em></p>"""
     else
       val rows = entries.zipWithIndex.map { case (e, idx) => logRow(e, idx + 1) }
-      html"""
-        <table class="compact">
-          <thead><tr>
-            <th>#</th><th>Task</th><th>Modules</th><th>Start</th><th>Status</th><th>Duration</th><th></th>
-          </tr></thead>
-          $rows
-        </table>
-      """
+       html"""
+         <table class="striped compact">
+           <thead><tr>
+             <th>#</th><th>Task</th><th>Modules</th><th>Start</th><th>Status</th><th>Duration</th><th></th>
+           </tr></thead>
+           $rows
+         </table>
+       """
 
   private def logRow(e: ExecEntry, num: Int): Html =
     val startStr = formatTime(e.startTime)
@@ -115,7 +115,7 @@ object TasksPage {
     val cancelBtn = e.status match
       case ExecStatus.RUNNING | ExecStatus.PENDING =>
         html"""<button class="outline compact cancel-btn" hx-post="/tasks/cancel?execId=${e.execId}"
-               hx-target="#log-table" hx-swap="outerHTML">Cancel</button>"""
+                hx-target="#log-table" hx-swap="innerHTML">Cancel</button>"""
       case _ => Html("")
 
     html"""
@@ -168,9 +168,9 @@ ${combinedOutput.takeRight(10000)}</pre>"""
         html"""<tr><td>${o.moduleId}</td><td>$status$cached</td><td><small>$err</small></td></tr>"""
       }
       html"""
-        <div>
-          <table class="compact">
-            <thead><tr><th>Module</th><th>Outcome</th><th>Error</th></tr></thead>
+         <div>
+           <table class="striped compact">
+             <thead><tr><th>Module</th><th>Outcome</th><th>Error</th></tr></thead>
             <tbody>$outcomeRows</tbody>
           </table>
         </div>

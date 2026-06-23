@@ -83,9 +83,9 @@ object StatsPage {
         </tbody>
         """
       }
-      html"""
-        <table>
-          <thead><tr><th>Task</th><th>Invocations</th><th>Errors</th><th>Total</th><th>Avg</th><th>Min</th><th>Max</th></tr></thead>
+       html"""
+         <table class="striped compact">
+           <thead><tr><th>Task</th><th>Invocations</th><th>Errors</th><th>Total</th><th>Avg</th><th>Min</th><th>Max</th></tr></thead>
           ${rows}
         </table>
       """
@@ -193,8 +193,8 @@ object StatsPage {
         html"""<tr><td>${e.taskName}</td><td>${e.errorCount}</td><td>${e.moduleIds.mkString(", ")}</td></tr>"""
       }
       html"""
-        <table>
-          <thead><tr><th>Task</th><th>Count</th><th>Modules</th></tr></thead>
+         <table class="striped compact">
+           <thead><tr><th>Task</th><th>Count</th><th>Modules</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """

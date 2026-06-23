@@ -93,8 +93,8 @@ object LivePage {
           <div class="section-header">
             <mark class="$badgeClass">${title} (${reqs.size})</mark>
           </div>
-          <table>
-            <thead><tr><th>Started</th><th>Client</th><th>Task</th><th class="col-modules">Modules</th><th>Details</th><th></th></tr></thead>
+           <table class="striped compact">
+             <thead><tr><th>Started</th><th>Client</th><th>Task</th><th class="col-modules">Modules</th><th>Details</th><th></th></tr></thead>
             <tbody>$rows</tbody>
           </table>
         </section>
@@ -210,9 +210,9 @@ object LivePage {
       val rows = caches.toSeq.sortBy(_._1).map { case (name, stats) =>
         html"""<tr><td>$name</td><td>${stats.estimatedSize}</td><td>${stats.hitCount}</td><td>${stats.missCount}</td></tr>"""
       }
-      html"""
-        <table>
-          <thead><tr><th>Name</th><th>Size</th><th>Hits</th><th>Misses</th></tr></thead>
+       html"""
+         <table class="striped compact">
+           <thead><tr><th>Name</th><th>Size</th><th>Hits</th><th>Misses</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       """
