@@ -9,7 +9,6 @@ body {
   padding: 0.5rem 0.75rem;
 }
 
-
 /* smaller inputs */
 input,
 select,
@@ -87,11 +86,13 @@ button {
   align-items: end;
   flex-wrap: nowrap;
 }
-.task-trigger-row > label {
+
+.task-trigger-row>label {
   flex: 2;
   min-width: 0;
 }
-.task-trigger-row > input[type="submit"] {
+
+.task-trigger-row>input[type="submit"] {
   flex: 1;
   white-space: nowrap;
 }
@@ -182,4 +183,15 @@ button {
 .cancel-btn:hover {
   background: var(--pico-color-red-400);
   color: white;
+}
+
+
+/* sticky footer */
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  backdrop-filter: blur(2px);
+  text-align: center;
 }
