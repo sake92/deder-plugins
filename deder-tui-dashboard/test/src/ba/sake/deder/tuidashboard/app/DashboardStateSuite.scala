@@ -116,4 +116,25 @@ class DashboardStateSuite extends FunSuite {
     val (s4, _) = app.update(ToggleSort, s3)
     assertEquals(s4.historySort, SortOrder.Newest)
   }
+
+  test("update parses request-statuses JSON with state, lock and task progress") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState()
+    val json = """[{"requestId":"req-q1","caller":"CLI","taskName":"compile","moduleIds":["core"],"startTimeMs":1,"state":"Queued","lockProgress":null,"taskProgress":null},{"requestId":"req-l1","caller":"BSP","taskName":"test","moduleIds":["core-test"],"startTimeMs":2,"state":"AcquiringLocks","lockProgress":{"acquired":1,"total":3,"blockingOn":"core.compile","heldBy":"req-042"},"taskProgress":null}]"""
+    val (newState, _) = app.update(CurrentResp(Right(json)), state)
+    assertEquals(newState.currentRequests.length, 2)
+    val r1 = newState.currentRequests(0)
+    assertEquals(r1.requestId, "req-q1")
+    assertEquals(r1.state, ApiRequestState.Queued)
+    assertEquals(r1.lockProgress, None)
+    assertEquals(r1.taskProgress, None)
+    val r2 = newState.currentRequests(1)
+    assertEquals(r2.requestId, "req-l1")
+    assertEquals(r2.state, ApiRequestState.AcquiringLocks)
+    assert(r2.lockProgress.isDefined)
+    assertEquals(r2.lockProgress.get.acquired, 1)
+    assertEquals(r2.lockProgress.get.total, 3)
+    assertEquals(r2.taskProgress, None)
+    assertEquals(newState.lastError, None)
+  }
 }

@@ -10,7 +10,7 @@ enum SortOrder { case Newest, Oldest, Longest, Shortest }
 case class DashboardState(
     modules: Seq[ApiModule] = Seq.empty,
     overview: Option[StatsOverview] = None,
-    currentRequests: Seq[ApiCurrentRequest] = Seq.empty,
+    currentRequests: Seq[ApiRequestStatus] = Seq.empty,
     history: Seq[ApiHistoryEntry] = Seq.empty,
     taskStats: Seq[ApiTaskAggregate] = Seq.empty,
     errors: Seq[ApiErrorSummaryEntry] = Seq.empty,
@@ -52,7 +52,7 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       state.copy(lastError = Some(s"overview: $err"))
 
     case CurrentResp(Right(json)) =>
-      safely(state)(_.copy(currentRequests = json.parseJson[Seq[ApiCurrentRequest]], lastError = None))
+      safely(state)(_.copy(currentRequests = json.parseJson[Seq[ApiRequestStatus]], lastError = None))
     case CurrentResp(Left(err)) =>
       state.copy(lastError = Some(s"current: $err"))
 
@@ -200,13 +200,25 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     val currentBox = box("Current Requests")(
       if state.currentRequests.isEmpty then "(none)".color(Color.BrightBlack)
       else {
-        val items = state.currentRequests.map(r =>
+        val items = state.currentRequests.map { r =>
+          val stateLabel = r.state.label
+          val stateColor = r.state match
+            case ApiRequestState.Queued          => Color.BrightBlack
+            case ApiRequestState.AcquiringLocks  => Color.BrightYellow
+            case ApiRequestState.Executing       => Color.BrightGreen
+            case _                               => Color.BrightBlack
+          val stateText = Text(s" $stateLabel").color(stateColor)
+          val lockText = r.lockProgress.map(l => Text(s" Lock ${l.acquired}/${l.total}").color(Color.BrightYellow)).getOrElse(empty)
+          val stageText = r.taskProgress.map(t => Text(s" Stage ${t.currentStage}/${t.totalStages}").color(Color.BrightGreen)).getOrElse(empty)
           rowTight(
             Text(r.requestId),
             Text(s"  ${r.taskName}"),
-            Text(s"  [${r.moduleIds.mkString(", ")}]")
+            Text(s"  [${r.moduleIds.mkString(", ")}]"),
+            stateText,
+            lockText,
+            stageText
           )
-        )
+        }
         layout(items*)
       }
     ).border(Border.Round).color(Color.BrightBlue)

@@ -4,8 +4,19 @@ import ba.sake.tupson.*
 
 case class ApiModule(id: String, `type`: String, deps: Int) derives JsonRW
 case class StatsOverview(totalRequestsServed: Long, totalErrors: Long, uptimeSecs: Long) derives JsonRW
-case class ApiCurrentRequest(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long) derives JsonRW
 case class ApiHistoryEntry(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long, durationMs: Long, success: Boolean) derives JsonRW
+
+enum ApiRequestState(val label: String):
+  case Queued extends ApiRequestState("QUEUED")
+  case AcquiringLocks extends ApiRequestState("ACQUIRING_LOCKS")
+  case Executing extends ApiRequestState("EXECUTING")
+  case Unknown extends ApiRequestState("UNKNOWN")
+
+case class ApiLockProgress(acquired: Int, total: Int, blockingOn: Option[String], heldBy: Option[String]) derives JsonRW
+
+case class ApiTaskStageProgress(currentStage: Int, totalStages: Int, completed: Int, failed: Int, skipped: Int, running: Int, pending: Int) derives JsonRW
+
+case class ApiRequestStatus(requestId: String, caller: String, taskName: String, moduleIds: Seq[String], startTimeMs: Long, state: ApiRequestState, lockProgress: Option[ApiLockProgress], taskProgress: Option[ApiTaskStageProgress]) derives JsonRW
 
 case class ApiTaskAggregate(
   taskName: String,
