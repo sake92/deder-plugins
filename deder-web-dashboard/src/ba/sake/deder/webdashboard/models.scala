@@ -120,7 +120,8 @@ case class ApiExecEntry(
     endTimeMs: Option[Long],
     status: String,
     output: String,
-    error: Option[String]
+    error: Option[String],
+    requestId: Option[String] = None
 ) derives JsonRW
 
 case class CancelResult(cancelled: Boolean) derives JsonRW

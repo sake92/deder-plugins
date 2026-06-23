@@ -22,14 +22,11 @@ class TaskRunner(
   private var runSubprocessSeen = false
 
   /** Triggers a task execution. Returns immediately with a PENDING or FAILURE ExecEntry. */
-  def trigger(taskName: String, moduleIds: Seq[String]): ExecEntry =
+  def trigger(taskName: String, moduleIds: Seq[String], logLevel: LogLevel = LogLevel.INFO): ExecEntry =
     val allTasks = taskRegistry.allTasks
     val knownTasks = allTasks.map(t => t.name).toSet
     val allModulesIds = project.modules.asScala.map(_.id).toSeq
     val resolvedModuleIds = if moduleIds.isEmpty then allModulesIds else moduleIds
-    println(s"allModulesIds '$allModulesIds' ")
-    println(s"moduleIds  '$moduleIds' ${moduleIds.length} ")
-    println(s"Triggering task '$taskName' for modules: ${resolvedModuleIds.mkString(", ")}")
 
     val validationError: Option[String] =
       if !knownTasks.contains(taskName) then
@@ -45,7 +42,7 @@ class TaskRunner(
         log.add(entry)
         entry
       case None =>
-        submitTask(taskName, resolvedModuleIds)
+        submitTask(taskName, resolvedModuleIds, logLevel)
 
   private def failEntry(taskName: String, moduleIds: Seq[String], msg: String): ExecEntry =
     ExecEntry(
@@ -62,7 +59,7 @@ class TaskRunner(
       requestId = None
     )
 
-  private def submitTask(taskName: String, moduleIds: Seq[String]): ExecEntry =
+  private def submitTask(taskName: String, moduleIds: Seq[String], logLevel: LogLevel): ExecEntry =
     val execId = UUID.randomUUID().toString
     val entry = ExecEntry(
       execId = execId,
@@ -91,10 +88,9 @@ class TaskRunner(
           moduleIds = moduleIds,
           args = Seq.empty,
           onNotification = notif =>
-            val line = formatNotification(notif)
+            val line = formatNotification(notif, logLevel)
             if line.nonEmpty then
               outputLock.synchronized {
-                println(s"appending [$taskName] $line")
                 output.append(line).append('\n')
               }
             if idHolder.get() == null then
@@ -110,7 +106,6 @@ class TaskRunner(
           ExecModuleOutcome(o.moduleId, o.success, o.error, o.fromCache)
         )
         val success = result.outcomes.forall(_.success)
-        println("Got output:\n" + output.toString())
         log.update(execId)(_.copy(
           status = if success then ExecStatus.SUCCESS else ExecStatus.FAILURE,
           endTime = Some(Instant.now()),
@@ -132,11 +127,13 @@ class TaskRunner(
 
     entry
 
-  private def formatNotification(notif: ServerNotification): String = notif match
+  private def formatNotification(notif: ServerNotification, logLevel: LogLevel): String = notif match
     case ServerNotification.Output(text) => text
     case ServerNotification.Log(level, _, message, moduleId, _) =>
-      val modStr = moduleId.map(m => s"[$m] ").getOrElse("")
-      s"[$level] ${modStr}$message"
+      if level.ordinal <= logLevel.ordinal then
+        val modStr = moduleId.map(m => s"[$m] ").getOrElse("")
+        s"[$level] ${modStr}$message"
+      else ""
     case ServerNotification.RunSubprocess(_, _, _) =>
       runSubprocessSeen = true
       ""

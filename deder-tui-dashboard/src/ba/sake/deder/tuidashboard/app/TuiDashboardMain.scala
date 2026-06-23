@@ -20,7 +20,7 @@ import layoutz.Key
     renderIntervalMs = 50,
     clearOnStart = true,
     clearOnExit = true,
-    quitKey = Key.Char('q')
+    quitKey = Key.Ctrl('c')
   )
 }
 

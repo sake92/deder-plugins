@@ -4,6 +4,7 @@ import scala.jdk.CollectionConverters.*
 import ba.sake.sharaf.*
 import ba.sake.querson.QueryStringRW
 import ba.sake.deder.*
+import ba.sake.deder.ServerNotification.LogLevel
 import ba.sake.deder.config.DederProject
 import ba.sake.deder.webdashboard.*
 
@@ -19,13 +20,14 @@ class ApiRoutes(
       Response.withBody(executionLog.recent(200).map(toApi))
 
     case POST -> Path("api", "tasks", "run") =>
-      case class QP(taskName: String, moduleIds: Seq[String]) derives QueryStringRW{
+      case class QP(taskName: String, moduleIds: Seq[String], logLevel: String = "INFO") derives QueryStringRW{
         def filteredModuleIds: Seq[String] = moduleIds.filterNot(_.isBlank())
       }
       val qp = Request.current.queryParams[QP]
       val taskName = qp.taskName
+      val logLevel = try LogLevel.valueOf(qp.logLevel) catch case _: Exception => LogLevel.INFO
       if taskName.nonEmpty then
-        val entry = taskRunner.trigger(taskName, qp.filteredModuleIds)
+        val entry = taskRunner.trigger(taskName, qp.filteredModuleIds, logLevel)
         Response.withBody(
           TaskRunResult(
             execId = Some(entry.execId),
@@ -66,6 +68,19 @@ class ApiRoutes(
       val qp = Request.current.queryParams[QP]
       val requestId = qp.requestId
       val cancelled = if requestId.nonEmpty then internals.cancelRequest(requestId) else false
+      Response.withBody(CancelResult(cancelled))
+
+    case POST -> Path("api", "tasks", "cancel") =>
+      case class QP(execId: String) derives QueryStringRW
+      val qp = Request.current.queryParams[QP]
+      val execId = qp.execId
+      var cancelled = false
+      if execId.nonEmpty then
+        executionLog.get(execId).flatMap(_.requestId).foreach { requestId =>
+          cancelled = internals.cancelRequest(requestId)
+        }
+        if cancelled then
+          executionLog.update(execId)(_.copy(status = ExecStatus.CANCELLED, endTime = Some(java.time.Instant.now())))
       Response.withBody(CancelResult(cancelled))
 
     case GET -> Path("api", "stats", "history") =>
@@ -115,7 +130,8 @@ class ApiRoutes(
       endTimeMs = e.endTime.map(_.toEpochMilli),
       status = e.status.toString,
       output = e.output,
-      error = e.error
+      error = e.error,
+      requestId = e.requestId
     )
 
   private def currentRequests = {

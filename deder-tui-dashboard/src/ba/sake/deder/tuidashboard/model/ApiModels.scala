@@ -52,3 +52,25 @@ case class ApiServerInfo(
   projectRoot: String,
   plugins: Seq[ApiPluginInfo]
 ) derives JsonRW
+
+// --- Task runner API types ---
+case class ApiExecEntry(
+    execId: String,
+    taskName: String,
+    moduleIds: Seq[String],
+    startTimeMs: Long,
+    endTimeMs: Option[Long],
+    status: String,
+    output: String,
+    error: Option[String],
+    requestId: Option[String] = None
+) derives JsonRW
+
+case class CancelResult(cancelled: Boolean) derives JsonRW
+
+case class TaskRunResult(
+    execId: Option[String] = None,
+    status: Option[String] = None,
+    taskName: Option[String] = None,
+    error: Option[String] = None
+) derives JsonRW
