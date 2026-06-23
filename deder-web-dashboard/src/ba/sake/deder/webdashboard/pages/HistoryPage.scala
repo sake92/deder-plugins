@@ -85,7 +85,7 @@ object HistoryPage {
     else
       val rows = entries.map { entry =>
         val statusClass = if entry.success then "pico-color-green-400" else "pico-color-red-400"
-        val statusText = if entry.success then "OK" else "FAIL"
+        val statusText = if entry.success then "✅ OK" else "❌ FAIL"
         val startedStr = formatDateTime(Instant.ofEpochMilli(entry.startTimeMs))
         val durStr = formatElapsed(Duration.ofMillis(entry.durationMs))
         html"""
@@ -127,7 +127,7 @@ object HistoryPage {
     else
       val rows = entries.map { entry =>
         val statusClass = if entry.success then "pico-color-green-400" else "pico-color-red-400"
-        val statusText = if entry.success then "OK" else "FAIL"
+        val statusText = if entry.success then "✅ OK" else "❌ FAIL"
         val startedStr = formatDateTime(Instant.ofEpochMilli(entry.startTimeMs))
         val durStr = formatElapsed(Duration.ofMillis(entry.durationMs))
         html"""

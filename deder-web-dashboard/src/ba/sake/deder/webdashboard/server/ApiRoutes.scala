@@ -1,7 +1,7 @@
 package ba.sake.deder.webdashboard.server
 
 import scala.jdk.CollectionConverters.*
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.querson.QueryStringRW
 import ba.sake.deder.*
 import ba.sake.deder.ServerNotification.LogLevel
@@ -19,7 +19,7 @@ class ApiRoutes(
     case GET -> Path("api", "tasks") =>
       Response.withBody(executionLog.recent(200).map(toApi))
 
-    case POST -> Path("api", "tasks", "run") =>
+    case POST -> Path("api", "tasks", "exec") =>
       case class QP(taskName: String, moduleIds: Seq[String], logLevel: String = "INFO") derives QueryStringRW{
         def filteredModuleIds: Seq[String] = moduleIds.filterNot(_.isBlank())
       }
@@ -38,10 +38,8 @@ class ApiRoutes(
         )
       else Response.withBody(TaskRunResult(error = Some("taskName is required")))
 
-    case GET -> Path("api", "tasks", "exec") =>
-      case class QP(execId: String = "") derives QueryStringRW
-      val qp = Request.current.queryParams[QP]
-      val res = executionLog.get(qp.execId).map(toApi)
+    case GET -> Path("api", "tasks", "exec", execId, "logs") =>
+      val res = executionLog.get(execId).map(toApi)
       Response.withBodyOpt(res, "execId")
 
     case GET -> Path("api", "modules") =>
@@ -131,7 +129,8 @@ class ApiRoutes(
       status = e.status.toString,
       output = e.output,
       error = e.error,
-      requestId = e.requestId
+      requestId = e.requestId,
+      renderedSummary = e.renderedSummary
     )
 
   private def currentRequests = {

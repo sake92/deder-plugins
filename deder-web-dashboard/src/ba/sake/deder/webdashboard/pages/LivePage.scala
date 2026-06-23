@@ -73,9 +73,9 @@ object LivePage {
     if statuses.isEmpty then html"""<p><em>No requests in progress.</em></p>"""
     else
       html"""
-        ${renderSection(queued, "Queued", "pico-color-grey-400", renderQueuedRow)}
-        ${renderSection(acquiring, "Acquiring Locks", "pico-color-yellow-400", renderAcquiringRow)}
-        ${renderSection(executing, "Executing", "pico-color-green-400", renderExecutingRow)}
+        ${renderSection(queued, "⏳ Queued", "pico-color-grey-400", renderQueuedRow)}
+        ${renderSection(acquiring, "🔒 Acquiring Locks", "pico-color-yellow-400", renderAcquiringRow)}
+        ${renderSection(executing, "⚙️ Executing", "pico-color-green-400", renderExecutingRow)}
       """
   }
 

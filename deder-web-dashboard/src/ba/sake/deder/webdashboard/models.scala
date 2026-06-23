@@ -121,7 +121,8 @@ case class ApiExecEntry(
     status: String,
     output: String,
     error: Option[String],
-    requestId: Option[String] = None
+    requestId: Option[String] = None,
+    renderedSummary: Option[String] = None
 ) derives JsonRW
 
 case class CancelResult(cancelled: Boolean) derives JsonRW

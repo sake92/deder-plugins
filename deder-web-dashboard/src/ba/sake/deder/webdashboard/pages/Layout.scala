@@ -28,9 +28,9 @@ object Layout {
             <li><a href="/server" ${activePageAttrs(activeTab, Set("server"))}><strong>Home</strong></a></li>
           </ul>
           <ul>
-            <li><a href="/modules" ${activePageAttrs(activeTab, Set("modules", "graph"))}>Modules</a></li>
-            <li><a href="/tasks" ${activePageAttrs(activeTab, Set("tasks"))}>Tasks</a></li>
-            <li><a href="/live" ${activePageAttrs(activeTab, Set("live", "history", "stats"))}>Stats</a></li>
+            <li><a href="/modules" ${activePageAttrs(activeTab, Set("modules", "graph"))}>📦 Modules</a></li>
+            <li><a href="/tasks" ${activePageAttrs(activeTab, Set("tasks"))}>🔧 Tasks</a></li>
+            <li><a href="/live" ${activePageAttrs(activeTab, Set("live", "history", "stats"))}>ℹ️ Stats</a></li>
           </ul>
         </nav>
         ${
@@ -38,8 +38,8 @@ object Layout {
             html"""
             <nav class="sub-nav">
               <ul>
-                <li><a href="/modules"       ${activePageAttrs(activeTab, Set("modules"))}>List</a></li>
-                <li><a href="/modules/graph" ${activePageAttrs(activeTab, Set("graph"))}>Graph</a></li>
+                <li><a href="/modules"       ${activePageAttrs(activeTab, Set("modules"))}>📋 List</a></li>
+                <li><a href="/modules/graph" ${activePageAttrs(activeTab, Set("graph"))}>🕸️ Graph</a></li>
               </ul>
             </nav>
             """
@@ -47,9 +47,9 @@ object Layout {
             html"""
             <nav class="sub-nav">
               <ul>
-                <li><a href="/live" ${activePageAttrs(activeTab, Set("live"))}>Live</a></li>
-                <li><a href="/history" ${activePageAttrs(activeTab, Set("history"))}>History</a></li>
-                <li><a href="/stats" ${activePageAttrs(activeTab, Set("stats"))}>Aggregates</a></li>
+                <li><a href="/live" ${activePageAttrs(activeTab, Set("live"))}>👁️ Live</a></li>
+                <li><a href="/history" ${activePageAttrs(activeTab, Set("history"))}>📜 History</a></li>
+                <li><a href="/stats" ${activePageAttrs(activeTab, Set("stats"))}>📊 Aggregates</a></li>
               </ul>
             </nav>
             """

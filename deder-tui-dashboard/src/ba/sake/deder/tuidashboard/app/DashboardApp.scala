@@ -25,7 +25,7 @@ case class DashboardState(
     cursorPos: Int = 7,
     selectedTaskName: Option[String] = Some("compile"),
     toggledModuleIds: Set[String] = Set.empty,
-    focus: FocusField = FocusField.TaskInput,
+    focus: FocusField = FocusField.ModuleList,
     taskExecutions: Seq[ApiExecEntry] = Seq.empty,
     expandedExecId: Option[String] = None,
     selectedModuleIdx: Int = 0,
@@ -171,14 +171,13 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       (state.copy(toggledModuleIds = Set.empty, lastError = None), Cmd.none)
 
     case RunTask =>
-      state.selectedTaskName match
-        case Some(taskName) =>
-          val moduleIdsQs = if state.toggledModuleIds.isEmpty then ""
-          else state.toggledModuleIds.map(id => s"moduleIds=$id").mkString("&", "&", "")
-          val url = s"${state.serverUrl}/api/tasks/run?taskName=$taskName$moduleIdsQs&logLevel=INFO"
-          (state, Cmd.http.post(url, "", RunTaskResp.apply))
-        case None =>
-          (state.copy(lastError = Some("No task selected")), Cmd.none)
+      val taskName = state.taskInput.trim
+      if taskName.nonEmpty then
+        val moduleIdsQs = if state.toggledModuleIds.isEmpty then ""
+        else state.toggledModuleIds.map(id => s"moduleIds=$id").mkString("&", "&", "")
+        val url = s"${state.serverUrl}/api/tasks/exec?taskName=$taskName$moduleIdsQs&logLevel=INFO"
+        (state, Cmd.http.post(url, "", RunTaskResp.apply))
+      else (state.copy(lastError = Some("No task selected")), Cmd.none)
 
     case TaskExecsResp(Right(json)) =>
       safely(state)(_.copy(taskExecutions = json.parseJson[Seq[ApiExecEntry]], lastError = None))
@@ -248,6 +247,9 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
   private def safely(state: DashboardState)(f: DashboardState => DashboardState): DashboardState =
     try f(state)
     catch { case e: Exception => state.copy(lastError = Some(e.getMessage)) }
+
+  private def truncPad(s: String, n: Int): String =
+    if s.length > n then s.take(n - 1) + "…" else s.padTo(n, ' ')
 
   def subscriptions(state: DashboardState): Sub[Msg] = Sub.batch(
     Sub.http.pollMs(s"${state.serverUrl}/api/modules", pollMs, ModulesResp.apply),
@@ -367,17 +369,17 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       else text
     }
     rowTight(
-      tab(1, "Modules", Tab.Modules),
+      tab(1, "📦 Modules", Tab.Modules),
       Text("  "),
-      tab(2, "Tasks", Tab.Tasks),
+      tab(2, "🔧 Tasks", Tab.Tasks),
       Text("  "),
-      tab(3, "Live", Tab.Live),
+      tab(3, "👁️ Live", Tab.Live),
       Text("  "),
-      tab(4, "History", Tab.History),
+      tab(4, "📜 History", Tab.History),
       Text("  "),
-      tab(5, "Aggregates", Tab.Aggregates),
+      tab(5, "📊 Aggregates", Tab.Aggregates),
       Text("  "),
-      tab(6, "Info", Tab.Info),
+      tab(6, "ℹ️ Info", Tab.Info),
       Text("    q quit")
     )
   }
@@ -417,6 +419,14 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       case "PENDING"  => Color.Yellow
       case _          => Color.Red
 
+    val statusEmoji = e.status match
+      case "SUCCESS"    => "✅"
+      case "FAILURE"    => "❌"
+      case "RUNNING"    => "🔄"
+      case "PENDING"    => "⏳"
+      case "CANCELLED"  => "🚫"
+      case _            => ""
+
     val modulesStr = if e.moduleIds.isEmpty then "*" else e.moduleIds.mkString(", ")
 
     val outputSection = if e.output.nonEmpty then
@@ -443,11 +453,16 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     else
       Text("  Esc/Enter = back").color(Color.BrightBlack)
 
+    val summarySection = e.renderedSummary.filter(_.nonEmpty).map { s =>
+      Text(s"Summary: $s").color(Color.BrightGreen)
+    }.getOrElse(empty)
+
     box(s"Execution: ${e.taskName} ($modulesStr)")(
       layout(
-        Text(s"Status: ${e.status}").color(statusColor),
+        Text(s"Status: $statusEmoji ${e.status}").color(statusColor),
         Text(s"Exec ID: ${e.execId}").color(Color.BrightBlack),
         outputSection,
+        summarySection,
         errorSection,
         Text("─" * 40).color(Color.BrightBlack),
         cancelHint
@@ -515,30 +530,34 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       box("Executions")("No executions yet.".color(Color.BrightBlack))
         .border(Border.Round)
     else
-      val header = Text("  #  Task          Modules                              Status   Duration").style(Style.Bold)
+      val header = Text("  #  Task            Modules                    Status    Duration").style(Style.Bold)
 
       val items = state.taskExecutions.zipWithIndex.map { case (e, i) =>
         val cursor = if i == state.selectedExecIdx then "▶" else " "
-        val modulesStr = if e.moduleIds.isEmpty then "*"
-        else
-          val s = e.moduleIds.mkString(", ")
-          if s.length > 34 then s.take(31) + "..." else s
+        val modulesStr = if e.moduleIds.isEmpty then "*" else e.moduleIds.mkString(", ")
         val statusColor = e.status match
           case "SUCCESS"  => Color.Green
           case "FAILURE"  => Color.Red
           case "RUNNING"  => Color.Blue
           case "PENDING"  => Color.Yellow
           case _          => Color.Red
+        val statusEmoji = e.status match
+          case "SUCCESS"    => "✅"
+          case "FAILURE"    => "❌"
+          case "RUNNING"    => "🔄"
+          case "PENDING"    => "⏳"
+          case "CANCELLED"  => "🚫"
+          case _            => ""
         val durationStr = e.endTimeMs match
           case Some(end) => s"${end - e.startTimeMs}ms"
           case None      => s"${System.currentTimeMillis() - e.startTimeMs}ms"
 
         val idxStr = f"${i + 1}%2d"
-        val taskNamePadded = e.taskName.padTo(13, ' ')
-        val modPadded = modulesStr.padTo(37, ' ')
-        val statusPadded = e.status.padTo(9, ' ')
+        val taskDisplay = truncPad(e.taskName, 15)
+        val modDisplay = truncPad(modulesStr, 25)
+        val statusDisplay = truncPad(s"$statusEmoji ${e.status}", 12)
 
-        val row = Text(s" $cursor$idxStr. $taskNamePadded$modPadded$statusPadded$durationStr").color(statusColor)
+        val row = Text(s" $cursor$idxStr. $taskDisplay $modDisplay $statusDisplay $durationStr").color(statusColor)
         if i == state.selectedExecIdx then row.color(Color.Cyan) else row
       }
 
@@ -571,7 +590,11 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       if state.currentRequests.isEmpty then "(none)".color(Color.BrightBlack)
       else {
         val items = state.currentRequests.map { r =>
-          val stateLabel = r.state.label
+          val stateLabel = r.state match
+            case ApiRequestState.Queued          => "⏳ QUEUED"
+            case ApiRequestState.AcquiringLocks  => "🔒 ACQUIRING_LOCKS"
+            case ApiRequestState.Executing       => "⚙️ EXECUTING"
+            case _                               => r.state.label
           val stateColor = r.state match
             case ApiRequestState.Queued          => Color.BrightBlack
             case ApiRequestState.AcquiringLocks  => Color.BrightYellow
@@ -614,26 +637,19 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       case SortOrder.Longest => state.history.sortBy(-_.durationMs)
       case SortOrder.Shortest => state.history.sortBy(_.durationMs)
 
-    val header = s"(sorted by: $sortLabel, press 's' to change)".color(Color.BrightBlack)
+    val header = Text(s"(sorted by: $sortLabel, press 's' to change)").color(Color.BrightBlack)
 
-    val historyBox = box("History")(
-      if sorted.isEmpty then "(none)".color(Color.BrightBlack)
+    val body = if sorted.isEmpty then "(none)".color(Color.BrightBlack)
       else {
         val items = sorted.map { h =>
-          val icon = if h.success then "+".color(Color.Green) else "x".color(Color.Red)
-          rowTight(
-            icon,
-            Text(s" [${h.caller}]"),
-            Text(s" ${h.taskName}"),
-            Text(s"  ${h.durationMs}ms"),
-            Text(s"  [${h.moduleIds.mkString(", ")}]")
-          )
+          val icon = if h.success then "✅" else "❌"
+          val mods = if h.moduleIds.isEmpty then "*" else h.moduleIds.mkString(", ")
+          Text(s" $icon [${h.caller}] ${h.taskName}  ${h.durationMs}ms  [$mods]")
         }
         layout(items*)
       }
-    ).border(Border.Round).color(Color.BrightMagenta)
 
-    layout(header, historyBox)
+    layout(header, body)
   }
 
   // --- Tab 4: Aggregates ---
@@ -677,6 +693,19 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       val sec = si.uptimeSecs % 60
       val uptimeStr = s"${h}h ${m}m ${sec}s"
 
+      val projectSection = box("Project")(
+        Text(s"Folder: ${si.projectRoot}")
+      ).border(Border.Round)
+
+      val pluginsSection = if si.plugins.nonEmpty then
+        box("Loaded Plugins")(
+          table(
+            headers = Seq(Text("Plugin ID"), Text("#Tasks"), Text("Task Names")),
+            rows = si.plugins.map(p => Seq(Text(p.id), Text(p.taskCount.toString), Text(p.taskNames.mkString(", "))))
+          ).border(Border.Round)
+        ).border(Border.Round)
+      else empty
+
       val dederSection = box("Deder")(
         layout(
           Text(s"Version: ${si.dederVersion}"),
@@ -701,19 +730,6 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
         )
       ).border(Border.Round)
 
-      val projectSection = box("Project")(
-        Text(s"Folder: ${si.projectRoot}")
-      ).border(Border.Round)
-
-      val pluginsSection = if si.plugins.nonEmpty then
-        box("Loaded Plugins")(
-          table(
-            headers = Seq(Text("Plugin ID"), Text("#Tasks"), Text("Task Names")),
-            rows = si.plugins.map(p => Seq(Text(p.id), Text(p.taskCount.toString), Text(p.taskNames.mkString(", "))))
-          ).border(Border.Round)
-        ).border(Border.Round)
-      else empty
-
-      layout(dederSection, jdkSection, osSection, projectSection, pluginsSection)
+      layout(projectSection, dederSection, pluginsSection, jdkSection, osSection)
   }
 }

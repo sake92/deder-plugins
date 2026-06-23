@@ -2,15 +2,15 @@ amends "https://sake92.github.io/deder/config/early-access/DederProject.pkl"
 
 import "../../resources/WebDashboardPlugin.pkl" as WD
 
-/*
+
 tools {
   ["tui"] {
     deps {
-      "ba.sake::deder-tui-dashboard:0.3.1-SNAPSHOT"
+      "ba.sake::deder-tui-dashboard:0.5.1-SNAPSHOT"
     }
   }
 }
-*/
+
 
 plugins {
   new WD.WebDashboardPlugin {

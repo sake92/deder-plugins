@@ -393,7 +393,7 @@ class DashboardServerSuite extends FunSuite {
     assert(tasks.exists(_.taskName == "compile"), s"should contain compile entry, got: ${res.body}")
   }
 
-  test("GET /api/tasks/exec returns JSON for valid execId") {
+  test("GET /api/tasks/exec/:id/logs returns JSON for valid execId") {
     quickRequest.get(uri"$baseUrl/tasks/run?taskName=compile").send()
     Thread.sleep(600)
     val tasksRes = quickRequest.get(uri"$baseUrl/api/tasks").send()
@@ -401,23 +401,23 @@ class DashboardServerSuite extends FunSuite {
     assert(tasks.nonEmpty, s"should have at least one task entry")
     val execId = tasks.head.execId
 
-    val res = quickRequest.get(uri"$baseUrl/api/tasks/exec?execId=$execId").send()
+    val res = quickRequest.get(uri"$baseUrl/api/tasks/exec/$execId/logs").send()
     assertEquals(res.code.code, 200)
     val exec = res.body.parseJson[ApiExecEntry]
     assertEquals(exec.execId, execId)
     assertEquals(exec.taskName, "compile")
   }
 
-  test("POST /api/tasks/run with valid task returns execId JSON") {
-    val res = quickRequest.post(uri"$baseUrl/api/tasks/run?taskName=compile").send()
+  test("POST /api/tasks/exec with valid task returns execId JSON") {
+    val res = quickRequest.post(uri"$baseUrl/api/tasks/exec?taskName=compile").send()
     assertEquals(res.code.code, 200)
     val result = res.body.parseJson[TaskRunResult]
     assert(result.execId.isDefined, s"should contain execId field, got: ${res.body}")
     assert(result.status.isDefined, s"should contain status field, got: ${res.body}")
   }
 
-  test("POST /api/tasks/run with unknown task returns error") {
-    val res = quickRequest.post(uri"$baseUrl/api/tasks/run?taskName=nonexistent19999").send()
+  test("POST /api/tasks/exec with unknown task returns error") {
+    val res = quickRequest.post(uri"$baseUrl/api/tasks/exec?taskName=nonexistent19999").send()
     assertEquals(res.code.code, 200)
     val result = res.body.parseJson[TaskRunResult]
     assert(result.error.isDefined, s"should contain error field, got: ${res.body}")

@@ -112,6 +112,13 @@ object TasksPage {
       case ExecStatus.PENDING  => "pico-color-yellow-400"
       case ExecStatus.CANCELLED => "pico-color-red-400"
 
+    val statusEmoji = e.status match
+      case ExecStatus.SUCCESS   => "✅"
+      case ExecStatus.FAILURE   => "❌"
+      case ExecStatus.RUNNING   => "🔄"
+      case ExecStatus.PENDING   => "⏳"
+      case ExecStatus.CANCELLED => "🚫"
+
     val cancelBtn = e.status match
       case ExecStatus.RUNNING | ExecStatus.PENDING =>
         html"""<button class="outline compact cancel-btn" hx-post="/tasks/cancel?execId=${e.execId}"
@@ -127,7 +134,7 @@ object TasksPage {
           <td>$startStr</td>
           <td>
             <mark class="$statusClass">
-              ${e.status.toString}
+              $statusEmoji ${e.status.toString}
             </mark>
             $cancelBtn
           </td>
