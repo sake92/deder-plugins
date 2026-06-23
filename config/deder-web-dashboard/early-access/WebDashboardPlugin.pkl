@@ -13,9 +13,12 @@ class WebDashboardPlugin extends P.DederPlugin {
 
 class WebDashboardPluginConfig {
   enabled: Boolean = true
-  host: String = "localhost"
+  host: String = "127.0.0.1"
   port: Int = 9292
   statsRefreshIntervalMs: Int = 1000
+  tasksMaxConcurrent: Int = 3
+  tasksMaxHistory: Int = 200
+  tasksOutputLineLimit: Int = 500
 }
 
 config: WebDashboardPluginConfig = new {}
