@@ -41,6 +41,14 @@ Press `q` or `Ctrl+C` to quit.
 - **Current Requests** — tasks currently executing, with module IDs
 - **Recent History** — recently completed tasks with success/failure status and duration
 
-## Screenshot
+## Screenshots
 
-![TUI Dashboard](/images/deder-tui-dashboard/tui.png)
+<article>
+  <img src="/images/deder-tui-dashboard/modules.png" alt="Modules tab">
+  <footer>Modules tab — module ID, type, and dependency count</footer>
+</article>
+
+<article>
+  <img src="/images/deder-tui-dashboard/tasks_run.png" alt="Tasks run tab">
+  <footer>Tasks tab — trigger builds and view execution logs with log level filtering</footer>
+</article>

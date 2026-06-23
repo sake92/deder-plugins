@@ -4,7 +4,7 @@ import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
 
 class BuildInfoPlugin extends P.DederPlugin {
   id = "build-info"
-  version: String = "0.4.0"
+  version: String = "0.6.0"
   deps {
     "ba.sake::deder-build-info:\(version)"
   }

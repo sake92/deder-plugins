@@ -45,7 +45,37 @@ This plugin starts the dashboard server during plugin initialization and does no
 
 ## Screenshots
 
-![Modules list](/images/deder-web-dashboard/modules_list.png)
-![Modules graph](/images/deder-web-dashboard/modules_graph.png)
-![Server info](/images/deder-web-dashboard/server_info.png)
-![Live stats](/images/deder-web-dashboard/live_stats.png)
+<article>
+  <img src="/images/deder-web-dashboard/home.png" alt="Server info">
+  <footer>Server info — Deder version, uptime, JVM stats, and plugins</footer>
+</article>
+
+<article>
+  <img src="/images/deder-web-dashboard/modules_list.png" alt="Modules list">
+  <footer>Modules list — filterable table with type badges</footer>
+</article>
+
+<article>
+  <img src="/images/deder-web-dashboard/modules_graph.png" alt="Modules graph">
+  <footer>Module dependency graph with type coloring</footer>
+</article>
+
+<article>
+  <img src="/images/deder-web-dashboard/tasks_run.png" alt="Tasks run">
+  <footer>Tasks — trigger builds and view execution logs</footer>
+</article>
+
+<article>
+  <img src="/images/deder-web-dashboard/stats_live.png" alt="Live stats">
+  <footer>Live stats — queued, executing, and acquiring requests</footer>
+</article>
+
+<article>
+  <img src="/images/deder-web-dashboard/stats_history.png" alt="Stats history">
+  <footer>History — filterable, sortable build run history</footer>
+</article>
+
+<article>
+  <img src="/images/deder-web-dashboard/stats_aggregate.png" alt="Stats aggregate">
+  <footer>Aggregates — per-task stats, heaviest modules, error summary</footer>
+</article>
