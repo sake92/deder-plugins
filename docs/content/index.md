@@ -18,7 +18,12 @@ Add a plugin to your `deder.pkl` by importing its config, and adding it in the `
 import "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl" as WD
 
 plugins {
-  new WD.WebDashboardPlugin {}
+  new WD.WebDashboardPlugin {
+    // version = "1.2.3" // optionally override version
+    config { // most plugins have some config
+
+    }
+  }
 }
 ```
 
