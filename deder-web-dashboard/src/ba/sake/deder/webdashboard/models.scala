@@ -3,9 +3,10 @@ package ba.sake.deder.webdashboard
 import ba.sake.tupson.*
 import ba.sake.deder.RequestState
 
-
 case class ApiModule(id: String, `type`: String, deps: Int) derives JsonRW
+
 case class StatsOverview(totalRequestsServed: Long, totalErrors: Long, uptimeSecs: Long) derives JsonRW
+
 case class ApiCurrentRequest(
     requestId: String,
     caller: String,

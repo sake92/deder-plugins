@@ -83,6 +83,7 @@ class DashboardServerSuite extends FunSuite {
   val dashboardService = new DashboardService(stubInternals, stubTaskRegistry)
   val executionLog = TaskExecutionLog(config.tasksMaxHistory.toInt)
   val taskRunner = TaskRunner(
+    stubProject,
     stubTaskInvoker,
     stubInternals,
     executionLog,

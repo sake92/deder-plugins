@@ -19,12 +19,13 @@ class ApiRoutes(
       Response.withBody(executionLog.recent(200).map(toApi))
 
     case POST -> Path("api", "tasks", "run") =>
-      case class QP(taskName: String, moduleIds: Seq[String]) derives QueryStringRW
+      case class QP(taskName: String, moduleIds: Seq[String]) derives QueryStringRW{
+        def filteredModuleIds: Seq[String] = moduleIds.filterNot(_.isBlank())
+      }
       val qp = Request.current.queryParams[QP]
       val taskName = qp.taskName
-      val moduleIds = qp.moduleIds
       if taskName.nonEmpty then
-        val entry = taskRunner.trigger(taskName, moduleIds)
+        val entry = taskRunner.trigger(taskName, qp.filteredModuleIds)
         Response.withBody(
           TaskRunResult(
             execId = Some(entry.execId),

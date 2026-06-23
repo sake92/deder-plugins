@@ -14,7 +14,7 @@ private class DummyModule(id: String, mt: DederProject.ModuleType)
 @main def dummyServer(): Unit =
 
   val now = Instant.now()
-  val host = "0.0.0.0"
+  val host = "127.0.0.1"
   val port = 19980
 
   // --- modules: one of each type ---
@@ -97,7 +97,7 @@ private class DummyModule(id: String, mt: DederProject.ModuleType)
   val config = WebDashboardPluginConfig(true, host, port.toLong, 5000L, 3L, 200L, 500L)
   val dashboardService = new DashboardService(internals, taskRegistry)
   val executionLog = TaskExecutionLog(config.tasksMaxHistory.toInt)
-  val taskRunner = TaskRunner(taskInvoker, internals, executionLog, config.tasksMaxConcurrent.toInt, taskRegistry)
+  val taskRunner = TaskRunner(project, taskInvoker, internals, executionLog, config.tasksMaxConcurrent.toInt, taskRegistry)
   val apiRoutes = new ApiRoutes(dashboardService, project, internals, executionLog, taskRunner)
   val htmlRoutes = new HtmlRoutes(config, dashboardService, project, internals, executionLog, taskRunner)
   val server = DashboardServer(config, apiRoutes, htmlRoutes)

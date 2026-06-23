@@ -33,6 +33,7 @@ class WebDashboardPluginImpl extends DederPluginApi {
         val dashboardService = new DashboardService(params.internals, params.taskRegistry)
         val executionLog = TaskExecutionLog(config.tasksMaxHistory.toInt)
         val taskRunner = TaskRunner(
+          params.project,
           params.taskInvoker,
           params.internals,
           executionLog,

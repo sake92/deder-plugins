@@ -3,10 +3,13 @@ package ba.sake.deder.webdashboard.server
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.{Executors, Semaphore}
+import scala.jdk.CollectionConverters.*
 import ba.sake.deder.*
 import ba.sake.deder.ServerNotification.LogLevel
+import ba.sake.deder.config.DederProject
 
 class TaskRunner(
+  project: DederProject,
     taskInvoker: TaskInvokerApi,
     internals: DederProjectInternals,
     log: TaskExecutionLog,
@@ -22,22 +25,27 @@ class TaskRunner(
   def trigger(taskName: String, moduleIds: Seq[String]): ExecEntry =
     val allTasks = taskRegistry.allTasks
     val knownTasks = allTasks.map(t => t.name).toSet
+    val allModulesIds = project.modules.asScala.map(_.id).toSeq
+    val resolvedModuleIds = if moduleIds.isEmpty then allModulesIds else moduleIds
+    println(s"allModulesIds '$allModulesIds' ")
+    println(s"moduleIds  '$moduleIds' ${moduleIds.length} ")
+    println(s"Triggering task '$taskName' for modules: ${resolvedModuleIds.mkString(", ")}")
 
     val validationError: Option[String] =
       if !knownTasks.contains(taskName) then
         Some(s"Task '$taskName' not found. Available: ${knownTasks.toSeq.sorted.mkString(", ")}")
-      else if allTasks.exists(t => t.name == taskName && t.singleton) && moduleIds.lengthIs != 1 then
-        val hint = if moduleIds.isEmpty then "pick a single module" else "pick only 1 module"
+      else if allTasks.exists(t => t.name == taskName && t.singleton) && resolvedModuleIds.lengthIs != 1 then
+        val hint = if resolvedModuleIds.isEmpty then "pick a single module" else "pick only 1 module"
         Some(s"Task '$taskName' is singleton — $hint")
       else None
 
     validationError match
       case Some(msg) =>
-        val entry = failEntry(taskName, moduleIds, msg)
+        val entry = failEntry(taskName, resolvedModuleIds, msg)
         log.add(entry)
         entry
       case None =>
-        submitTask(taskName, moduleIds)
+        submitTask(taskName, resolvedModuleIds)
 
   private def failEntry(taskName: String, moduleIds: Seq[String], msg: String): ExecEntry =
     ExecEntry(
@@ -86,6 +94,7 @@ class TaskRunner(
             val line = formatNotification(notif)
             if line.nonEmpty then
               outputLock.synchronized {
+                println(s"appending [$taskName] $line")
                 output.append(line).append('\n')
               }
             if idHolder.get() == null then
@@ -101,6 +110,7 @@ class TaskRunner(
           ExecModuleOutcome(o.moduleId, o.success, o.error, o.fromCache)
         )
         val success = result.outcomes.forall(_.success)
+        println("Got output:\n" + output.toString())
         log.update(execId)(_.copy(
           status = if success then ExecStatus.SUCCESS else ExecStatus.FAILURE,
           endTime = Some(Instant.now()),

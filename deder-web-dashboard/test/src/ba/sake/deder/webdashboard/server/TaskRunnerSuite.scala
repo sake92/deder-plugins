@@ -1,13 +1,27 @@
 package ba.sake.deder.webdashboard.server
 
 import java.time.Instant
+import scala.jdk.CollectionConverters.*
+import munit.FunSuite
 import ba.sake.deder.*
 import ba.sake.deder.ServerNotification.LogLevel
-import munit.FunSuite
+import ba.sake.deder.config.DederProject
 
 class TaskRunnerSuite extends FunSuite {
 
   private def now: Instant = Instant.now()
+
+  val project = new DederProject(
+    Seq().asJava,
+    java.util.List.of(), // plugins
+    java.util.List.of(), // repositories
+    true,                // includeDefaultRepos
+    java.util.List.of(), // watchIgnore
+    true,                // bspEnabled
+    1L,                  // maxActiveCompilers
+    1L,                  // maxConcurrentTestForks
+    java.util.Map.of(),  // tools
+  )
 
   private def stubTaskInvoker(succeed: Boolean, outcomeModuleIds: Seq[String] = Seq("mod1")): TaskInvokerApi =
     new TaskInvokerApi {
@@ -55,7 +69,7 @@ class TaskRunnerSuite extends FunSuite {
     val internals = stubInternals(Seq("compile"))
     val taskInvoker = stubTaskInvoker(succeed = true)
     val taskRegistry = stubTaskRegistry(Seq("compile"))
-    val runner = TaskRunner(taskInvoker, internals, log, maxConcurrent = 3, taskRegistry)
+    val runner = TaskRunner(project, taskInvoker, internals, log, maxConcurrent = 3, taskRegistry)
 
     val entry = runner.trigger("compile", Seq.empty)
     assertEquals(entry.status, ExecStatus.PENDING)
@@ -76,7 +90,7 @@ class TaskRunnerSuite extends FunSuite {
     val internals = stubInternals(Seq("test"))
     val taskInvoker = stubTaskInvoker(succeed = false)
     val taskRegistry = stubTaskRegistry(Seq("test"))
-    val runner = TaskRunner(taskInvoker, internals, log, maxConcurrent = 3, taskRegistry)
+    val runner = TaskRunner(project, taskInvoker, internals, log, maxConcurrent = 3, taskRegistry)
 
     runner.trigger("test", Seq.empty)
     Thread.sleep(500)
@@ -91,7 +105,7 @@ class TaskRunnerSuite extends FunSuite {
     val internals = stubInternals(Seq("compile"))
     val taskInvoker = stubTaskInvoker(succeed = true)
     val taskRegistry2 = stubTaskRegistry(Seq("compile"))
-    val runner = TaskRunner(taskInvoker, internals, log, maxConcurrent = 3, taskRegistry2)
+    val runner = TaskRunner(project, taskInvoker, internals, log, maxConcurrent = 3, taskRegistry2)
 
     val entry = runner.trigger("nonexistent", Seq.empty)
     assertEquals(entry.status, ExecStatus.FAILURE)
@@ -113,7 +127,7 @@ class TaskRunnerSuite extends FunSuite {
       }
     }
     val taskRegistry3 = stubTaskRegistry(Seq("compile"))
-    val runner = TaskRunner(blockingInvoker, internals, log, maxConcurrent = 2, taskRegistry3)
+    val runner = TaskRunner(project, blockingInvoker, internals, log, maxConcurrent = 2, taskRegistry3)
 
     runner.trigger("compile", Seq.empty)
     runner.trigger("compile", Seq.empty)
@@ -143,7 +157,7 @@ class TaskRunnerSuite extends FunSuite {
       }
     }
     val taskRegistry4 = stubTaskRegistry(Seq("compile"))
-    val runner = TaskRunner(loggingInvoker, internals, log, maxConcurrent = 3, taskRegistry4)
+    val runner = TaskRunner(project, loggingInvoker, internals, log, maxConcurrent = 3, taskRegistry4)
     runner.trigger("compile", Seq.empty)
     Thread.sleep(500)
 

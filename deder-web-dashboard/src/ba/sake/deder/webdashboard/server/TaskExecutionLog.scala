@@ -37,7 +37,7 @@ class TaskExecutionLog(maxEntries: Int):
   def add(entry: ExecEntry): Unit = lock.synchronized {
     entries.add(entry)
     // remove oldest entries if we exceed maxEntries
-    while entries.size() > maxEntries do entries.poll()
+    while entries.size() > maxEntries do entries.remove()
   }
 
   def get(execId: String): Option[ExecEntry] =

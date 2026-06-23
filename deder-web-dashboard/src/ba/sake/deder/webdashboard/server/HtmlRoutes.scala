@@ -240,15 +240,15 @@ class HtmlRoutes(
       Response.withBody(Layout.htmlPage("Tasks - Deder Dashboard", "tasks", content, projectRoot))
 
     case GET -> Path("tasks", "run") =>
-      case class QP(taskName: String, moduleIds: Seq[String]) derives QueryStringRW
+      case class QP(taskName: String, moduleIds: Seq[String]) derives QueryStringRW {
+        def filteredModuleIds: Seq[String] = moduleIds.filterNot(_.isBlank())
+      }
       val qp = Request.current.queryParams[QP]
       val taskName = qp.taskName
-      val moduleIdsRaw = qp.moduleIds
       if taskName.isEmpty then
         Response.withBody(html"""<tr><td colspan="7" class="failure">Task name is required</td></tr>""")
       else
-        val moduleIds = qp.moduleIds
-        taskRunner.trigger(taskName, moduleIds)
+        taskRunner.trigger(taskName, qp.filteredModuleIds)
         val table = TasksPage.logTable(executionLog)
         Response.withBody(table)
 
