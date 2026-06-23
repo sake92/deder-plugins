@@ -25,11 +25,15 @@ class ApiRoutes(
       val moduleIds = qp.moduleIds
       if taskName.nonEmpty then
         val entry = taskRunner.trigger(taskName, moduleIds)
-        val status = entry.status.toString
-        val err = entry.error.map(e => Map("error" -> e)).getOrElse(Map.empty)
-        val res = Map("execId" -> entry.execId, "status" -> status, "taskName" -> entry.taskName) ++ err
-        Response.withBody(res)
-      else Response.withBody(Map("error" -> "taskName is required"))
+        Response.withBody(
+          TaskRunResult(
+            execId = Some(entry.execId),
+            status = Some(entry.status.toString),
+            taskName = Some(entry.taskName),
+            error = entry.error
+          )
+        )
+      else Response.withBody(TaskRunResult(error = Some("taskName is required")))
 
     case GET -> Path("api", "tasks", "exec") =>
       case class QP(execId: String = "") derives QueryStringRW
@@ -61,7 +65,7 @@ class ApiRoutes(
       val qp = Request.current.queryParams[QP]
       val requestId = qp.requestId
       val cancelled = if requestId.nonEmpty then internals.cancelRequest(requestId) else false
-      Response.withBody(Map("cancelled" -> cancelled))
+      Response.withBody(CancelResult(cancelled))
 
     case GET -> Path("api", "stats", "history") =>
       val entries = internals.recentHistory.map { r =>

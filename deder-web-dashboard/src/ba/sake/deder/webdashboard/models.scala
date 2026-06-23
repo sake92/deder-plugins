@@ -121,3 +121,12 @@ case class ApiExecEntry(
     output: String,
     error: Option[String]
 ) derives JsonRW
+
+case class CancelResult(cancelled: Boolean) derives JsonRW
+
+case class TaskRunResult(
+    execId: Option[String] = None,
+    status: Option[String] = None,
+    taskName: Option[String] = None,
+    error: Option[String] = None
+) derives JsonRW
