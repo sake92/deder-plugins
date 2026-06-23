@@ -87,8 +87,9 @@ object ModulesGraphPage {
             <label><input type="checkbox" x-model="showScalaNative" @change="applyFilters()"> <img src="${scalaNativeIcon}" class="legend-icon"> Scala Native</label>
             <label><input type="checkbox" x-model="showJava" @change="applyFilters()"> <img src="${javaIcon}" class="legend-icon"> Java</label>
             <label><input type="checkbox" x-model="showTest" @change="applyFilters()"> <span class="legend-icon-test"></span> Test</label>
+            <button type="button" class="outline secondary" @click="reset()">🔄 Reset</button>
+            <button type="button" class="outline secondary" @click="window.__cy.fit(); window.__cy.center()">🔍 Fit</button>
             <input type="search" @input="search($$el.value)" placeholder="Search module..." class="graph-search" aria-label="Search graph">
-            <button type="button" class="outline secondary" @click="reset()">Reset</button>
           </div>
           <div id="cy"></div>
 
