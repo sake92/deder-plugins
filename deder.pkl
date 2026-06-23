@@ -1,7 +1,7 @@
-amends "https://sake92.github.io/deder/config/v0.19.5/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
 
 local const scalaVer = "3.7.4"
-local const pluginApiVersion = "0.19.6-SNAPSHOT"
+local const pluginApiVersion = "0.20.0"
 
 local const function pom(artId: String, artName: String, artDesc: String): PomSettings = new {
   groupId = "ba.sake"

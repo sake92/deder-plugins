@@ -4,7 +4,7 @@ package ba.sake.deder.webdashboard.pages
 import play.twirl.api.HtmlFormat
 import ba.sake.sharaf.*, ba.sake.sharaf.{given, *}
 import ba.sake.deder.config.DederProject
-import ba.sake.deder.config.DederProject.{DederModule, JavaModule, JavaTestModule, ScalaModule, ScalaTestModule, ScalaJsModule, ScalaJsTestModule, ScalaNativeModule, ScalaNativeTestModule}
+import ba.sake.deder.config.DederProject.{DederModule}
 import scala.jdk.CollectionConverters.*
 
 object ModulesGraphPage {
@@ -174,16 +174,12 @@ object ModulesGraphPage {
 
   private def buildGraphJson(modules: Seq[DederModule]): String = {
     val nodes = modules.map { m =>
-      val (typ, iconPath) = m match
-        case _: ScalaTestModule         => ("SCALA_TEST", scalaIcon)
-        case _: ScalaJsTestModule       => ("SCALA_JS_TEST", scalaJsIcon)
-        case _: ScalaNativeTestModule   => ("SCALA_NATIVE_TEST", scalaNativeIcon)
-        case _: JavaTestModule          => ("JAVA_TEST", javaIcon)
-        case _: ScalaJsModule           => ("SCALA_JS", scalaJsIcon)
-        case _: ScalaNativeModule       => ("SCALA_NATIVE", scalaNativeIcon)
-        case _: ScalaModule             => ("SCALA", scalaIcon)
-        case _: JavaModule              => ("JAVA", javaIcon)
-        case _                          => ("UNKNOWN", "")
+      val typ = if m.`type` == null then "UNKNOWN" else m.`type`.name()
+      val iconPath = typ match
+        case s if s.startsWith("SCALA_JS")     => scalaJsIcon
+        case s if s.startsWith("SCALA_NATIVE") => scalaNativeIcon
+        case s if s.startsWith("SCALA")        => scalaIcon
+        case _                                 => javaIcon
       s"""{ "data": { "id": "${esc(m.id)}", "type": "$typ", "label": "${esc(m.id)}", "icon": "$iconPath" } }"""
     }
 
@@ -195,7 +191,7 @@ object ModulesGraphPage {
     }
 
     val elements = if edges.nonEmpty then nodes.mkString(",") + "," + edges.mkString(",") else nodes.mkString(",")
-    s"""[$elements] """
+    s"""[ $elements ]"""
   }
 
   private def esc(s: String): String = s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")

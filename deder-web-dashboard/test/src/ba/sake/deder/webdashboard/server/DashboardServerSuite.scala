@@ -7,6 +7,7 @@ import ba.sake.deder.plugins.WebDashboard.WebDashboardPluginConfig
 import ba.sake.tupson.*
 import sttp.client4.quick.*
 import ba.sake.deder.webdashboard.*
+import ba.sake.deder.webdashboard.server.stubs.*
 import munit.FunSuite
 
 class DashboardServerSuite extends FunSuite {
@@ -17,33 +18,25 @@ class DashboardServerSuite extends FunSuite {
 
   private def now: Instant = Instant.now()
 
-  private def stubInternals: DederProjectInternals = new DederProjectInternals {
-    def currentRequests: Seq[LiveRequest] =
-      Seq(LiveRequest("req-001", CallerType.Cli, "compile", Seq("my-module"), now))
-    def recentHistory: Seq[CompletedRequest] =
-      Seq(
-        CompletedRequest("req-000", CallerType.Cli, "compile", Seq("my-module"), now.minusSeconds(10), Duration.ofSeconds(5), true, None),
-        CompletedRequest("req-001", CallerType.Bsp, "test", Seq("core-test"), now.minusSeconds(20), Duration.ofSeconds(12), false, Some("test failed")),
-        CompletedRequest("req-002", CallerType.Cli, "compile", Seq("core"), now.minusSeconds(30), Duration.ofSeconds(2), true, None),
-        CompletedRequest("req-003", CallerType.Cli, "compile", Seq("api"), now.minusSeconds(40), Duration.ofMillis(800), true, None),
-        CompletedRequest("req-004", CallerType.Bsp, "compile", Seq("core", "api"), now.minusSeconds(50), Duration.ofSeconds(45), true, None),
-        CompletedRequest("req-005", CallerType.Cli, "test", Seq("core-test"), now.minusSeconds(60), Duration.ofSeconds(1), false, Some("assertion error")),
-      )
-    def taskStats(taskName: String): Option[TaskStats] = None
-    def allTaskStats: Seq[(String, TaskStats)] = Seq.empty
-    def totalRequestsServed: Long = 100L
-    def totalErrors: Long = 5L
-    def serverUptime: Duration = Duration.ofSeconds(8130L)
-    def workerThreadPoolSize: Int = 10
-    def inMemoryCachesStats: Map[String, InMemCacheStats] = Map.empty
-    def loadedPlugins: Seq[LoadedPluginInfo] = Seq(
+  private lazy val stubInternals: DederProjectInternals = StubInternals(
+    currentRequests = Seq(LiveRequest("req-001", CallerType.Cli, "compile", Seq("my-module"), now)),
+    recentHistory = Seq(
+      CompletedRequest("req-000", CallerType.Cli, "compile", Seq("my-module"), now.minusSeconds(10), Duration.ofSeconds(5), true, None),
+      CompletedRequest("req-001", CallerType.Bsp, "test", Seq("core-test"), now.minusSeconds(20), Duration.ofSeconds(12), false, Some("test failed")),
+      CompletedRequest("req-002", CallerType.Cli, "compile", Seq("core"), now.minusSeconds(30), Duration.ofSeconds(2), true, None),
+      CompletedRequest("req-003", CallerType.Cli, "compile", Seq("api"), now.minusSeconds(40), Duration.ofMillis(800), true, None),
+      CompletedRequest("req-004", CallerType.Bsp, "compile", Seq("core", "api"), now.minusSeconds(50), Duration.ofSeconds(45), true, None),
+      CompletedRequest("req-005", CallerType.Cli, "test", Seq("core-test"), now.minusSeconds(60), Duration.ofSeconds(1), false, Some("assertion error")),
+    ),
+    totalRequestsServed = 100L,
+    totalErrors = 5L,
+    serverUptime = Duration.ofSeconds(8130L),
+    loadedPlugins = Seq(
       LoadedPluginInfo("web-dashboard", Seq()),
       LoadedPluginInfo("core", Seq("compile", "test", "run", "jar", "publishLocal"))
-    )
-    def purgeInMemoryCaches(): PurgeCachesResult = PurgeCachesResult(0, 0, 0, false)
-    def cancelRequest(requestId: String): Boolean = requestId != "nonexistent"
-    def requestStatus(requestId: String): Option[RequestStatus] = None
-    def allRequestStatuses: Seq[RequestStatus] = Seq(
+    ),
+    cancelFn = _ != "nonexistent",
+    allRequestStatuses = Seq(
       RequestStatus("req-q1", CallerType.Cli, "compile", Seq("core"), now,
         RequestState.QUEUED, None, None),
       RequestStatus("req-l1", CallerType.Bsp, "test", Seq("core-test"), now.minusSeconds(5),
@@ -55,10 +48,10 @@ class DashboardServerSuite extends FunSuite {
         Some(TaskStageProgress(2, 5, Seq("a", "b"), Seq.empty, Seq.empty, Seq("c", "d"), Seq("e", "f", "g")))),
       RequestStatus("req-e2", CallerType.Bsp, "run", Seq("app"), now.minusSeconds(20),
         RequestState.EXECUTING, None, None)
-    )
-  }
+    ),
+  )
 
-  private def stubProject: DederProject =
+  private lazy val stubProject: DederProject =
     new DederProject(
       java.util.List.of(),
       java.util.List.of(),
@@ -73,29 +66,19 @@ class DashboardServerSuite extends FunSuite {
 
   private val config = WebDashboardPluginConfig(true, testHost, testPort.toLong, testRefreshMs.toLong, 3L, 200L, 500L)
 
-  private val stubTaskInvoker: TaskInvokerApi = new TaskInvokerApi {
-    def invoke(
-        taskName: String,
-        moduleIds: Seq[String],
-        args: Seq[String],
-        onNotification: ServerNotification => Unit
-    ): TaskInvokeResult = {
-      onNotification(ServerNotification.Output(s"Running $taskName..."))
-      val outcomes = moduleIds.map { m =>
-        TaskInvokeOutcome(m, success = true, None, fromCache = false)
-      }
-      TaskInvokeResult(outcomes, None, None)
+  private lazy val stubTaskInvoker: TaskInvokerApi = StubTaskInvoker { (taskName, moduleIds, _, onNotification) =>
+    onNotification(ServerNotification.Output(s"Running $taskName..."))
+    val outcomes = moduleIds.map { m =>
+      TaskInvokeOutcome(m, success = true, None, fromCache = false)
     }
+    TaskInvokeResult(outcomes, None, None)
   }
 
-  private val stubTaskRegistry: TasksRegistryApi = new TasksRegistryApi {
-    def allTasks: Seq[TaskInfo] = Seq(
-      TaskInfo("compile", "Compile Scala/Java sources", "Build", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
-      TaskInfo("test", "Run tests", "Test", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
-      TaskInfo("run", "Run main class", "Run", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
-    )
-    def tasksFor(moduleType: ba.sake.deder.config.DederProject.ModuleType): Seq[TaskInfo] = Seq.empty
-  }
+  private lazy val stubTaskRegistry: TasksRegistryApi = StubTaskRegistry(tasks = Seq(
+    TaskInfo("compile", "Compile Scala/Java sources", "Build", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
+    TaskInfo("test", "Run tests", "Test", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
+    TaskInfo("run", "Run main class", "Run", TaskKind.Standard, Seq.empty, false, false, false, Seq.empty),
+  ))
 
   val dashboardService = new DashboardService(stubInternals, stubTaskRegistry)
   val executionLog = TaskExecutionLog(config.tasksMaxHistory.toInt)
