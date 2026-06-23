@@ -35,8 +35,12 @@ object ModulesPage {
 
   private def buildRow(m: DederModule): Html = {
     val (typeLabel, typeClass) = m match
+      case _: ScalaJsTestModule => ("SCALAJS_TEST", "pico-color-jade-300")
+      case _: ScalaNativeTestModule => ("SCALANATIVE_TEST", "pico-color-lime-300")
       case _: ScalaTestModule => ("SCALA_TEST", "pico-color-pink-300")
       case _: JavaTestModule => ("JAVA_TEST", "pico-color-cyan-300")
+      case _: ScalaJsModule => ("SCALAJS", "pico-color-orange-400")
+      case _: ScalaNativeModule => ("SCALANATIVE", "pico-color-green-400")
       case _: ScalaModule => ("SCALA", "pico-color-red-400")
       case _: JavaModule => ("JAVA", "pico-color-blue-400")
       case _ => (if m.`type` != null then m.`type`.name().toLowerCase else "unknown", "")
