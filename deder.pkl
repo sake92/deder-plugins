@@ -132,9 +132,36 @@ local const tuiModules =
     }
   }.get
 
+local const sourcegenModules =
+  new CreateScalaModules {
+    root = "deder-sourcegen"
+    id = "deder-sourcegen"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "org.scala-lang::scala3-compiler:\(scalaVer)"
+      }
+      pomSettings =
+        pom(
+          "deder-sourcegen",
+          "Deder Sourcegen Plugin",
+          "Deder plugin for custom source code generation via user-written Scala scripts"
+        )
+      publish = true
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
   ...dashboardModules.all
   ...tuiModules.all
+  ...sourcegenModules.all
 }
