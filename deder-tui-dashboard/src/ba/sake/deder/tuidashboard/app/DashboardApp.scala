@@ -97,45 +97,63 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
 
   def update(msg: Msg, state: DashboardState): (DashboardState, Cmd[Msg]) = msg match {
     case ModulesResp(Right(json)) =>
-      safely(state)(_.copy(modules = json.parseJson[Seq[ApiModule]], lastError = None))
+      safely(state)(_.copy(modules = json.parseJson[Seq[ApiModule]], lastError = None,
+        spinnerFrame = (state.spinnerFrame + 1) % 100))
     case ModulesResp(Left(err)) =>
       state.copy(lastError = Some(s"modules: $err"))
 
     case OverviewResp(Right(json)) =>
-      safely(state)(_.copy(overview = Some(json.parseJson[StatsOverview]), lastError = None))
+      safely(state) { s =>
+        val ov = json.parseJson[StatsOverview]
+        val delta = if s.lastRequestCount > 0 then ov.totalRequestsServed - s.lastRequestCount else 0L
+        val newHistory = (s.requestCountHistory :+ delta).takeRight(60)
+        s.copy(
+          overview = Some(ov),
+          lastError = None,
+          requestCountHistory = newHistory,
+          lastRequestCount = ov.totalRequestsServed,
+          spinnerFrame = (s.spinnerFrame + 1) % 100
+        )
+      }
     case OverviewResp(Left(err)) =>
       state.copy(lastError = Some(s"overview: $err"))
 
     case CurrentResp(Right(json)) =>
-      safely(state)(_.copy(currentRequests = json.parseJson[Seq[ApiRequestStatus]], lastError = None))
+      safely(state)(_.copy(currentRequests = json.parseJson[Seq[ApiRequestStatus]], lastError = None,
+        spinnerFrame = (state.spinnerFrame + 1) % 100))
     case CurrentResp(Left(err)) =>
       state.copy(lastError = Some(s"current: $err"))
 
     case HistoryResp(Right(json)) =>
-      safely(state)(_.copy(history = json.parseJson[Seq[ApiHistoryEntry]], lastError = None))
+      safely(state)(_.copy(history = json.parseJson[Seq[ApiHistoryEntry]], lastError = None,
+        spinnerFrame = (state.spinnerFrame + 1) % 100))
     case HistoryResp(Left(err)) =>
       state.copy(lastError = Some(s"history: $err"))
 
     case TaskStatsResp(Right(json)) =>
       safely(state)(_.copy(
         taskStats = json.parseJson[Seq[ApiTaskAggregate]].sortBy(-_.totalTimeMs),
-        lastError = None
+        lastError = None,
+        spinnerFrame = (state.spinnerFrame + 1) % 100
       ))
     case TaskStatsResp(Left(err)) =>
       state.copy(lastError = Some(s"task stats: $err"))
 
     case ErrorsResp(Right(json)) =>
-      safely(state)(_.copy(errors = json.parseJson[Seq[ApiErrorSummaryEntry]], lastError = None))
+      safely(state)(_.copy(errors = json.parseJson[Seq[ApiErrorSummaryEntry]], lastError = None,
+        spinnerFrame = (state.spinnerFrame + 1) % 100))
     case ErrorsResp(Left(err)) =>
       state.copy(lastError = Some(s"errors: $err"))
 
     case ServerInfoResp(Right(json)) =>
-      safely(state)(_.copy(serverInfo = Some(json.parseJson[ApiServerInfo]), lastError = None))
+      safely(state)(_.copy(serverInfo = Some(json.parseJson[ApiServerInfo]), lastError = None,
+        spinnerFrame = (state.spinnerFrame + 1) % 100))
     case ServerInfoResp(Left(err)) =>
       state.copy(lastError = Some(s"server info: $err"))
 
     case ChangeTab(tab) =>
-      (state.copy(activeTab = tab, lastError = None), Cmd.none)
+      (state.copy(activeTab = tab, lastError = None,
+        spinnerFrame = (state.spinnerFrame + 1) % 100), Cmd.none)
 
     case ToggleSort =>
       val next = state.historySort match
@@ -201,7 +219,8 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       else (state.copy(lastError = Some("No task selected")), Cmd.none)
 
     case TaskExecsResp(Right(json)) =>
-      safely(state)(_.copy(taskExecutions = json.parseJson[Seq[ApiExecEntry]], lastError = None))
+      safely(state)(_.copy(taskExecutions = json.parseJson[Seq[ApiExecEntry]], lastError = None,
+        spinnerFrame = (state.spinnerFrame + 1) % 100))
     case TaskExecsResp(Left(err)) =>
       state.copy(lastError = Some(s"task execs: $err"))
 
@@ -209,10 +228,10 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       safely(state) { s =>
         val result = json.parseJson[TaskRunResult]
         val err = result.error.map(e => s"Task error: $e")
-        s.copy(lastError = err)
+        s.copy(lastError = err, spinnerFrame = (s.spinnerFrame + 1) % 100)
       }
     case RunTaskResp(Left(err)) =>
-      state.copy(lastError = Some(s"run task: $err"))
+      state.copy(lastError = Some(s"run task: $err"), spinnerFrame = (state.spinnerFrame + 1) % 100)
 
     case CancelExec(execId) =>
       val url = s"${state.serverUrl}/api/tasks/cancel?execId=$execId"
@@ -224,19 +243,23 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
 
     case ModuleUp =>
       val newIdx = if state.modules.isEmpty then 0 else Math.max(0, state.selectedModuleIdx - 1)
-      (state.copy(selectedModuleIdx = newIdx), Cmd.none)
+      val newOff = clampOffset(newIdx, state.taskModulesScrollOffset, state.modules.size, state.taskModulesVisibleHeight)
+      (state.copy(selectedModuleIdx = newIdx, taskModulesScrollOffset = newOff), Cmd.none)
 
     case ModuleDown =>
       val newIdx = if state.modules.isEmpty then 0 else Math.min(state.modules.size - 1, state.selectedModuleIdx + 1)
-      (state.copy(selectedModuleIdx = newIdx), Cmd.none)
+      val newOff = clampOffset(newIdx, state.taskModulesScrollOffset, state.modules.size, state.taskModulesVisibleHeight)
+      (state.copy(selectedModuleIdx = newIdx, taskModulesScrollOffset = newOff), Cmd.none)
 
     case ExecUp =>
       val newIdx = if state.taskExecutions.isEmpty then 0 else Math.max(0, state.selectedExecIdx - 1)
-      (state.copy(selectedExecIdx = newIdx), Cmd.none)
+      val newOff = clampOffset(newIdx, state.execsScrollOffset, state.taskExecutions.size, state.execsVisibleHeight)
+      (state.copy(selectedExecIdx = newIdx, execsScrollOffset = newOff), Cmd.none)
 
     case ExecDown =>
       val newIdx = if state.taskExecutions.isEmpty then 0 else Math.min(state.taskExecutions.size - 1, state.selectedExecIdx + 1)
-      (state.copy(selectedExecIdx = newIdx), Cmd.none)
+      val newOff = clampOffset(newIdx, state.execsScrollOffset, state.taskExecutions.size, state.execsVisibleHeight)
+      (state.copy(selectedExecIdx = newIdx, execsScrollOffset = newOff), Cmd.none)
 
     case ToggleCurrentModule =>
       state.modules.lift(state.selectedModuleIdx) match
@@ -260,11 +283,20 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     case CursorEnd =>
       (state.copy(cursorPos = state.taskInput.length), Cmd.none)
 
-    case PageUp           => (state, Cmd.none)
-    case PageDown         => (state, Cmd.none)
-    case Home             => (state, Cmd.none)
-    case End              => (state, Cmd.none)
-    case ToggleChartView  => (state, Cmd.none)
+    case PageUp =>
+      pageState(state, -1)
+
+    case PageDown =>
+      pageState(state, 1)
+
+    case Home =>
+      homeEndState(state, 0)
+
+    case End =>
+      homeEndState(state, Int.MaxValue)
+
+    case ToggleChartView =>
+      (state.copy(chartViewActive = !state.chartViewActive), Cmd.none)
   }
 
   private def taskCharOr(state: DashboardState, c: Char, otherwise: Msg): Option[Msg] =
@@ -277,6 +309,41 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
 
   private def truncPad(s: String, n: Int): String =
     if s.length > n then s.take(n - 1) + "…" else s.padTo(n, ' ')
+
+  private def contextOffsets(state: DashboardState): (Int, Int, Int) =
+    state.activeTab match
+      case Tab.Modules    => (state.modulesScrollOffset, state.modulesVisibleHeight, state.modules.size)
+      case Tab.Tasks      => state.focus match
+        case FocusField.ModuleList => (state.taskModulesScrollOffset, state.taskModulesVisibleHeight, state.modules.size)
+        case FocusField.ExecLog    => (state.execsScrollOffset, state.execsVisibleHeight, state.taskExecutions.size)
+        case _                     => (0, 0, 0)
+      case Tab.History    => (state.historyScrollOffset, state.historyVisibleHeight, state.history.size)
+      case Tab.Live       => (state.liveRequestsScrollOffset, state.liveRequestsVisibleHeight, state.currentRequests.size)
+      case Tab.Aggregates => (0, state.taskStats.size, state.taskStats.size)
+      case _              => (0, 0, 0)
+
+  private def withScrollOffset(state: DashboardState, newOffset: Int): DashboardState =
+    state.activeTab match
+      case Tab.Modules    => state.copy(modulesScrollOffset = newOffset)
+      case Tab.Tasks      => state.focus match
+        case FocusField.ModuleList => state.copy(taskModulesScrollOffset = newOffset)
+        case FocusField.ExecLog    => state.copy(execsScrollOffset = newOffset)
+        case _                     => state
+      case Tab.History    => state.copy(historyScrollOffset = newOffset)
+      case Tab.Live       => state.copy(liveRequestsScrollOffset = newOffset)
+      case _              => state
+
+  private def pageState(state: DashboardState, direction: Int): (DashboardState, Cmd[Msg]) = {
+    val (offset, height, total) = contextOffsets(state)
+    val newOff = math.max(0, math.min(total - height, offset + direction * height))
+    (withScrollOffset(state, newOff), Cmd.none)
+  }
+
+  private def homeEndState(state: DashboardState, target: Int): (DashboardState, Cmd[Msg]) = {
+    val (_, height, total) = contextOffsets(state)
+    val newOff = math.max(0, math.min(target, total - height))
+    (withScrollOffset(state, newOff), Cmd.none)
+  }
 
   def subscriptions(state: DashboardState): Sub[Msg] = Sub.batch(
     Sub.http.pollMs(s"${state.serverUrl}/api/modules", pollMs, ModulesResp.apply),
