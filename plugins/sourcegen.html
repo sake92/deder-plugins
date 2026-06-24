@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Sourcegen plugin tasks and schema">
+  <title> Sourcegen | Deder Plugins </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/deder-plugins/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/deder-plugins/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/deder-plugins/">Home</a></li>
+    </ul>
+    <ul></ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#sourcegen">Sourcegen</a>
+         <ul>
+          <li><a href="#script-api">Script API</a>
+           <ul>
+            <li><a href="#config-json-shape">Config JSON shape</a></li>
+           </ul></li>
+          <li><a href="#schema">Schema</a></li>
+          <li><a href="#tasks">Tasks</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="sourcegen">Sourcegen<a href="#sourcegen" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>Generates source code before module compilation using user-written Scala scripts.</p>
+   <p>Place scripts in <code>&lt;module-root&gt;/deder/sourcegen/</code> with a <code>@main</code> entry point. Scripts are compiled and executed independently — they don't require the module to compile first.</p>
+   <p>Add it to your plugins list:</p>
+   <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/deder-sourcegen/early-access/SourcegenPlugin.pkl" as SG
+
+plugins {
+  new SG.SourcegenPlugin {
+    config = new {
+      defaults = new {
+        deps {
+          "com.lihaoyi::upickle:4.1.0"
+          "com.lihaoyi::os-lib:0.11.3"
+        }
+        extra {
+          ["package"] = "com.example.generated"
+        }
+      }
+    }
+  }
+}
+</code></pre>
+   <p>Here are the defaults if you need to tweak them:</p>
+   <pre><code class="language-pkl">plugins {
+  new SG.SourcegenPlugin {
+    config = new {
+      defaults = new {
+        enabled = true
+        deps = new {}
+        scriptsDir = "deder/sourcegen"
+        scalaVersion = null
+        outputSourceSet = "main"
+        extra = new Mapping {}
+      }
+      modules = new Mapping {}
+    }
+  }
+}
+</code></pre>
+   <h2 id="script-api">Script API<a href="#script-api" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Each script is a <code>.scala</code> file with a <code>@main</code> entry point. The plugin writes a JSON config file and passes its path as the only argument:</p>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">// core/deder/sourcegen/GenerateCodecs.scala</span>
+<span class="hljs-meta">@main</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">generate</span></span>(configPath: <span class="hljs-type">String</span>): <span class="hljs-type">Unit</span> =
+  <span class="hljs-keyword">val</span> config = ujson.read(os.read(os.<span class="hljs-type">Path</span>(configPath)))
+  <span class="hljs-keyword">val</span> outDir = os.<span class="hljs-type">Path</span>(config(<span class="hljs-string">"outDir"</span>).str)
+  <span class="hljs-keyword">val</span> pkg = config(<span class="hljs-string">"config"</span>)(<span class="hljs-string">"package"</span>).str
+
+  <span class="hljs-keyword">val</span> source =
+    <span class="hljs-string">s""</span><span class="hljs-string">"package $pkg
+       |
+       |case class GeneratedMessage(text: String)
+       |"</span><span class="hljs-string">""</span>.stripMargin
+
+  os.write(outDir / <span class="hljs-string">"GeneratedMessage.scala"</span>, source)
+</code></pre>
+   <h3 id="config-json-shape">Config JSON shape<a href="#config-json-shape" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+   <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"outDir"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/target/deder/sourcegen/main"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"module"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"id"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"core"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"root"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/home/user/project/core"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"scalaVersion"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"3.7.4"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"moduleType"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"scala"</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"config"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"package"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"com.example.generated"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+   <p>The <code>config</code> object mirrors the user's <code>extra</code> mapping from the Pkl config.</p>
+   <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <ul>
+    <li><a href="../config/deder-sourcegen/early-access/SourcegenPlugin.pkl">early-access</a></li>
+   </ul>
+   <h2 id="tasks">Tasks<a href="#tasks" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <ul>
+    <li><code>sourcegenDiscoverScripts</code> — discovers <code>.scala</code> files in the scripts directory</li>
+    <li><code>sourcegenGenerate</code> (source generator) — compiles and runs scripts, writes generated sources</li>
+   </ul>
+  </main>
+  <footer class="pico container">Deder Plugins | Official Deder Build Tool Plugins</footer>
+ </body>
+</html>
