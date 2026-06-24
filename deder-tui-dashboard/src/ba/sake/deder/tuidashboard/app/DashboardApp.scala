@@ -566,13 +566,20 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
 
     box(s"Execution: ${e.taskName} ($modulesStr)")(
       layout(
-        Text(s"Status: $statusEmoji ${e.status}").color(statusColor),
+        if e.status == "RUNNING" then
+          rowTight(
+            spinner(e.taskName, state.spinnerFrame, SpinnerStyle.Dots).color(Color.Blue),
+            Text(s" ${e.status}").color(Color.Blue)
+          )
+        else
+          Text(s"Status: $statusEmoji ${e.status}").color(statusColor),
         Text(s"Exec ID: ${e.execId}").color(Color.BrightBlack),
         outputSection,
         summarySection,
         errorSection,
         Text("─" * 40).color(Color.BrightBlack),
-        cancelHint
+        cancelHint,
+        if e.status == "RUNNING" then Text("  (output refreshes every second)").color(Color.BrightBlack) else empty
       )
     ).border(Border.Round)
   }
@@ -813,32 +820,60 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
   // --- Tab 4: Aggregates ---
 
   private def aggregatesView(state: DashboardState): Element = {
-    val taskStatsTable = if state.taskStats.isEmpty then "(no data)".color(Color.BrightBlack)
-    else {
-      val rows = state.taskStats.map { s =>
-        Seq(Text(s.taskName), Text(s.invocations.toString), Text(s.errors.toString),
-          Text(s.avgTimeMs.toString + "ms"), Text(s.maxTimeMs.toString + "ms"), Text(s.longestModuleId))
-      }
-      table(
-        headers = Seq("Task Name", "Invocations", "Errors", "Avg", "Max", "Longest Module"),
-        rows = rows
-      ).border(Border.Round)
-    }
+    val toggleHint = Text(s"Press 'v' to view ${if state.chartViewActive then "table" else "charts"}").color(Color.BrightBlack)
 
-    val errorTable = if state.errors.isEmpty then empty
-    else {
-      val rows = state.errors.map { e =>
-        Seq(Text(e.taskName), Text(e.moduleIds.mkString(", ")), Text(e.errorCount.toString))
-      }
-      box("Errors")(
-        table(
-          headers = Seq("Task Name", "Module IDs", "Error Count"),
-          rows = rows
+    val mainContent = if state.chartViewActive then
+      // --- Chart view ---
+      val barChart: Element = if state.taskStats.nonEmpty then
+        box("Avg Task Time (ms)")(
+          bar(width = 50, height = 10)(
+            state.taskStats.map(s => Bar(s.avgTimeMs.toInt, s.taskName).color(Color.Cyan))*
+          )
         ).border(Border.Round)
-      ).border(Border.Round).color(Color.Red)
-    }
+      else empty
 
-    layout(taskStatsTable, errorTable)
+      val pieChart: Element = if state.taskStats.nonEmpty then
+        val totalSuccess = state.taskStats.map(s => s.invocations - s.errors).sum
+        val totalErrors = state.taskStats.map(_.errors).sum
+        if totalSuccess + totalErrors > 0 then
+          box("Success vs Error")(
+            pie()(
+              Slice(totalSuccess.toDouble, "Success").color(Color.Green),
+              Slice(totalErrors.toDouble, "Errors").color(Color.Red)
+            )
+          ).border(Border.Round)
+        else empty
+      else empty
+
+      layout(barChart, pieChart)
+    else
+      // --- Table view ---
+      val taskStatsTable = if state.taskStats.isEmpty then "(no data)".color(Color.BrightBlack)
+      else ScrollView[ApiTaskAggregate](
+        items = state.taskStats,
+        selectedIndex = -1,
+        scrollOffset = 0,
+        visibleHeight = 12,
+        renderItem = (s, _, _) =>
+          Text(f"  ${s.taskName}%-15s  ${s.invocations}%4d  ${s.errors}%4d  ${s.avgTimeMs}%5dms  ${s.maxTimeMs}%5dms  ${s.longestModuleId}")
+      )
+
+      val errorTable = if state.errors.isEmpty then empty
+      else {
+        val rows = ScrollView[ApiErrorSummaryEntry](
+          items = state.errors,
+          selectedIndex = -1,
+          scrollOffset = 0,
+          visibleHeight = 5,
+          renderItem = (e, _, _) =>
+            Text(f"  ${e.taskName}%-15s  ${e.moduleIds.mkString(", ")}%-20s  ${e.errorCount}%4d")
+        )
+        box("Errors")(rows).border(Border.Round).color(Color.Red)
+      }
+
+      layout(taskStatsTable, errorTable)
+
+    layout(toggleHint, mainContent)
   }
 
   // --- Tab 5: Info ---
