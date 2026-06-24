@@ -10,6 +10,10 @@ object SourcegenGenerationTasks:
   // Set.empty means "all module types" (JAVA, SCALA, SCALA_JS, SCALA_NATIVE, and their test variants)
   private val allModuleTypes: Set[ModuleType] = Set.empty
 
+  private def resolveModuleRoot(module: DederModule): os.Path =
+    if module.root == "." || module.root.isEmpty then DederGlobals.projectRootDir
+    else DederGlobals.projectRootDir / os.RelPath(module.root)
+
   def scriptSourceFilesTask(config: Sourcegen.SourcegenPluginConfig): SourceFilesTask =
     SourceFilesTask(
       name = "sourcegenDiscoverScripts",
@@ -17,7 +21,7 @@ object SourcegenGenerationTasks:
         val resolved = SourcegenConfigNormalizer.normalize(ctx.module, config)
         if !resolved.enabled then Seq.empty
         else
-          val moduleRoot = os.Path(ctx.module.root)
+          val moduleRoot = resolveModuleRoot(ctx.module)
           val scriptsDir = moduleRoot / os.RelPath(resolved.scriptsDir)
           if os.exists(scriptsDir) then
             os.walk(scriptsDir)
@@ -83,7 +87,7 @@ object SourcegenGenerationTasks:
           val sourceOut = ctx.out / "sources"
           os.makeDir.all(sourceOut)
 
-          val moduleRoot = ctx.module.root
+          val moduleRoot = resolveModuleRoot(ctx.module).toString
           val moduleTypeStr = ctx.module.`type`.toString.toLowerCase
           val configFile = ScriptRunner.writeConfig(
             sourceOut, resolved, ctx.module.id, moduleRoot, scalaVer, moduleTypeStr

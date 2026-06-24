@@ -1,0 +1,28 @@
+amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
+
+import "../../resources/SourcegenPlugin.pkl" as SG
+
+plugins {
+  new SG.SourcegenPlugin {
+    config = new {
+      defaults = new {
+        deps {
+          "com.lihaoyi::upickle:4.1.0"
+          "com.lihaoyi::os-lib:0.11.3"
+        }
+        extra {
+          ["package"] = "consumer.generated"
+        }
+      }
+    }
+  }
+}
+
+modules {
+  new ScalaModule {
+    id = "example"
+    root = "."
+    scalaVersion = "3.7.4"
+    mainClass = "consumer.main"
+  }
+}

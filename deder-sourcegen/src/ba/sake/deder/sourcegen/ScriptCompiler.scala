@@ -19,8 +19,7 @@ object ScriptCompiler:
       val sourceArgs = sourceFiles.map(_.toString)
       val allArgs = Array(
         "-classpath", classpath,
-        "-d", outputDir.toString,
-        "-usejavacp"
+        "-d", outputDir.toString
       ) ++ sourceArgs
 
       val driver = new dotty.tools.dotc.Driver

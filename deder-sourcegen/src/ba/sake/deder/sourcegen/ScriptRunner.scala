@@ -25,7 +25,7 @@ object ScriptRunner:
       configPath: os.Path,
       notifications: ServerNotificationsLogger
   ): Unit =
-    val mainMethods = discoverMainMethods(classesDir)
+    val mainMethods = discoverMainMethods(classesDir, classpath)
     if mainMethods.isEmpty then
       notifications.add(ServerNotification.logInfo("No @main entry points found in compiled scripts"))
     else
@@ -35,9 +35,10 @@ object ScriptRunner:
       }
 
   /** Discovers all classes in classesDir that have a public static main(String[]) method. */
-  private def discoverMainMethods(classesDir: os.Path): Seq[(String, java.lang.reflect.Method)] =
+  private def discoverMainMethods(classesDir: os.Path, classpath: String): Seq[(String, java.lang.reflect.Method)] =
     val classFiles = os.walk(classesDir).filter(_.ext == "class")
-    val urls = Array(classesDir.toNIO.toUri.toURL)
+    val cpUrls = classpath.split(":").map(p => os.Path(p).toNIO.toUri.toURL)
+    val urls = (classesDir.toNIO.toUri.toURL +: cpUrls).distinct
     val classLoader = new java.net.URLClassLoader(urls, getClass.getClassLoader)
 
     classFiles.flatMap { classFile =>
@@ -64,7 +65,7 @@ object ScriptRunner:
       moduleType: String
   ): String =
     val absoluteOutDir = outDir.toString
-    val absoluteModuleRoot = os.pwd / os.RelPath(moduleRoot)
+    val absoluteModuleRoot = os.Path(moduleRoot)
 
     val extraJson = config.extra.map { case (k, v) =>
       s"""    "${escapeJson(k)}": "${escapeJson(v)}""""

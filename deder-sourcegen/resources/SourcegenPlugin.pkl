@@ -4,7 +4,7 @@ import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
 
 class SourcegenPlugin extends P.DederPlugin {
   id = "sourcegen"
-  version: String = "0.1.0-SNAPSHOT"
+  version: String = "0.6.1-SNAPSHOT"
   deps {
     "ba.sake::deder-sourcegen:\(version)"
   }
