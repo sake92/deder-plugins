@@ -1,0 +1,30 @@
+amends "https://sake92.github.io/deder/config-api/DederPlugins.pkl"
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class SourcegenPlugin extends P.DederPlugin {
+  id = "sourcegen"
+  config: SourcegenPluginConfig = new {}
+}
+
+class SourcegenPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {}
+}
+
+class ModuleDefaults {
+  enabled: Boolean = true
+  deps: Listing<String> = new {}
+  scriptsDir: String = "deder/sourcegen"
+  scalaVersion: String?
+  outputSourceSet: String = "main"
+  extra: Mapping<String, String> = new Mapping {}
+}
+
+class ModuleOverride {
+  enabled: Boolean?
+  deps: Listing<String>?
+  scriptsDir: String?
+  scalaVersion: String?
+  outputSourceSet: String?
+  extra: Mapping<String, String>?
+}
