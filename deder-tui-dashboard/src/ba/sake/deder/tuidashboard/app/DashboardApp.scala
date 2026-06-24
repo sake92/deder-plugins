@@ -719,13 +719,25 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       case None => "Waiting for data..."
     }
 
-    val currentBox = box("Current Requests")(
-      if state.currentRequests.isEmpty then "(none)".color(Color.BrightBlack)
-      else {
-        val items = state.currentRequests.map { r =>
+    val sparklineElem: Element = if state.requestCountHistory.nonEmpty then
+      rowTight(
+        Text("Requests/min: ").color(Color.BrightBlack),
+        sparkline(state.requestCountHistory.map(_.toDouble)).color(Color.Cyan)
+      )
+    else empty
+
+    val currentBox: Element = if state.currentRequests.isEmpty then
+      box("Current Requests")("(none)".color(Color.BrightBlack)).border(Border.Round).color(Color.BrightBlue)
+    else
+      val viewport = ScrollView[ApiRequestStatus](
+        items = state.currentRequests,
+        selectedIndex = -1,
+        scrollOffset = state.liveRequestsScrollOffset,
+        visibleHeight = state.liveRequestsVisibleHeight,
+        renderItem = (r, _, _) =>
           val stateLabel = r.state match
             case ApiRequestState.Queued          => "⏳ QUEUED"
-            case ApiRequestState.AcquiringLocks  => "🔒 ACQUIRING_LOCKS"
+            case ApiRequestState.AcquiringLocks  => "🔒 ACQUIRING"
             case ApiRequestState.Executing       => "⚙️ EXECUTING"
             case _                               => r.state.label
           val stateColor = r.state match
@@ -733,24 +745,35 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
             case ApiRequestState.AcquiringLocks  => Color.BrightYellow
             case ApiRequestState.Executing       => Color.BrightGreen
             case _                               => Color.BrightBlack
-          val stateText = Text(s" $stateLabel").color(stateColor)
-          val lockText = r.lockProgress.map(l => Text(s" Lock ${l.acquired}/${l.total}").color(Color.BrightYellow)).getOrElse(empty)
-          val stageText = r.taskProgress.map(t => Text(s" Stage ${t.currentStage}/${t.totalStages}").color(Color.BrightGreen)).getOrElse(empty)
-          rowTight(
-            Text(r.requestId),
-            Text(s"  ${r.taskName}"),
-            Text(s"  [${r.moduleIds.mkString(", ")}]"),
-            stateText,
-            lockText,
-            stageText
+
+          val lockElem: Element = r.lockProgress.map { l =>
+            val pct = if l.total > 0 then l.acquired.toDouble / l.total else 0.0
+            inlineBar(Text(s"Lock ${l.acquired}/${l.total}"), pct).color(Color.BrightYellow)
+          }.getOrElse(empty)
+
+          val stageElem: Element = r.taskProgress.map { t =>
+            val pct = if t.totalStages > 0 then t.currentStage.toDouble / t.totalStages else 0.0
+            inlineBar(Text(s"Stage ${t.currentStage}/${t.totalStages}"), pct).color(Color.BrightGreen)
+          }.getOrElse(empty)
+
+          val progElements = Seq(lockElem, stageElem).filter(_ != empty)
+          val progRow = if progElements.nonEmpty then layout(progElements*) else empty
+
+          layout(
+            rowTight(
+              Text(r.requestId).color(Color.BrightBlack),
+              Text(s"  ${r.taskName}"),
+              Text(s"  [${r.moduleIds.mkString(", ")}]"),
+              Text(s" $stateLabel").color(stateColor)
+            ),
+            progRow
           )
-        }
-        layout(items*)
-      }
-    ).border(Border.Round).color(Color.BrightBlue)
+      )
+      box("Current Requests")(viewport).border(Border.Round).color(Color.BrightBlue)
 
     layout(
       section("Stats")(statsLine.color(Color.BrightGreen)),
+      sparklineElem,
       currentBox
     )
   }
@@ -770,17 +793,19 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       case SortOrder.Longest => state.history.sortBy(-_.durationMs)
       case SortOrder.Shortest => state.history.sortBy(_.durationMs)
 
-    val header = Text(s"(sorted by: $sortLabel, press 's' to change)").color(Color.BrightBlack)
+    val header = Text(s"(sorted by: $sortLabel, press 's' to change, h=top e=bottom PgUp/PgDn=scroll)").color(Color.BrightBlack)
 
     val body = if sorted.isEmpty then "(none)".color(Color.BrightBlack)
-      else {
-        val items = sorted.map { h =>
-          val icon = if h.success then "✅" else "❌"
-          val mods = if h.moduleIds.isEmpty then "*" else h.moduleIds.mkString(", ")
-          Text(s" $icon [${h.caller}] ${h.taskName}  ${h.durationMs}ms  [$mods]")
-        }
-        layout(items*)
-      }
+    else ScrollView[ApiHistoryEntry](
+      items = sorted,
+      selectedIndex = -1,
+      scrollOffset = state.historyScrollOffset,
+      visibleHeight = state.historyVisibleHeight,
+      renderItem = (h, _, _) =>
+        val icon = if h.success then "✅" else "❌"
+        val mods = if h.moduleIds.isEmpty then "*" else h.moduleIds.mkString(", ")
+        Text(s" $icon [${h.caller}] ${h.taskName}  ${h.durationMs}ms  [$mods]")
+    )
 
     layout(header, body)
   }
