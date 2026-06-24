@@ -29,7 +29,23 @@ case class DashboardState(
     taskExecutions: Seq[ApiExecEntry] = Seq.empty,
     expandedExecId: Option[String] = None,
     selectedModuleIdx: Int = 0,
-    selectedExecIdx: Int = 0
+    selectedExecIdx: Int = 0,
+    // --- Scroll offsets ---
+    modulesScrollOffset: Int = 0,
+    taskModulesScrollOffset: Int = 0,
+    execsScrollOffset: Int = 0,
+    historyScrollOffset: Int = 0,
+    liveRequestsScrollOffset: Int = 0,
+    modulesVisibleHeight: Int = 12,
+    taskModulesVisibleHeight: Int = 10,
+    execsVisibleHeight: Int = 8,
+    historyVisibleHeight: Int = 12,
+    liveRequestsVisibleHeight: Int = 8,
+    // --- Animations & charts ---
+    spinnerFrame: Int = 0,
+    chartViewActive: Boolean = false,
+    requestCountHistory: Seq[Long] = Seq.empty,
+    lastRequestCount: Long = 0
 )
 
 sealed trait Msg
@@ -66,6 +82,11 @@ case object ModuleDown extends Msg
 case object ExecUp extends Msg
 case object ExecDown extends Msg
 case object ToggleCurrentModule extends Msg
+case object PageUp extends Msg
+case object PageDown extends Msg
+case object Home extends Msg
+case object End extends Msg
+case object ToggleChartView extends Msg
 
 class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardState, Msg] {
 
@@ -238,6 +259,12 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
 
     case CursorEnd =>
       (state.copy(cursorPos = state.taskInput.length), Cmd.none)
+
+    case PageUp           => (state, Cmd.none)
+    case PageDown         => (state, Cmd.none)
+    case Home             => (state, Cmd.none)
+    case End              => (state, Cmd.none)
+    case ToggleChartView  => (state, Cmd.none)
   }
 
   private def taskCharOr(state: DashboardState, c: Char, otherwise: Msg): Option[Msg] =

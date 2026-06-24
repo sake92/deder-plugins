@@ -386,4 +386,47 @@ class DashboardStateSuite extends FunSuite {
     assertEquals(state.cursorPos, 7)
     assertEquals(state.selectedTaskName, Some("compile"))
   }
+
+  test("scroll offsets default to 0") {
+    val state = DashboardState()
+    assertEquals(state.modulesScrollOffset, 0)
+    assertEquals(state.taskModulesScrollOffset, 0)
+    assertEquals(state.execsScrollOffset, 0)
+    assertEquals(state.historyScrollOffset, 0)
+    assertEquals(state.liveRequestsScrollOffset, 0)
+  }
+
+  test("spinnerFrame and chartViewActive default correctly") {
+    val state = DashboardState()
+    assertEquals(state.spinnerFrame, 0)
+    assertEquals(state.chartViewActive, false)
+  }
+
+  test("ToggleChartView toggles chart view") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState()
+    assertEquals(state.chartViewActive, false)
+  }
+
+  test("PageUp and PageDown change scroll offsets") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState(modules = (1 to 50).map(i =>
+      ApiModule(s"m$i", "SCALA", 0)
+    ), modulesScrollOffset = 20, activeTab = Tab.Modules)
+    val (s1, _) = app.update(PageUp, state)
+    assertEquals(s1.modulesScrollOffset, 8)
+    val (s2, _) = app.update(PageDown, s1)
+    assertEquals(s2.modulesScrollOffset, 20)
+  }
+
+  test("Home and End snap scroll offsets to extremes") {
+    val app = DashboardApp("http://localhost:9292", 1000)
+    val state = DashboardState(modules = (1 to 50).map(i =>
+      ApiModule(s"m$i", "SCALA", 0)
+    ), modulesScrollOffset = 20, activeTab = Tab.Modules)
+    val (s1, _) = app.update(Home, state)
+    assertEquals(s1.modulesScrollOffset, 0)
+    val (s2, _) = app.update(End, s1)
+    assertEquals(s2.modulesScrollOffset, 38)
+  }
 }
