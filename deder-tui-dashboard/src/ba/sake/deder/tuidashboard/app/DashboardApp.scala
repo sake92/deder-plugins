@@ -365,6 +365,11 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       case Key.Char('q')       => taskCharOr(state, 'q', Quit)
       case Key.Ctrl('c')       => Some(Quit)
       case Key.Ctrl('x')       => Some(Quit)
+      case Key.PageUp           => Some(PageUp)
+      case Key.PageDown         => Some(PageDown)
+      case Key.Char('h')        => taskCharOr(state, 'h', Home)
+      case Key.Char('e')        => taskCharOr(state, 'e', End)
+      case Key.Char('v')        => taskCharOr(state, 'v', ToggleChartView)
       // --- Tasks tab keys ---
       case Key.Tab             => if state.activeTab == Tab.Tasks then Some(FocusNext) else None
       case Key.Enter           => if state.activeTab == Tab.Tasks then
@@ -482,10 +487,18 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
 
   private def modulesView(state: DashboardState): Element = {
     if state.modules.isEmpty then "(no data)".color(Color.BrightBlack)
-    else table(
-      headers = Seq("Module", "Type", "Deps"),
-      rows = state.modules.map(m => Seq(Text(m.id), Text(m.`type`), Text(m.deps.toString)))
-    ).border(Border.Round)
+    else {
+      val header = Text("  Module                  Type         Deps").style(Style.Bold)
+      val viewport = ScrollView[ApiModule](
+        items = state.modules,
+        selectedIndex = -1,
+        scrollOffset = state.modulesScrollOffset,
+        visibleHeight = state.modulesVisibleHeight,
+        renderItem = (m, i, _) =>
+          Text(f"  ${m.id}%-20s  ${m.`type`}%-12s  ${m.deps}%4d")
+      )
+      box()(layout(header, viewport)).border(Border.Round)
+    }
   }
 
   // --- Tab 2: Tasks ---
