@@ -11,3 +11,11 @@ plugins:
     dir: deder-web-dashboard
     schema: WebDashboardPlugin.pkl
     description: Embedded HTTP dashboard showing module info, dependency graph, and live stats.
+  - name: TUI Dashboard
+    dir: deder-tui-dashboard
+    schema: ""
+    description: Terminal-based dashboard that polls the Web Dashboard API.
+  - name: Sourcegen
+    dir: deder-sourcegen
+    schema: SourcegenPlugin.pkl
+    description: Generates source code from user-written Scala scripts before module compilation.

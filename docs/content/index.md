@@ -43,3 +43,5 @@ Each plugin also has an `examples/` folder in this GitHub repository.
 | Embedded HTTP dashboard with module info and live stats. | |
 | **[TUI Dashboard](plugins/tui-dashboard.html)** | — |
 | Terminal-based dashboard that polls the Web Dashboard API. | |
+| **[Sourcegen](plugins/sourcegen.html)** | [early-access](config/deder-sourcegen/early-access/SourcegenPlugin.pkl) |
+| Generates source code from user-written Scala scripts. | |
