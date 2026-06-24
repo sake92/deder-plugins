@@ -589,11 +589,15 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
       s"Task: ${state.taskInput}  (Tab=modules, r=run, Esc=clear)"
 
     val taskList = if state.focus == FocusField.TaskInput && filteredTasks.nonEmpty then
-      val items = filteredTasks.map(name =>
-        if state.selectedTaskName.contains(name) then Text(s"  ▶ $name").color(Color.BrightGreen)
-        else Text(s"    $name")
+      ScrollView[String](
+        items = filteredTasks,
+        selectedIndex = filteredTasks.indexOf(state.selectedTaskName.getOrElse("")),
+        scrollOffset = 0,
+        visibleHeight = 5,
+        renderItem = (name, _, isSel) =>
+          if isSel then Text(s"  ▶ $name").color(Color.BrightGreen)
+          else Text(s"    $name")
       )
-      layout(items*)
     else empty
 
     val moduleHeader = if state.focus == FocusField.ModuleList then
@@ -606,13 +610,17 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     val moduleList = if state.focus == FocusField.ModuleList then
       if state.modules.isEmpty then "(no modules loaded)".color(Color.BrightBlack)
       else
-        val moduleItems = state.modules.zipWithIndex.map { case (m, i) =>
-          val checked = if state.toggledModuleIds.contains(m.id) then "[x]" else "[ ]"
-          val cursor = if i == state.selectedModuleIdx then "▶" else " "
-          val elem = Text(s"$cursor $checked ${m.id}  (${m.`type`})")
-          if i == state.selectedModuleIdx then elem.color(Color.Cyan) else elem
-        }
-        layout(moduleItems*)
+        ScrollView[ApiModule](
+          items = state.modules,
+          selectedIndex = state.selectedModuleIdx,
+          scrollOffset = state.taskModulesScrollOffset,
+          visibleHeight = state.taskModulesVisibleHeight,
+          renderItem = (m, i, isSel) =>
+            val checked = if state.toggledModuleIds.contains(m.id) then "[x]" else "[ ]"
+            val cursor = if isSel then "▶" else " "
+            val elem = Text(s"$cursor $checked ${m.id}  (${m.`type`})")
+            if isSel then elem.color(Color.Cyan) else elem
+        )
     else
       val summary = if state.toggledModuleIds.isEmpty then "all modules" else s"${state.toggledModuleIds.size} selected"
       Text(s"  $summary").color(Color.BrightBlack)
@@ -639,45 +647,63 @@ class DashboardApp(serverUrl: String, pollMs: Int) extends LayoutzApp[DashboardS
     else
       val header = Text("  #  Task            Modules                    Status    Duration").style(Style.Bold)
 
-      val items = state.taskExecutions.zipWithIndex.map { case (e, i) =>
-        val cursor = if i == state.selectedExecIdx then "▶" else " "
-        val modulesStr = if e.moduleIds.isEmpty then "*" else e.moduleIds.mkString(", ")
-        val statusColor = e.status match
-          case "SUCCESS"  => Color.Green
-          case "FAILURE"  => Color.Red
-          case "RUNNING"  => Color.Blue
-          case "PENDING"  => Color.Yellow
-          case _          => Color.Red
-        val statusEmoji = e.status match
-          case "SUCCESS"    => "✅"
-          case "FAILURE"    => "❌"
-          case "RUNNING"    => "🔄"
-          case "PENDING"    => "⏳"
-          case "CANCELLED"  => "🚫"
-          case _            => ""
-        val durationStr = e.endTimeMs match
-          case Some(end) => s"${end - e.startTimeMs}ms"
-          case None      => s"${System.currentTimeMillis() - e.startTimeMs}ms"
-
-        val idxStr = f"${i + 1}%2d"
-        val taskDisplay = truncPad(e.taskName, 15)
-        val modDisplay = truncPad(modulesStr, 25)
-        val statusDisplay = truncPad(s"$statusEmoji ${e.status}", 12)
-
-        val row = Text(s" $cursor$idxStr. $taskDisplay $modDisplay $statusDisplay $durationStr").color(statusColor)
-        if i == state.selectedExecIdx then row.color(Color.Cyan) else row
-      }
-
       val runCancelHint =
         if state.focus == FocusField.ExecLog then
-          Text("  enter=expand  c=cancel  up/down=navigate  Tab=switch").color(Color.Cyan)
+          Text("  enter=expand  c=cancel  up/down=navigate  PgUp/PgDn=scroll  Tab=switch").color(Color.Cyan)
         else if state.taskExecutions.exists(e => e.status == "RUNNING" || e.status == "PENDING") then
-          Text("  Tab=switch  enter=expand  c=cancel").color(Color.BrightBlack)
+          Text("  Tab=switch  enter=expand  c=cancel  PgUp/PgDn=scroll").color(Color.BrightBlack)
         else
-          Text("  Tab=switch  enter=expand").color(Color.BrightBlack)
+          Text("  Tab=switch  enter=expand  PgUp/PgDn=scroll").color(Color.BrightBlack)
+
+      val viewport = ScrollView[ApiExecEntry](
+        items = state.taskExecutions,
+        selectedIndex = state.selectedExecIdx,
+        scrollOffset = state.execsScrollOffset,
+        visibleHeight = state.execsVisibleHeight,
+        renderItem = (e, i, isSel) =>
+          val cursor = if isSel then "▶" else " "
+          val modulesStr = if e.moduleIds.isEmpty then "*" else e.moduleIds.mkString(", ")
+          val statusColor = e.status match
+            case "SUCCESS"  => Color.Green
+            case "FAILURE"  => Color.Red
+            case "RUNNING"  => Color.Blue
+            case "PENDING"  => Color.Yellow
+            case _          => Color.Red
+
+          val statusDisplay = e.status match
+            case "RUNNING" => rowTight(
+                spinner(s"${e.taskName}", state.spinnerFrame, SpinnerStyle.Dots).color(Color.Blue),
+                Text(s" RUNNING").color(Color.Blue)
+              )
+            case _ =>
+              val statusEmoji = e.status match
+                case "SUCCESS"    => "✅"
+                case "FAILURE"    => "❌"
+                case "PENDING"    => "⏳"
+                case "CANCELLED"  => "🚫"
+                case _            => ""
+              Text(s"$statusEmoji ${e.status}")
+
+          val durationStr = e.endTimeMs match
+            case Some(end) => s"${end - e.startTimeMs}ms"
+            case None      => s"${System.currentTimeMillis() - e.startTimeMs}ms"
+
+          val idxStr = f"${i + 1}%2d"
+          val taskDisplay = truncPad(e.taskName, 15)
+          val modDisplay = truncPad(modulesStr, 25)
+
+          val row = rowTight(
+            Text(s" $cursor$idxStr. "),
+            Text(taskDisplay),
+            Text(s" $modDisplay "),
+            statusDisplay,
+            Text(s" $durationStr")
+          ).color(if isSel then Color.Cyan else statusColor)
+          row
+      )
 
       section("Executions")(
-        layout(header +: items :+ runCancelHint*)
+        layout(header, viewport, runCancelHint)
       )
   }
 
