@@ -1,0 +1,45 @@
+module ba.sake.deder.plugins.openapi4s
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class Openapi4sPlugin extends P.DederPlugin {
+  id = "openapi4s"
+  version: String = "0.6.1-SNAPSHOT"
+  deps {
+    "ba.sake::deder-openapi4s:\(version)"
+  }
+  config: Openapi4sPluginConfig = new {}
+}
+
+class Openapi4sPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {}
+}
+
+class ModuleDefaults {
+  enabled: Boolean = true
+  basePackage: String = ""
+  models: String = "tupson"
+  framework: String = "sharaf"
+  client: String = "none"
+  validation: String = "none"
+  tags: Listing<String> = new {}
+  input: String? = null
+  targetDir: String? = null
+  version: String = "0.9.0"
+}
+
+class ModuleOverride {
+  enabled: Boolean? = null
+  basePackage: String? = null
+  models: String? = null
+  framework: String? = null
+  client: String? = null
+  validation: String? = null
+  tags: Listing<String>? = null
+  input: String? = null
+  targetDir: String? = null
+  version: String? = null
+}
+
+config: Openapi4sPluginConfig = new {}
