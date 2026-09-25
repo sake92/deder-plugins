@@ -192,11 +192,37 @@ local const squeryModules =
     }
   }.get
 
+local const openapi4sModules =
+  new CreateScalaModules {
+    root = "deder-openapi4s"
+    id = "deder-openapi4s"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+      }
+      pomSettings =
+        pom(
+          "deder-openapi4s",
+          "Deder OpenAPI4s Plugin",
+          "Deder plugin for editable Scala source generation with OpenAPI4s"
+        )
+      publish = true
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
   ...dashboardModules.all
   ...tuiModules.all
   ...sourcegenModules.all
+  ...openapi4sModules.all
   ...squeryModules.all
 }

@@ -1,0 +1,26 @@
+amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
+
+import "../../resources/Openapi4sPlugin.pkl" as OA
+
+plugins {
+  new OA.Openapi4sPlugin {
+    config = new {
+      defaults = new {
+        basePackage = "demo"
+        framework = "none"
+        input = "src/main/resources/openapi.json"
+        targetDir = "src/main/scala"
+      }
+    }
+  }
+}
+
+modules {
+  new ScalaModule {
+    id = "example"
+    root = "."
+    scalaVersion = "3.7.4"
+    resources { "src/main/resources" }
+    sources { "src/main/scala" }
+  }
+}
