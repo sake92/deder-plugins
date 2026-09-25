@@ -184,6 +184,7 @@ local const squeryModules =
           "Deder plugin for Squery database model and DAO generation",
         )
       publish = true
+      publishTo = publishRepo
     }
     testTemplate = (template.asTest()) {
       deps {
@@ -209,6 +210,7 @@ local const openapi4sModules =
           "Deder plugin for editable Scala source generation with OpenAPI4s"
         )
       publish = true
+      publishTo = publishRepo
     }
     testTemplate = (template.asTest()) {
       deps {
