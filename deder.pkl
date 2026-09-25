@@ -2,6 +2,10 @@ amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
 
 local const scalaVer = "3.7.4"
 local const pluginApiVersion = "0.20.0"
+local const publishRepo = if (read?("env:DEDER_PUBLISH_SNAPSHOT") == "true")
+  new SonatypeSnapshotRepo { id = "sonatype" }
+else
+  new SonatypeCentralRepo { id = "sonatype" }
 
 local const function pom(artId: String, artName: String, artDesc: String): PomSettings = new {
   groupId = "ba.sake"
@@ -45,6 +49,7 @@ local const pluginModules =
           "Deder plugin for protobuf and gRPC code generation",
         )
       publish = true
+      publishTo = publishRepo
     }
     testTemplate = (template.asTest()) {
       deps {
@@ -70,6 +75,7 @@ local const buildInfoModules =
           "Deder plugin that generates a BuildInfo Scala object with build metadata constants",
         )
       publish = true
+      publishTo = publishRepo
     }
     testTemplate = (template.asTest()) {
       deps {
@@ -97,6 +103,7 @@ local const dashboardModules =
           "Deder plugin that starts a web dashboard showing module info and live server stats",
         )
       publish = true
+      publishTo = publishRepo
     }
     testTemplate = (template.asTest()) {
       deps {
@@ -124,6 +131,7 @@ local const tuiModules =
           "CLI TUI dashboard for Deder live build stats"
         )
       publish = true
+      publishTo = publishRepo
     }
     testTemplate = (template.asTest()) {
       deps {
@@ -148,6 +156,32 @@ local const sourcegenModules =
           "deder-sourcegen",
           "Deder Sourcegen Plugin",
           "Deder plugin for custom source code generation via user-written Scala scripts"
+        )
+      publish = true
+      publishTo = publishRepo
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
+local const squeryModules =
+  new CreateScalaModules {
+    root = "deder-squery"
+    id = "deder-squery"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+      }
+      pomSettings =
+        pom(
+          "deder-squery",
+          "Deder Squery Plugin",
+          "Deder plugin for Squery database model and DAO generation",
         )
       publish = true
     }
@@ -190,4 +224,5 @@ modules {
   ...tuiModules.all
   ...sourcegenModules.all
   ...openapi4sModules.all
+  ...squeryModules.all
 }
