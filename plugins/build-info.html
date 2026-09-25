@@ -5,47 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Build Info plugin tasks and schema">
-  <title> Build Info | Deder Plugins </title>
+  <title>Build Info | Deder Plugins</title>
   <link rel="shortcut icon" href="https://sake92.github.io/deder-plugins/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/deder-plugins/styles/default.css">
  </head>
  <body>
   <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/deder-plugins/">Home</a></li>
-    </ul>
-    <ul></ul>
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/deder-plugins/">Deder Plugins</a>
+    <div></div>
    </nav>
   </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
   <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
-       <ul>
-        <li><a href="#build-info">Build Info</a>
-         <ul>
-          <li><a href="#schema">Schema</a></li>
-          <li><a href="#tasks">Tasks</a></li>
-         </ul></li>
-       </ul>
-      </div>
-     </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
-   </div>
-   <h1 id="build-info">Build Info<a href="#build-info" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>Generates a Scala <code>BuildInfo</code> object with build metadata constants.</p>
-   <p>Add it to your plugins list:</p>
-   <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.4.0/BuildInfoPlugin.pkl" as BI
+   <div>
+    <div class="content">
+     <h1 id="build-info">Build Info<a href="#build-info" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Generates a Scala <code>BuildInfo</code> object with build metadata constants.</p>
+     <p>Add it to your plugins list:</p>
+     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.4.0/BuildInfoPlugin.pkl" as BI
 
 plugins {
   new BI.BuildInfoPlugin {
@@ -62,8 +53,8 @@ plugins {
   }
 }
 </code></pre>
-   <p>Here are the defaults if you need to tweak them:</p>
-   <pre><code class="language-pkl">plugins {
+     <p>Here are the defaults if you need to tweak them:</p>
+     <pre><code class="language-pkl">plugins {
   new BI.BuildInfoPlugin {
     config = new BI.BuildInfoPluginConfig {
       defaults = new BI.ModuleDefaults {
@@ -79,15 +70,37 @@ plugins {
   }
 }
 </code></pre>
-   <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <ul>
-    <li><a href="../config/deder-build-info/early-access/BuildInfoPlugin.pkl">early-access</a></li>
-   </ul>
-   <h2 id="tasks">Tasks<a href="#tasks" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <ul>
-    <li><code>buildInfoGenerate</code> (source generator)</li>
-   </ul>
+     <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <ul>
+      <li><a href="../config/deder-build-info/early-access/BuildInfoPlugin.pkl">early-access</a></li>
+     </ul>
+     <h2 id="tasks">Tasks<a href="#tasks" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <ul>
+      <li><code>buildInfoGenerate</code> (source generator)</li>
+     </ul>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#build-info">Build Info</a>
+         <ul>
+          <li><a href="#schema">Schema</a></li>
+          <li><a href="#tasks">Tasks</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
   </main>
   <footer class="pico container">Deder Plugins | Official Deder Build Tool Plugins</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/deder-plugins/scripts/code-copy.js"></script>
  </body>
 </html>
