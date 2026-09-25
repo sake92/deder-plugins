@@ -1,0 +1,49 @@
+module ba.sake.deder.plugins.squery
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class SqueryPlugin extends P.DederPlugin {
+  id = "squery"
+  version: String = "0.6.1-SNAPSHOT"
+  deps {
+    "ba.sake::deder-squery:\(version)"
+  }
+  config: SqueryPluginConfig = new {}
+}
+
+class SqueryPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {}
+}
+
+class ModuleDefaults {
+  enabled: Boolean = true
+  jdbcUrl: String = ""
+  jdbcDeps: Listing<String> = new {}
+  schemaMappings: Mapping<String, String> = new Mapping {}
+  colNameIdentifierMapper: String = "camelcase"
+  typeNameMapper: String = "camelcase"
+  rowTypeSuffix: String = "Row"
+  daoTypeSuffix: String = "Dao"
+  typeMappingRules: Listing<String> = new {}
+  includeTables: Listing<String> = new {}
+  excludeTables: Listing<String> = new {}
+  squeryVersion: String = "0.12.0"
+}
+
+class ModuleOverride {
+  enabled: Boolean? = null
+  jdbcUrl: String? = null
+  jdbcDeps: Listing<String>? = null
+  schemaMappings: Mapping<String, String>? = null
+  colNameIdentifierMapper: String? = null
+  typeNameMapper: String? = null
+  rowTypeSuffix: String? = null
+  daoTypeSuffix: String? = null
+  typeMappingRules: Listing<String>? = null
+  includeTables: Listing<String>? = null
+  excludeTables: Listing<String>? = null
+  squeryVersion: String? = null
+}
+
+config: SqueryPluginConfig = new {}

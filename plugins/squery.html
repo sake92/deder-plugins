@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Generate Squery models and DAOs from a JDBC database">
+  <title>Squery | Deder Plugins</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/deder-plugins/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/deder-plugins/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/deder-plugins/">Deder Plugins</a>
+    <div></div>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="squery">Squery<a href="#squery" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Generate Scala row models and DAOs from a JDBC database before compilation.</p>
+     <p>Add the plugin to <code>deder.pkl</code>:</p>
+     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/deder-squery/early-access/SqueryPlugin.pkl" as SQ
+
+plugins {
+  new SQ.SqueryPlugin {
+    config = new {
+      defaults = new {
+        jdbcUrl = "jdbc:h2:./database"
+        jdbcDeps { "com.h2database:h2:2.3.232" }
+        schemaMappings { ["PUBLIC"] = "example.db" }
+      }
+    }
+  }
+}
+</code></pre>
+     <p>Add <code>ba.sake::squery:0.12.0</code> and the JDBC driver to the consuming Scala module's dependencies. Run <code>deder exec -t squeryGenerate -m &lt;module-id&gt;</code>, or compile the module to generate sources automatically.</p>
+     <h2 id="configuration">Configuration<a href="#configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p><code>defaults</code> applies to each Scala module. Set fields in <code>modules["module-id"]</code> to override them for one module. Set <code>enabled = false</code> to skip generation.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Default</th>
+        <th>Purpose</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>jdbcUrl</code></td>
+        <td><code>""</code></td>
+        <td>JDBC connection URL; required when enabled.</td>
+       </tr>
+       <tr>
+        <td><code>jdbcDeps</code></td>
+        <td>empty</td>
+        <td>Maven dependencies for the JDBC driver.</td>
+       </tr>
+       <tr>
+        <td><code>schemaMappings</code></td>
+        <td>empty</td>
+        <td>Database schema to Scala package mappings; required when enabled.</td>
+       </tr>
+       <tr>
+        <td><code>colNameIdentifierMapper</code></td>
+        <td><code>"camelcase"</code></td>
+        <td>Column identifier mapper (<code>camelcase</code> or <code>noop</code>).</td>
+       </tr>
+       <tr>
+        <td><code>typeNameMapper</code></td>
+        <td><code>"camelcase"</code></td>
+        <td>Type name mapper (<code>camelcase</code> or <code>noop</code>).</td>
+       </tr>
+       <tr>
+        <td><code>rowTypeSuffix</code></td>
+        <td><code>"Row"</code></td>
+        <td>Generated row type suffix.</td>
+       </tr>
+       <tr>
+        <td><code>daoTypeSuffix</code></td>
+        <td><code>"Dao"</code></td>
+        <td>Generated DAO type suffix.</td>
+       </tr>
+       <tr>
+        <td><code>typeMappingRules</code></td>
+        <td>empty</td>
+        <td>Ordered <code>column-regex|declared-type-regex|Scala-type</code> rules.</td>
+       </tr>
+       <tr>
+        <td><code>includeTables</code></td>
+        <td>all tables</td>
+        <td>Regexes matching <code>schema.table</code>; ordered and repeatable.</td>
+       </tr>
+       <tr>
+        <td><code>excludeTables</code></td>
+        <td>empty</td>
+        <td>Regexes to exclude; exclusions take precedence.</td>
+       </tr>
+       <tr>
+        <td><code>squeryVersion</code></td>
+        <td><code>"0.12.0"</code></td>
+        <td>Squery CLI version.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>Generated files are written to Deder's <code>squeryGenerate/sources</code> output.</p>
+     <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <ul>
+      <li><a href="../config/deder-squery/early-access/SqueryPlugin.pkl">early-access</a></li>
+     </ul>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#squery">Squery</a>
+         <ul>
+          <li><a href="#configuration">Configuration</a></li>
+          <li><a href="#schema">Schema</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <footer class="pico container">Deder Plugins | Official Deder Build Tool Plugins</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/deder-plugins/scripts/code-copy.js"></script>
+ </body>
+</html>
