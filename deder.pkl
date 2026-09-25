@@ -167,10 +167,36 @@ local const sourcegenModules =
     }
   }.get
 
+local const squeryModules =
+  new CreateScalaModules {
+    root = "deder-squery"
+    id = "deder-squery"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+      }
+      pomSettings =
+        pom(
+          "deder-squery",
+          "Deder Squery Plugin",
+          "Deder plugin for Squery database model and DAO generation",
+        )
+      publish = true
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
   ...dashboardModules.all
   ...tuiModules.all
   ...sourcegenModules.all
+  ...squeryModules.all
 }
