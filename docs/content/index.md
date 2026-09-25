@@ -45,3 +45,5 @@ Each plugin also has an `examples/` folder in this GitHub repository.
 | Terminal-based dashboard that polls the Web Dashboard API. | |
 | **[Sourcegen](plugins/sourcegen.html)** | [early-access](config/deder-sourcegen/early-access/SourcegenPlugin.pkl) |
 | Generates source code from user-written Scala scripts. | |
+| **[Squery](plugins/squery.html)** | [early-access](config/deder-squery/early-access/SqueryPlugin.pkl) |
+| Generates Scala row models and DAOs from a JDBC database. | |
