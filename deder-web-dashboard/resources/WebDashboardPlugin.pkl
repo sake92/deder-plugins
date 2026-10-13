@@ -12,7 +12,7 @@ class WebDashboardPlugin extends P.DederPlugin {
 }
 
 class WebDashboardPluginConfig {
-  enabled: Boolean = true
+  enabled: Boolean = read?("env:CI") == null
   host: String = "127.0.0.1"
   port: Int = 9292
   statsRefreshIntervalMs: Int = 1000
