@@ -19,9 +19,9 @@ modules {
   new ScalaModule {
     id = "consumer"
     root = "."
-    scalaVersion = "3.7.4"
+    scalaVersion = "3.9.0"
     deps {
-      "ba.sake::squery:0.12.0"
+      "ba.sake::squery:0.13.0"
       "com.h2database:h2:2.3.232"
     }
   }

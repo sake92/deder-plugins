@@ -28,7 +28,8 @@ class ModuleDefaults {
   typeMappingRules: Listing<String> = new {}
   includeTables: Listing<String> = new {}
   excludeTables: Listing<String> = new {}
-  squeryVersion: String = "0.12.0"
+  newtypes: "none"|"iron" = "none"
+  squeryVersion: String = "0.13.0"
 }
 
 class ModuleOverride {
@@ -43,6 +44,7 @@ class ModuleOverride {
   typeMappingRules: Listing<String>? = null
   includeTables: Listing<String>? = null
   excludeTables: Listing<String>? = null
+  newtypes: ("none"|"iron")? = null
   squeryVersion: String? = null
 }
 
