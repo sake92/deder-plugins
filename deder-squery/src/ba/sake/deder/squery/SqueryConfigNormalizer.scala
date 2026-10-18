@@ -15,6 +15,7 @@ final case class SqueryConfig(
     typeMappingRules: Seq[String],
     includeTables: Seq[String],
     excludeTables: Seq[String],
+    newtypes: String,
     squeryVersion: String
 )
 
@@ -47,6 +48,7 @@ object SqueryConfigNormalizer {
       typeMappingRules = listing(_.typeMappingRules, defaults.typeMappingRules),
       includeTables = listing(_.includeTables, defaults.includeTables),
       excludeTables = listing(_.excludeTables, defaults.excludeTables),
+      newtypes = string(_.newtypes, defaults.newtypes),
       squeryVersion = string(_.squeryVersion, defaults.squeryVersion)
     )
   }

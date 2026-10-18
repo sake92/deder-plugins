@@ -43,14 +43,15 @@ object SqueryGenerationTask {
       values.flatMap(value => Seq(name, value))
 
     Seq(
-      "--jdbcUrl", config.jdbcUrl,
-      "--baseFolder", sourceOut.toString,
-      "--colNameIdentifierMapper", config.colNameIdentifierMapper,
-      "--typeNameMapper", config.typeNameMapper,
-      "--rowTypeSuffix", config.rowTypeSuffix,
-      "--daoTypeSuffix", config.daoTypeSuffix
+      "--jdbc-url", config.jdbcUrl,
+      "--base-folder", sourceOut.toString,
+      "--col-name-identifier-mapper", config.colNameIdentifierMapper,
+      "--type-name-mapper", config.typeNameMapper,
+      "--row-type-suffix", config.rowTypeSuffix,
+      "--dao-type-suffix", config.daoTypeSuffix,
+      "--newtypes", config.newtypes
     ) ++
-      repeated("--schemaMappings", config.schemaMappings.map { case (schema, pkg) => s"$schema:$pkg" }) ++
+      repeated("--schema-mappings", config.schemaMappings.map { case (schema, pkg) => s"$schema:$pkg" }) ++
       repeated("--typeMappingRule", config.typeMappingRules) ++
       repeated("--includeTables", if config.includeTables.isEmpty then Seq(".*") else config.includeTables) ++
       repeated("--excludeTables", config.excludeTables)

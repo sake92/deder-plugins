@@ -197,6 +197,8 @@ public final class Squery {
 
     public final @NonNull List<@NonNull String> excludeTables;
 
+    public final @NonNull String newtypes;
+
     public final @NonNull String squeryVersion;
 
     public ModuleDefaults(@Named("enabled") boolean enabled,
@@ -210,6 +212,7 @@ public final class Squery {
         @Named("typeMappingRules") @NonNull List<@NonNull String> typeMappingRules,
         @Named("includeTables") @NonNull List<@NonNull String> includeTables,
         @Named("excludeTables") @NonNull List<@NonNull String> excludeTables,
+        @Named("newtypes") @NonNull String newtypes,
         @Named("squeryVersion") @NonNull String squeryVersion) {
       this.enabled = enabled;
       this.jdbcUrl = jdbcUrl;
@@ -222,56 +225,61 @@ public final class Squery {
       this.typeMappingRules = typeMappingRules;
       this.includeTables = includeTables;
       this.excludeTables = excludeTables;
+      this.newtypes = newtypes;
       this.squeryVersion = squeryVersion;
     }
 
     public ModuleDefaults withEnabled(boolean enabled) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withJdbcUrl(@NonNull String jdbcUrl) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withJdbcDeps(@NonNull List<@NonNull String> jdbcDeps) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withSchemaMappings(
         @NonNull Map<@NonNull String, @NonNull String> schemaMappings) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withColNameIdentifierMapper(@NonNull String colNameIdentifierMapper) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withTypeNameMapper(@NonNull String typeNameMapper) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withRowTypeSuffix(@NonNull String rowTypeSuffix) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withDaoTypeSuffix(@NonNull String daoTypeSuffix) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withTypeMappingRules(@NonNull List<@NonNull String> typeMappingRules) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withIncludeTables(@NonNull List<@NonNull String> includeTables) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withExcludeTables(@NonNull List<@NonNull String> excludeTables) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
+    }
+
+    public ModuleDefaults withNewtypes(@NonNull String newtypes) {
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleDefaults withSqueryVersion(@NonNull String squeryVersion) {
-      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleDefaults(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     @Override
@@ -291,6 +299,7 @@ public final class Squery {
       if (!Objects.equals(this.typeMappingRules, other.typeMappingRules)) return false;
       if (!Objects.equals(this.includeTables, other.includeTables)) return false;
       if (!Objects.equals(this.excludeTables, other.excludeTables)) return false;
+      if (!Objects.equals(this.newtypes, other.newtypes)) return false;
       if (!Objects.equals(this.squeryVersion, other.squeryVersion)) return false;
       return true;
     }
@@ -309,13 +318,14 @@ public final class Squery {
       result = 31 * result + Objects.hashCode(this.typeMappingRules);
       result = 31 * result + Objects.hashCode(this.includeTables);
       result = 31 * result + Objects.hashCode(this.excludeTables);
+      result = 31 * result + Objects.hashCode(this.newtypes);
       result = 31 * result + Objects.hashCode(this.squeryVersion);
       return result;
     }
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(650);
+      StringBuilder builder = new StringBuilder(700);
       builder.append(ModuleDefaults.class.getSimpleName()).append(" {");
       appendProperty(builder, "enabled", this.enabled);
       appendProperty(builder, "jdbcUrl", this.jdbcUrl);
@@ -328,6 +338,7 @@ public final class Squery {
       appendProperty(builder, "typeMappingRules", this.typeMappingRules);
       appendProperty(builder, "includeTables", this.includeTables);
       appendProperty(builder, "excludeTables", this.excludeTables);
+      appendProperty(builder, "newtypes", this.newtypes);
       appendProperty(builder, "squeryVersion", this.squeryVersion);
       builder.append("\n}");
       return builder.toString();
@@ -357,6 +368,8 @@ public final class Squery {
 
     public final List<@NonNull String> excludeTables;
 
+    public final String newtypes;
+
     public final String squeryVersion;
 
     public ModuleOverride(@Named("enabled") Boolean enabled, @Named("jdbcUrl") String jdbcUrl,
@@ -368,7 +381,7 @@ public final class Squery {
         @Named("typeMappingRules") List<@NonNull String> typeMappingRules,
         @Named("includeTables") List<@NonNull String> includeTables,
         @Named("excludeTables") List<@NonNull String> excludeTables,
-        @Named("squeryVersion") String squeryVersion) {
+        @Named("newtypes") String newtypes, @Named("squeryVersion") String squeryVersion) {
       this.enabled = enabled;
       this.jdbcUrl = jdbcUrl;
       this.jdbcDeps = jdbcDeps;
@@ -380,55 +393,60 @@ public final class Squery {
       this.typeMappingRules = typeMappingRules;
       this.includeTables = includeTables;
       this.excludeTables = excludeTables;
+      this.newtypes = newtypes;
       this.squeryVersion = squeryVersion;
     }
 
     public ModuleOverride withEnabled(Boolean enabled) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withJdbcUrl(String jdbcUrl) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withJdbcDeps(List<@NonNull String> jdbcDeps) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withSchemaMappings(Map<@NonNull String, @NonNull String> schemaMappings) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withColNameIdentifierMapper(String colNameIdentifierMapper) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withTypeNameMapper(String typeNameMapper) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withRowTypeSuffix(String rowTypeSuffix) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withDaoTypeSuffix(String daoTypeSuffix) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withTypeMappingRules(List<@NonNull String> typeMappingRules) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withIncludeTables(List<@NonNull String> includeTables) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withExcludeTables(List<@NonNull String> excludeTables) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
+    }
+
+    public ModuleOverride withNewtypes(String newtypes) {
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     public ModuleOverride withSqueryVersion(String squeryVersion) {
-      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, squeryVersion);
+      return new ModuleOverride(enabled, jdbcUrl, jdbcDeps, schemaMappings, colNameIdentifierMapper, typeNameMapper, rowTypeSuffix, daoTypeSuffix, typeMappingRules, includeTables, excludeTables, newtypes, squeryVersion);
     }
 
     @Override
@@ -448,6 +466,7 @@ public final class Squery {
       if (!Objects.equals(this.typeMappingRules, other.typeMappingRules)) return false;
       if (!Objects.equals(this.includeTables, other.includeTables)) return false;
       if (!Objects.equals(this.excludeTables, other.excludeTables)) return false;
+      if (!Objects.equals(this.newtypes, other.newtypes)) return false;
       if (!Objects.equals(this.squeryVersion, other.squeryVersion)) return false;
       return true;
     }
@@ -466,13 +485,14 @@ public final class Squery {
       result = 31 * result + Objects.hashCode(this.typeMappingRules);
       result = 31 * result + Objects.hashCode(this.includeTables);
       result = 31 * result + Objects.hashCode(this.excludeTables);
+      result = 31 * result + Objects.hashCode(this.newtypes);
       result = 31 * result + Objects.hashCode(this.squeryVersion);
       return result;
     }
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(650);
+      StringBuilder builder = new StringBuilder(700);
       builder.append(ModuleOverride.class.getSimpleName()).append(" {");
       appendProperty(builder, "enabled", this.enabled);
       appendProperty(builder, "jdbcUrl", this.jdbcUrl);
@@ -485,6 +505,7 @@ public final class Squery {
       appendProperty(builder, "typeMappingRules", this.typeMappingRules);
       appendProperty(builder, "includeTables", this.includeTables);
       appendProperty(builder, "excludeTables", this.excludeTables);
+      appendProperty(builder, "newtypes", this.newtypes);
       appendProperty(builder, "squeryVersion", this.squeryVersion);
       builder.append("\n}");
       return builder.toString();
