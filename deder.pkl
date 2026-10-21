@@ -219,6 +219,33 @@ local const openapi4sModules =
     }
   }.get
 
+local const springBootModules =
+  new CreateScalaModules {
+    root = "deder-spring-boot"
+    id = "deder-spring-boot"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "org.springframework.boot:spring-boot-loader-tools:3.5.6"
+      }
+      pomSettings =
+        pom(
+          "deder-spring-boot",
+          "Deder Spring Boot Plugin",
+          "Deder plugin for bundling and running Spring Boot applications"
+        )
+      publish = true
+      publishTo = publishRepo
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
@@ -227,4 +254,5 @@ modules {
   ...sourcegenModules.all
   ...openapi4sModules.all
   ...squeryModules.all
+  ...springBootModules.all
 }

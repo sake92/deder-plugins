@@ -50,6 +50,7 @@ The repo contains three Deder plugins, each in its own subdirectory:
 | `deder-protobuf/` | `protobuf` | Protobuf / gRPC code generation via `protoc` |
 | `deder-build-info/` | `build-info` | Generates a `BuildInfo` Scala object with build metadata |
 | `deder-web-dashboard/` | `web-dashboard` | Starts a web dashboard showing module info and live stats |
+| `deder-spring-boot/` | `spring-boot` | Bundles (JarLauncher layout) and runs Spring Boot 3.x apps |
 
 Each plugin follows the same structure:
 - `resources/*Plugin.pkl` — the Pkl schema users reference in their `deder.pkl`
