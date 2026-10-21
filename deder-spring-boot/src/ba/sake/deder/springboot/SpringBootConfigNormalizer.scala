@@ -5,7 +5,6 @@ import scala.jdk.CollectionConverters.*
 
 final case class ResolvedSpringBootConfig(
     enabled: Boolean,
-    springBootVersion: String,
     mainClass: Option[String],
     jvmOptions: Seq[String]
 )
@@ -20,10 +19,6 @@ object SpringBootConfigNormalizer {
       .flatMap(value => Option(value.enabled).map(_.booleanValue()))
       .getOrElse(defaults.enabled)
 
-    val springBootVersion = overrideConfig
-      .flatMap(value => trimToOption(value.springBootVersion))
-      .getOrElse(defaults.springBootVersion.trim)
-
     val mainClass = overrideConfig
       .flatMap(value => trimToOption(value.mainClass))
       .orElse(trimToOption(defaults.mainClass))
@@ -34,7 +29,7 @@ object SpringBootConfigNormalizer {
       .map(_.trim)
       .filter(_.nonEmpty)
 
-    ResolvedSpringBootConfig(enabled, springBootVersion, mainClass, jvmOptions)
+    ResolvedSpringBootConfig(enabled, mainClass, jvmOptions)
   }
 
   private def trimToOption(value: String): Option[String] =

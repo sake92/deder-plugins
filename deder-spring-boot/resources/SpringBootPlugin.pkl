@@ -18,8 +18,6 @@ class SpringBootPluginConfig {
 
 class ModuleDefaults {
   enabled: Boolean = true
-  /// Spring Boot version, used to resolve `spring-boot-loader` (3.x only)
-  springBootVersion: String = "3.5.6"
   /// Application main class, falls back to the module's main class
   mainClass: String? = null
   /// JVM options used by `springBootRun`
@@ -28,7 +26,6 @@ class ModuleDefaults {
 
 class ModuleOverride {
   enabled: Boolean? = null
-  springBootVersion: String? = null
   mainClass: String? = null
   jvmOptions: Listing<String>? = null
 }

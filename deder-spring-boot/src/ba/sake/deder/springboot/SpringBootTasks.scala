@@ -1,8 +1,7 @@
 package ba.sake.deder.springboot
 
 import ba.sake.deder.{*, given}
-import ba.sake.deder.config.DederProject.{ModuleType, ScalaModule}
-import ba.sake.deder.deps.Dependency
+import ba.sake.deder.config.DederProject.ModuleType
 import ba.sake.deder.plugins.Springboot
 
 object SpringBootTasks {
@@ -34,15 +33,8 @@ object SpringBootTasks {
               s"No main class found for module ${ctx.module.id}, set `mainClass` in the spring-boot plugin config or in the module"
             )
           )
-        val scalaVersion = ctx.module match {
-          case m: ScalaModule => m.scalaVersion
-          case _              => "3"
-        }
-        val loaderJar = ctx.dependencyResolver.fetchFile(
-          Dependency.make(s"org.springframework.boot:spring-boot-loader:${resolved.springBootVersion}", scalaVersion)
-        )
         val target = ctx.out / s"${ctx.module.id}-spring-boot.jar"
-        SpringBootPackager.pack(target, classpath, loaderJar, mainClass, resolved.springBootVersion)
+        SpringBootPackager.pack(target, classpath, ctx.out / "work", mainClass)
         DederPath(target)
       }
 

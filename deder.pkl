@@ -228,6 +228,7 @@ local const springBootModules =
       scalaVersion = scalaVer
       deps {
         "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "org.springframework.boot:spring-boot-loader-tools:3.5.6"
       }
       pomSettings =
         pom(

@@ -177,36 +177,27 @@ public final class Springboot {
   public static final class ModuleDefaults {
     public final boolean enabled;
 
-    public final @NonNull String springBootVersion;
-
     public final String mainClass;
 
     public final @NonNull List<@NonNull String> jvmOptions;
 
-    public ModuleDefaults(@Named("enabled") boolean enabled,
-        @Named("springBootVersion") @NonNull String springBootVersion,
-        @Named("mainClass") String mainClass,
+    public ModuleDefaults(@Named("enabled") boolean enabled, @Named("mainClass") String mainClass,
         @Named("jvmOptions") @NonNull List<@NonNull String> jvmOptions) {
       this.enabled = enabled;
-      this.springBootVersion = springBootVersion;
       this.mainClass = mainClass;
       this.jvmOptions = jvmOptions;
     }
 
     public ModuleDefaults withEnabled(boolean enabled) {
-      return new ModuleDefaults(enabled, springBootVersion, mainClass, jvmOptions);
-    }
-
-    public ModuleDefaults withSpringBootVersion(@NonNull String springBootVersion) {
-      return new ModuleDefaults(enabled, springBootVersion, mainClass, jvmOptions);
+      return new ModuleDefaults(enabled, mainClass, jvmOptions);
     }
 
     public ModuleDefaults withMainClass(String mainClass) {
-      return new ModuleDefaults(enabled, springBootVersion, mainClass, jvmOptions);
+      return new ModuleDefaults(enabled, mainClass, jvmOptions);
     }
 
     public ModuleDefaults withJvmOptions(@NonNull List<@NonNull String> jvmOptions) {
-      return new ModuleDefaults(enabled, springBootVersion, mainClass, jvmOptions);
+      return new ModuleDefaults(enabled, mainClass, jvmOptions);
     }
 
     @Override
@@ -216,7 +207,6 @@ public final class Springboot {
       if (this.getClass() != obj.getClass()) return false;
       ModuleDefaults other = (ModuleDefaults) obj;
       if (!Objects.equals(this.enabled, other.enabled)) return false;
-      if (!Objects.equals(this.springBootVersion, other.springBootVersion)) return false;
       if (!Objects.equals(this.mainClass, other.mainClass)) return false;
       if (!Objects.equals(this.jvmOptions, other.jvmOptions)) return false;
       return true;
@@ -226,7 +216,6 @@ public final class Springboot {
     public int hashCode() {
       int result = 1;
       result = 31 * result + Objects.hashCode(this.enabled);
-      result = 31 * result + Objects.hashCode(this.springBootVersion);
       result = 31 * result + Objects.hashCode(this.mainClass);
       result = 31 * result + Objects.hashCode(this.jvmOptions);
       return result;
@@ -234,10 +223,9 @@ public final class Springboot {
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(250);
+      StringBuilder builder = new StringBuilder(200);
       builder.append(ModuleDefaults.class.getSimpleName()).append(" {");
       appendProperty(builder, "enabled", this.enabled);
-      appendProperty(builder, "springBootVersion", this.springBootVersion);
       appendProperty(builder, "mainClass", this.mainClass);
       appendProperty(builder, "jvmOptions", this.jvmOptions);
       builder.append("\n}");
@@ -248,35 +236,27 @@ public final class Springboot {
   public static final class ModuleOverride {
     public final Boolean enabled;
 
-    public final String springBootVersion;
-
     public final String mainClass;
 
     public final List<@NonNull String> jvmOptions;
 
-    public ModuleOverride(@Named("enabled") Boolean enabled,
-        @Named("springBootVersion") String springBootVersion, @Named("mainClass") String mainClass,
+    public ModuleOverride(@Named("enabled") Boolean enabled, @Named("mainClass") String mainClass,
         @Named("jvmOptions") List<@NonNull String> jvmOptions) {
       this.enabled = enabled;
-      this.springBootVersion = springBootVersion;
       this.mainClass = mainClass;
       this.jvmOptions = jvmOptions;
     }
 
     public ModuleOverride withEnabled(Boolean enabled) {
-      return new ModuleOverride(enabled, springBootVersion, mainClass, jvmOptions);
-    }
-
-    public ModuleOverride withSpringBootVersion(String springBootVersion) {
-      return new ModuleOverride(enabled, springBootVersion, mainClass, jvmOptions);
+      return new ModuleOverride(enabled, mainClass, jvmOptions);
     }
 
     public ModuleOverride withMainClass(String mainClass) {
-      return new ModuleOverride(enabled, springBootVersion, mainClass, jvmOptions);
+      return new ModuleOverride(enabled, mainClass, jvmOptions);
     }
 
     public ModuleOverride withJvmOptions(List<@NonNull String> jvmOptions) {
-      return new ModuleOverride(enabled, springBootVersion, mainClass, jvmOptions);
+      return new ModuleOverride(enabled, mainClass, jvmOptions);
     }
 
     @Override
@@ -286,7 +266,6 @@ public final class Springboot {
       if (this.getClass() != obj.getClass()) return false;
       ModuleOverride other = (ModuleOverride) obj;
       if (!Objects.equals(this.enabled, other.enabled)) return false;
-      if (!Objects.equals(this.springBootVersion, other.springBootVersion)) return false;
       if (!Objects.equals(this.mainClass, other.mainClass)) return false;
       if (!Objects.equals(this.jvmOptions, other.jvmOptions)) return false;
       return true;
@@ -296,7 +275,6 @@ public final class Springboot {
     public int hashCode() {
       int result = 1;
       result = 31 * result + Objects.hashCode(this.enabled);
-      result = 31 * result + Objects.hashCode(this.springBootVersion);
       result = 31 * result + Objects.hashCode(this.mainClass);
       result = 31 * result + Objects.hashCode(this.jvmOptions);
       return result;
@@ -304,10 +282,9 @@ public final class Springboot {
 
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder(250);
+      StringBuilder builder = new StringBuilder(200);
       builder.append(ModuleOverride.class.getSimpleName()).append(" {");
       appendProperty(builder, "enabled", this.enabled);
-      appendProperty(builder, "springBootVersion", this.springBootVersion);
       appendProperty(builder, "mainClass", this.mainClass);
       appendProperty(builder, "jvmOptions", this.jvmOptions);
       builder.append("\n}");

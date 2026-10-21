@@ -11,12 +11,15 @@ layout: page.html
 Bundles a Spring Boot 3.x application into an executable jar and runs it.
 Only Java and Scala modules are supported (not test modules).
 
+The jar is written by Spring Boot's own `spring-boot-loader-tools` (`Repackager`), a dependency of this plugin.
+The launcher classes are bundled in that library, so the plugin version decides which Spring Boot launcher version is embedded.
+
 The jar uses Spring Boot's layout, so it is started by `JarLauncher` and its `LaunchedClassLoader`:
 
 - `BOOT-INF/classes/` application classes and resources
 - `BOOT-INF/lib/` dependency jars (stored uncompressed, nested)
 - `BOOT-INF/classpath.idx` classpath index
-- `org/springframework/boot/loader/` classes from `spring-boot-loader`
+- `org/springframework/boot/loader/` launcher classes
 - `Main-Class: org.springframework.boot.loader.launch.JarLauncher`, `Start-Class: <your main class>`
 
 Add it to your plugins list:
@@ -27,7 +30,7 @@ plugins {
   new SB.SpringBootPlugin {
     config = new SB.SpringBootPluginConfig {
       defaults = new SB.ModuleDefaults {
-        springBootVersion = "3.5.6"
+        jvmOptions = new Listing { "-Xmx512m" }
       }
     }
   }
@@ -43,7 +46,6 @@ plugins {
     config = new SB.SpringBootPluginConfig {
       defaults = new SB.ModuleDefaults {
         enabled = true
-        springBootVersion = "3.5.6" // version of spring-boot-loader
         mainClass = null // falls back to the module's mainClass
         jvmOptions = new Listing {} // used by springBootRun
       }
