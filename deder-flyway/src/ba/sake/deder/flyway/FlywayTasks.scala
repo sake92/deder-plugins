@@ -40,7 +40,7 @@ object FlywayTasks {
       )
       .dependsOn(runClasspathTask)
       .build { ctx =>
-        val moduleClasspath = ctx.depResults
+        val moduleClasspath = ctx.depResults._1
         val resolved = FlywayConfigNormalizer.normalize(ctx.module.id, config)
         require(resolved.enabled, s"flyway plugin is disabled for module ${ctx.module.id}")
         validate(resolved, ctx.module.id, method)
