@@ -23,3 +23,7 @@ plugins:
     dir: deder-spring-boot
     schema: SpringBootPlugin.pkl
     description: Bundles Spring Boot apps into executable jars (JarLauncher layout) and runs them.
+  - name: Flyway
+    dir: deder-flyway
+    schema: FlywayPlugin.pkl
+    description: Runs Flyway Community database migrations (migrate, info, validate, baseline, repair, clean).
