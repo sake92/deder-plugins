@@ -1,0 +1,49 @@
+module ba.sake.deder.plugins.flyway
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class FlywayPlugin extends P.DederPlugin {
+  id = "flyway"
+  version: String = "0.6.1-SNAPSHOT"
+  deps {
+    "ba.sake::deder-flyway:\(version)"
+  }
+  config: FlywayPluginConfig = new {}
+}
+
+class FlywayPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {}
+}
+
+class ModuleDefaults {
+  enabled: Boolean = true
+  /// JDBC url of the database to migrate
+  url: String = ""
+  user: String = ""
+  password: String = ""
+  /// Flyway locations, e.g. `classpath:db/migration` or `filesystem:db/migration`
+  locations: Listing<String> = new { "classpath:db/migration" }
+  /// Schemas managed by Flyway, the first one is the default schema
+  schemas: Listing<String> = new {}
+  /// JDBC driver and Flyway database module dependencies, e.g. `org.postgresql:postgresql:42.7.4`
+  jdbcDeps: Listing<String> = new {}
+  /// Flyway Community version
+  flywayVersion: String = "11.8.2"
+  /// `flywayClean` is destructive, so it fails unless this is set to false
+  cleanDisabled: Boolean = true
+}
+
+class ModuleOverride {
+  enabled: Boolean? = null
+  url: String? = null
+  user: String? = null
+  password: String? = null
+  locations: Listing<String>? = null
+  schemas: Listing<String>? = null
+  jdbcDeps: Listing<String>? = null
+  flywayVersion: String? = null
+  cleanDisabled: Boolean? = null
+}
+
+config: FlywayPluginConfig = new {}

@@ -246,6 +246,32 @@ local const springBootModules =
     }
   }.get
 
+local const flywayModules =
+  new CreateScalaModules {
+    root = "deder-flyway"
+    id = "deder-flyway"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = scalaVer
+      deps {
+        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+      }
+      pomSettings =
+        pom(
+          "deder-flyway",
+          "Deder Flyway Plugin",
+          "Deder plugin for running Flyway database migrations"
+        )
+      publish = true
+      publishTo = publishRepo
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:1.2.1"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
@@ -255,4 +281,5 @@ modules {
   ...openapi4sModules.all
   ...squeryModules.all
   ...springBootModules.all
+  ...flywayModules.all
 }
