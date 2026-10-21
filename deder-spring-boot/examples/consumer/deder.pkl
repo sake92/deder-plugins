@@ -1,0 +1,18 @@
+amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
+
+import "../../resources/SpringBootPlugin.pkl" as SB
+
+plugins {
+  new SB.SpringBootPlugin {}
+}
+
+modules {
+  new JavaModule {
+    id = "example"
+    root = "."
+    deps {
+      "org.springframework.boot:spring-boot-starter:3.5.6"
+    }
+    mainClass = "example.Application"
+  }
+}
