@@ -5,7 +5,9 @@ import ba.sake.deder.config.DederProject.ModuleType
 import ba.sake.deder.deps.Dependency
 import ba.sake.deder.plugins.Flyway
 
-import java.lang.reflect.InvocationTargetException
+import org.flywaydb.core.api.MigrationInfo
+import org.flywaydb.core.{Flyway => FlywayCore}
+
 import java.net.URLClassLoader
 
 object FlywayTasks {
@@ -42,11 +44,12 @@ object FlywayTasks {
         val resolved = FlywayConfigNormalizer.normalize(ctx.module.id, config)
         require(resolved.enabled, s"flyway plugin is disabled for module ${ctx.module.id}")
         validate(resolved, ctx.module.id, method)
-        val flywayDeps = Dependency.make(s"org.flywaydb:flyway-core:${resolved.flywayVersion}", "2.13.16") +:
-          resolved.jdbcDeps.map(Dependency.make(_, "2.13.16"))
-        val flywayClasspath = ctx.dependencyResolver.fetchFiles(flywayDeps, Some(ctx.notifications))
+        val jdbcDeps = resolved.jdbcDeps.map(Dependency.make(_, "2.13.16"))
+        val jdbcClasspath =
+          if jdbcDeps.isEmpty then Seq.empty
+          else ctx.dependencyResolver.fetchFiles(jdbcDeps, Some(ctx.notifications))
         ctx.notifications.add(ServerNotification.logInfo(s"Running $taskName for ${ctx.module.id}"))
-        val output = run(flywayClasspath ++ moduleClasspath, resolved, method)
+        val output = run(jdbcClasspath ++ moduleClasspath, resolved, method)
         if output.nonEmpty then ctx.notifications.add(ServerNotification.logInfo(output))
         output
       }
@@ -69,84 +72,39 @@ object FlywayTasks {
   }
 
   private def run(classpath: Seq[os.Path], config: ResolvedFlywayConfig, method: String): String = {
-    val thread = Thread.currentThread()
-    val previousLoader = thread.getContextClassLoader
-    val loader = new URLClassLoader(classpath.map(_.toNIO.toUri.toURL).toArray, ClassLoader.getPlatformClassLoader)
+    // JDBC drivers, Flyway database modules and classpath migrations are found through this loader
+    val loader = new URLClassLoader(classpath.map(_.toNIO.toUri.toURL).toArray, getClass.getClassLoader)
     try {
-      thread.setContextClassLoader(loader)
-      try {
-        val flywayClass = loader.loadClass("org.flywaydb.core.Flyway")
-        var conf = flywayClass.getMethod("configure").invoke(null)
-        def call(name: String, argTypes: Seq[Class[?]], args: Seq[AnyRef]): AnyRef = {
-          val m = conf.getClass.getMethod(name, argTypes*)
-          conf = m.invoke(conf, args*)
-          conf
-        }
-        val strings = classOf[Array[String]]
-        call("classLoader", Seq(classOf[ClassLoader]), Seq(loader))
-        call(
-          "dataSource",
-          Seq(classOf[String], classOf[String], classOf[String]),
-          Seq(config.url, config.user, config.password)
-        )
-        val locations = config.locations.map(resolveLocation(_, DederGlobals.projectRootDir)).toArray
-        call("locations", Seq(strings), Seq(locations))
-        if config.schemas.nonEmpty then call("schemas", Seq(strings), Seq(config.schemas.toArray))
-        call("cleanDisabled", Seq(classOf[Boolean]), Seq(Boolean.box(config.cleanDisabled)))
-        val flyway = conf.getClass.getMethod("load").invoke(conf)
-        val result = flyway.getClass.getMethod(method).invoke(flyway)
-        if method == "info" then formatInfo(result) else describe(method, result)
-      } catch {
-        case error: InvocationTargetException => throw error.getCause
+      val builder = FlywayCore
+        .configure(loader)
+        .dataSource(config.url, config.user, config.password)
+        .locations(config.locations.map(resolveLocation(_, DederGlobals.projectRootDir))*)
+        .cleanDisabled(config.cleanDisabled)
+      if config.schemas.nonEmpty then builder.schemas(config.schemas*)
+      val flyway = builder.load()
+      method match {
+        case "migrate" =>
+          val result = flyway.migrate()
+          s"Flyway migrate: ${result.migrationsExecuted} migration(s) executed, schema version: ${Option(result.targetSchemaVersion).getOrElse("<none>")}"
+        case "clean"    => flyway.clean(); "Flyway clean finished"
+        case "info"     => formatInfo(flyway.info().all().toSeq)
+        case "validate" => flyway.validate(); "Flyway validate: OK"
+        case "baseline" => flyway.baseline(); "Flyway baseline finished"
+        case "repair"   => flyway.repair(); "Flyway repair finished"
+        case other      => throw new IllegalArgumentException(s"Unknown Flyway command: $other")
       }
-    } finally {
-      thread.setContextClassLoader(previousLoader)
-      loader.close()
-    }
+    } finally loader.close()
   }
 
-  private def describe(method: String, result: AnyRef): String =
-    method match {
-      case "migrate" =>
-        val count = member(result, "migrationsExecuted")
-        val target = member(result, "targetSchemaVersion")
-        s"Flyway migrate: $count migration(s) executed, schema version: ${Option(target).getOrElse("<none>")}"
-      case "validate" => "Flyway validate: OK"
-      case other      => s"Flyway $other finished"
-    }
-
-  private def formatInfo(infoService: AnyRef): String = {
-    val all = invoke(infoService, "all").asInstanceOf[Array[AnyRef]]
-    val rows = all.toSeq.map { info =>
-      val state = invoke(invoke(info, "getState"), "getDisplayName")
-      Seq(
-        String.valueOf(Option(invoke(info, "getVersion")).getOrElse("")),
-        String.valueOf(invoke(info, "getDescription")),
-        String.valueOf(state)
-      )
-    }
+  private def formatInfo(infos: Seq[MigrationInfo]): String = {
     val header = Seq("Version", "Description", "State")
+    val rows = infos.map { info =>
+      Seq(Option(info.getVersion).map(_.toString).getOrElse(""), info.getDescription, info.getState.getDisplayName)
+    }
     val table = header +: rows
     val widths = header.indices.map(i => table.map(_(i).length).max)
     table
       .map(row => row.zip(widths).map { case (cell, w) => cell.padTo(w, ' ') }.mkString(" | ").trim)
       .mkString("\n")
   }
-
-  private def invoke(target: AnyRef, name: String): AnyRef =
-    if target == null then null
-    else {
-      val method = target.getClass.getMethod(name)
-      method.setAccessible(true)
-      method.invoke(target)
-    }
-
-  /** Flyway result objects expose public fields, older/newer versions may expose getters instead. */
-  private def member(target: AnyRef, name: String): AnyRef =
-    if target == null then null
-    else
-      try target.getClass.getField(name).get(target)
-      catch {
-        case _: NoSuchFieldException => invoke(target, "get" + name.capitalize)
-      }
 }

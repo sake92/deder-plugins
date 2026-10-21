@@ -36,7 +36,7 @@ Run with `deder exec -t <task> -m <module-id>`:
 
 `defaults` (overridable per module in `config.modules["module-id"]`):
 `enabled`, `url`, `user`, `password`, `locations` (default `classpath:db/migration`), `schemas`,
-`jdbcDeps`, `flywayVersion` (default `11.8.2`), `cleanDisabled` (default `true`).
+`jdbcDeps`, `cleanDisabled` (default `true`).
 
 - `classpath:` locations are read from the module's run classpath, so compile first (`deder exec -t compile`) after changing migrations; `flywayMigrate` already depends on the classpath task.
 - Relative `filesystem:` locations are resolved against the project root.

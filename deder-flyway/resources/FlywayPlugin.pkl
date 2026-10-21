@@ -28,8 +28,6 @@ class ModuleDefaults {
   schemas: Listing<String> = new {}
   /// JDBC driver and Flyway database module dependencies, e.g. `org.postgresql:postgresql:42.7.4`
   jdbcDeps: Listing<String> = new {}
-  /// Flyway Community version
-  flywayVersion: String = "11.8.2"
   /// `flywayClean` is destructive, so it fails unless this is set to false
   cleanDisabled: Boolean = true
 }
@@ -42,7 +40,6 @@ class ModuleOverride {
   locations: Listing<String>? = null
   schemas: Listing<String>? = null
   jdbcDeps: Listing<String>? = null
-  flywayVersion: String? = null
   cleanDisabled: Boolean? = null
 }
 

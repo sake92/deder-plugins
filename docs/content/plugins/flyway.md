@@ -41,7 +41,6 @@ password = ""
 locations { "classpath:db/migration" }
 schemas {}
 jdbcDeps {}
-flywayVersion = "11.8.2"
 cleanDisabled = true // flywayClean fails unless false
 ```
 

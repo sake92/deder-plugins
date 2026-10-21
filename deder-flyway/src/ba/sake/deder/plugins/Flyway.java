@@ -189,8 +189,6 @@ public final class Flyway {
 
     public final @NonNull List<@NonNull String> jdbcDeps;
 
-    public final @NonNull String flywayVersion;
-
     public final boolean cleanDisabled;
 
     public ModuleDefaults(@Named("enabled") boolean enabled,
@@ -200,7 +198,6 @@ public final class Flyway {
         @Named("locations") @NonNull List<@NonNull String> locations,
         @Named("schemas") @NonNull List<@NonNull String> schemas,
         @Named("jdbcDeps") @NonNull List<@NonNull String> jdbcDeps,
-        @Named("flywayVersion") @NonNull String flywayVersion,
         @Named("cleanDisabled") boolean cleanDisabled) {
       this.enabled = enabled;
       this.url = url;
@@ -209,44 +206,39 @@ public final class Flyway {
       this.locations = locations;
       this.schemas = schemas;
       this.jdbcDeps = jdbcDeps;
-      this.flywayVersion = flywayVersion;
       this.cleanDisabled = cleanDisabled;
     }
 
     public ModuleDefaults withEnabled(boolean enabled) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleDefaults withUrl(@NonNull String url) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleDefaults withUser(@NonNull String user) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleDefaults withPassword(@NonNull String password) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleDefaults withLocations(@NonNull List<@NonNull String> locations) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleDefaults withSchemas(@NonNull List<@NonNull String> schemas) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleDefaults withJdbcDeps(@NonNull List<@NonNull String> jdbcDeps) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
-    }
-
-    public ModuleDefaults withFlywayVersion(@NonNull String flywayVersion) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleDefaults withCleanDisabled(boolean cleanDisabled) {
-      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleDefaults(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     @Override
@@ -262,7 +254,6 @@ public final class Flyway {
       if (!Objects.equals(this.locations, other.locations)) return false;
       if (!Objects.equals(this.schemas, other.schemas)) return false;
       if (!Objects.equals(this.jdbcDeps, other.jdbcDeps)) return false;
-      if (!Objects.equals(this.flywayVersion, other.flywayVersion)) return false;
       if (!Objects.equals(this.cleanDisabled, other.cleanDisabled)) return false;
       return true;
     }
@@ -277,7 +268,6 @@ public final class Flyway {
       result = 31 * result + Objects.hashCode(this.locations);
       result = 31 * result + Objects.hashCode(this.schemas);
       result = 31 * result + Objects.hashCode(this.jdbcDeps);
-      result = 31 * result + Objects.hashCode(this.flywayVersion);
       result = 31 * result + Objects.hashCode(this.cleanDisabled);
       return result;
     }
@@ -293,7 +283,6 @@ public final class Flyway {
       appendProperty(builder, "locations", this.locations);
       appendProperty(builder, "schemas", this.schemas);
       appendProperty(builder, "jdbcDeps", this.jdbcDeps);
-      appendProperty(builder, "flywayVersion", this.flywayVersion);
       appendProperty(builder, "cleanDisabled", this.cleanDisabled);
       builder.append("\n}");
       return builder.toString();
@@ -315,8 +304,6 @@ public final class Flyway {
 
     public final List<@NonNull String> jdbcDeps;
 
-    public final String flywayVersion;
-
     public final Boolean cleanDisabled;
 
     public ModuleOverride(@Named("enabled") Boolean enabled,
@@ -326,7 +313,6 @@ public final class Flyway {
         @Named("locations") List<@NonNull String> locations,
         @Named("schemas") List<@NonNull String> schemas,
         @Named("jdbcDeps") List<@NonNull String> jdbcDeps,
-        @Named("flywayVersion") String flywayVersion,
         @Named("cleanDisabled") Boolean cleanDisabled) {
       this.enabled = enabled;
       this.url = url;
@@ -335,44 +321,39 @@ public final class Flyway {
       this.locations = locations;
       this.schemas = schemas;
       this.jdbcDeps = jdbcDeps;
-      this.flywayVersion = flywayVersion;
       this.cleanDisabled = cleanDisabled;
     }
 
     public ModuleOverride withEnabled(Boolean enabled) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleOverride withUrl(String url) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleOverride withUser(String user) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleOverride withPassword(String password) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleOverride withLocations(List<@NonNull String> locations) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleOverride withSchemas(List<@NonNull String> schemas) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleOverride withJdbcDeps(List<@NonNull String> jdbcDeps) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
-    }
-
-    public ModuleOverride withFlywayVersion(String flywayVersion) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     public ModuleOverride withCleanDisabled(Boolean cleanDisabled) {
-      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, flywayVersion, cleanDisabled);
+      return new ModuleOverride(enabled, url, user, password, locations, schemas, jdbcDeps, cleanDisabled);
     }
 
     @Override
@@ -388,7 +369,6 @@ public final class Flyway {
       if (!Objects.equals(this.locations, other.locations)) return false;
       if (!Objects.equals(this.schemas, other.schemas)) return false;
       if (!Objects.equals(this.jdbcDeps, other.jdbcDeps)) return false;
-      if (!Objects.equals(this.flywayVersion, other.flywayVersion)) return false;
       if (!Objects.equals(this.cleanDisabled, other.cleanDisabled)) return false;
       return true;
     }
@@ -403,7 +383,6 @@ public final class Flyway {
       result = 31 * result + Objects.hashCode(this.locations);
       result = 31 * result + Objects.hashCode(this.schemas);
       result = 31 * result + Objects.hashCode(this.jdbcDeps);
-      result = 31 * result + Objects.hashCode(this.flywayVersion);
       result = 31 * result + Objects.hashCode(this.cleanDisabled);
       return result;
     }
@@ -419,7 +398,6 @@ public final class Flyway {
       appendProperty(builder, "locations", this.locations);
       appendProperty(builder, "schemas", this.schemas);
       appendProperty(builder, "jdbcDeps", this.jdbcDeps);
-      appendProperty(builder, "flywayVersion", this.flywayVersion);
       appendProperty(builder, "cleanDisabled", this.cleanDisabled);
       builder.append("\n}");
       return builder.toString();

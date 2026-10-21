@@ -255,6 +255,7 @@ local const flywayModules =
       scalaVersion = scalaVer
       deps {
         "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "org.flywaydb:flyway-core:11.8.2"
       }
       pomSettings =
         pom(

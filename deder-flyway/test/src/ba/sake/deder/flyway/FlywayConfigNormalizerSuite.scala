@@ -14,11 +14,10 @@ class FlywayConfigNormalizerSuite extends FunSuite {
     JList.of("classpath:db/migration"),
     JList.of(),
     JList.of("com.h2database:h2:2.3.232"),
-    "11.8.2",
     true
   )
 
-  private def empty = new Flyway.ModuleOverride(null, null, null, null, null, null, null, null, null)
+  private def empty = new Flyway.ModuleOverride(null, null, null, null, null, null, null, null)
 
   test("defaults apply when module has no override") {
     val config = new Flyway.FlywayPluginConfig(defaults, JMap.of())
@@ -26,7 +25,6 @@ class FlywayConfigNormalizerSuite extends FunSuite {
     assertEquals(resolved.url, "jdbc:h2:mem:default")
     assertEquals(resolved.locations, Seq("classpath:db/migration"))
     assertEquals(resolved.cleanDisabled, true)
-    assertEquals(resolved.flywayVersion, "11.8.2")
   }
 
   test("module overrides replace defaults and inherit the rest") {
@@ -37,7 +35,6 @@ class FlywayConfigNormalizerSuite extends FunSuite {
       null,
       JList.of("filesystem:sql", " "),
       JList.of("PUBLIC"),
-      null,
       null,
       false
     )
@@ -68,7 +65,7 @@ class FlywayTasksSuite extends FunSuite {
   }
 
   test("clean requires cleanDisabled = false and url is required") {
-    val config = ResolvedFlywayConfig(true, "jdbc:h2:mem:x", "", "", Seq(), Seq(), Seq(), "11.8.2", true)
+    val config = ResolvedFlywayConfig(true, "jdbc:h2:mem:x", "", "", Seq(), Seq(), Seq(), true)
     intercept[IllegalArgumentException](FlywayTasks.validate(config, "app", "clean"))
     FlywayTasks.validate(config, "app", "migrate")
     FlywayTasks.validate(config.copy(cleanDisabled = false), "app", "clean")

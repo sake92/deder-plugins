@@ -11,7 +11,6 @@ final case class ResolvedFlywayConfig(
     locations: Seq[String],
     schemas: Seq[String],
     jdbcDeps: Seq[String],
-    flywayVersion: String,
     cleanDisabled: Boolean
 )
 
@@ -35,7 +34,6 @@ object FlywayConfigNormalizer {
       locations = listing(_.locations, defaults.locations),
       schemas = listing(_.schemas, defaults.schemas),
       jdbcDeps = listing(_.jdbcDeps, defaults.jdbcDeps),
-      flywayVersion = string(_.flywayVersion, defaults.flywayVersion).trim,
       cleanDisabled =
         module.flatMap(m => Option(m.cleanDisabled).map(_.booleanValue())).getOrElse(defaults.cleanDisabled)
     )
