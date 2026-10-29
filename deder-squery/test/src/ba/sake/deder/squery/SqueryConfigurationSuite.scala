@@ -9,7 +9,7 @@ class SqueryConfigurationSuite extends FunSuite {
   private def defaults = new Squery.ModuleDefaults(
     true,
     "jdbc:h2:mem:default",
-    JList.of("com.h2database:h2:2.3.232"),
+    JList.of("com.h2database:h2:2.5.252"),
     JMap.of("PUBLIC", "example"),
     "camelcase",
     "camelcase",
@@ -44,7 +44,7 @@ class SqueryConfigurationSuite extends FunSuite {
     assertEquals(resolved.schemaMappings, Seq("OTHER" -> "custom"))
     assertEquals(resolved.includeTables, Seq("OTHER\\.ACTOR"))
     assertEquals(resolved.rowTypeSuffix, "Row")
-    assertEquals(SqueryConfigNormalizer.normalize("default", config).jdbcDeps, Seq("com.h2database:h2:2.3.232"))
+    assertEquals(SqueryConfigNormalizer.normalize("default", config).jdbcDeps, Seq("com.h2database:h2:2.5.252"))
   }
 
   test("CLI arguments preserve ordered repeated values and default to all tables") {

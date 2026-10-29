@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.21.1/DederProject.pkl"
 
 import "../../resources/SqueryPlugin.pkl" as SQ
 
@@ -7,7 +7,7 @@ plugins {
     config = new {
       defaults = new {
         jdbcUrl = "jdbc:h2:mem:squery;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM './schema.sql'"
-        jdbcDeps { "com.h2database:h2:2.3.232" }
+        jdbcDeps { "com.h2database:h2:2.5.252" }
         schemaMappings { ["PUBLIC"] = "example" }
         includeTables { "PUBLIC\\.ACTOR" }
       }
@@ -22,7 +22,7 @@ modules {
     scalaVersion = "3.7.4"
     deps {
       "ba.sake::squery:0.12.0"
-      "com.h2database:h2:2.3.232"
+      "com.h2database:h2:2.5.252"
     }
   }
 }

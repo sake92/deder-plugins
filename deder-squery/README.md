@@ -13,7 +13,7 @@ plugins {
     config = new {
       defaults = new {
         jdbcUrl = "jdbc:h2:./database"
-        jdbcDeps { "com.h2database:h2:2.3.232" }
+        jdbcDeps { "com.h2database:h2:2.5.252" }
         schemaMappings { ["PUBLIC"] = "example.db" }
       }
     }

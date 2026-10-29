@@ -21,8 +21,8 @@ plugins {
     config = new {
       defaults = new {
         deps {
-          "com.lihaoyi::upickle:4.1.0"
-          "com.lihaoyi::os-lib:0.11.3"
+          "com.lihaoyi::upickle:4.4.3"
+          "com.lihaoyi::os-lib:0.11.10"
         }
         extra {
           ["package"] = "com.example.generated"
