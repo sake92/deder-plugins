@@ -45,7 +45,7 @@ plugins {
             name = "grpc-java"
             resolver = new PB.ResolverConfig {
               kind = "binary-maven"
-              dependency = "io.grpc:protoc-gen-grpc-java:1.75.0"
+              dependency = "io.grpc:protoc-gen-grpc-java:1.85.1"
             }
           }
         }

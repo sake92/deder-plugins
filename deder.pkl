@@ -1,7 +1,15 @@
-amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.21.1/DederProject.pkl"
 
-local const scalaVer = "3.7.4"
-local const pluginApiVersion = "0.20.0"
+local const versions = new {
+  scala = "3.7.4"
+  dederPluginApi = "0.21.1"
+  munit = "1.3.6"
+  sharaf = "0.19.0"
+  tupson = "0.31.0"
+  layoutz = "0.7.0"
+  springBootLoaderTools = "3.5.6"
+  flyway = "11.8.2"
+}
 local const publishRepo = if (read?("env:DEDER_PUBLISH_SNAPSHOT") == "true")
   new SonatypeSnapshotRepo { id = "sonatype" }
 else
@@ -38,9 +46,9 @@ local const pluginModules =
     id = "deder-protobuf"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       deps {
-        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
       }
       pomSettings =
         pom(
@@ -53,7 +61,7 @@ local const pluginModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get
@@ -64,9 +72,9 @@ local const buildInfoModules =
     id = "deder-build-info"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       deps {
-        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
       }
       pomSettings =
         pom(
@@ -79,7 +87,7 @@ local const buildInfoModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get
@@ -90,11 +98,11 @@ local const dashboardModules =
     id = "deder-web-dashboard"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       scalacOptions { "-Yretain-trees" }
       deps {
-        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
-        "ba.sake::sharaf-jdk-httpserver:0.19.0"
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
+        "ba.sake::sharaf-jdk-httpserver:\(versions.sharaf)"
       }
       pomSettings =
         pom(
@@ -107,7 +115,7 @@ local const dashboardModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get
@@ -118,10 +126,10 @@ local const tuiModules =
     id = "deder-tui-dashboard"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       deps {
-        "ba.sake::tupson:0.20.0"
-        "xyz.matthieucourt::layoutz:0.7.0"
+        "ba.sake::tupson:\(versions.tupson)"
+        "xyz.matthieucourt::layoutz:\(versions.layoutz)"
       }
       mainClass = "ba.sake.deder.tuidashboard.app.TuiDashboardMain"
       pomSettings =
@@ -135,7 +143,7 @@ local const tuiModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get
@@ -146,10 +154,10 @@ local const sourcegenModules =
     id = "deder-sourcegen"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       deps {
-        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
-        "org.scala-lang::scala3-compiler:\(scalaVer)"
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
+        "org.scala-lang::scala3-compiler:\(versions.scala)"
       }
       pomSettings =
         pom(
@@ -162,7 +170,7 @@ local const sourcegenModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get
@@ -173,9 +181,9 @@ local const squeryModules =
     id = "deder-squery"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       deps {
-        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
       }
       pomSettings =
         pom(
@@ -188,7 +196,7 @@ local const squeryModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get
@@ -199,9 +207,9 @@ local const openapi4sModules =
     id = "deder-openapi4s"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       deps {
-        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
       }
       pomSettings =
         pom(
@@ -214,7 +222,7 @@ local const openapi4sModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get
@@ -225,10 +233,10 @@ local const springBootModules =
     id = "deder-spring-boot"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       deps {
-        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
-        "org.springframework.boot:spring-boot-loader-tools:3.5.6"
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
+        "org.springframework.boot:spring-boot-loader-tools:\(versions.springBootLoaderTools)"
       }
       pomSettings =
         pom(
@@ -241,7 +249,7 @@ local const springBootModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get
@@ -252,10 +260,10 @@ local const flywayModules =
     id = "deder-flyway"
     layout = "default"
     template = new ScalaModule {
-      scalaVersion = scalaVer
+      scalaVersion = versions.scala
       deps {
-        "ba.sake::deder-plugin-api:\(pluginApiVersion)"
-        "org.flywaydb:flyway-core:11.8.2"
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
+        "org.flywaydb:flyway-core:\(versions.flyway)"
       }
       pomSettings =
         pom(
@@ -268,7 +276,7 @@ local const flywayModules =
     }
     testTemplate = (template.asTest()) {
       deps {
-        "org.scalameta::munit:1.2.1"
+        "org.scalameta::munit:\(versions.munit)"
       }
     }
   }.get

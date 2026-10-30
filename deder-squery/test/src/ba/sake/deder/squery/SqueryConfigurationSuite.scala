@@ -9,7 +9,7 @@ class SqueryConfigurationSuite extends FunSuite {
   private def defaults = new Squery.ModuleDefaults(
     true,
     "jdbc:h2:mem:default",
-    JList.of("com.h2database:h2:2.3.232"),
+    JList.of("com.h2database:h2:2.5.252"),
     JMap.of("PUBLIC", "example"),
     "camelcase",
     "camelcase",
@@ -48,7 +48,7 @@ class SqueryConfigurationSuite extends FunSuite {
     assertEquals(resolved.rowTypeSuffix, "Row")
     assertEquals(resolved.newtypes, "none")
     assertEquals(resolved.squeryVersion, "0.13.0")
-    assertEquals(SqueryConfigNormalizer.normalize("default", config).jdbcDeps, Seq("com.h2database:h2:2.3.232"))
+    assertEquals(SqueryConfigNormalizer.normalize("default", config).jdbcDeps, Seq("com.h2database:h2:2.5.252"))
   }
 
   private def overrideWith(newtypes: String): Squery.ModuleOverride = new Squery.ModuleOverride(
@@ -97,5 +97,8 @@ class SqueryConfigurationSuite extends FunSuite {
     assertEquals(args.sliding(2).filter(_.head == "--newtypes").map(_.last).toSeq, Seq("none"))
     assertEquals(args.sliding(2).filter(_.head == "--includeTables").map(_.last).toSeq, Seq(".*"))
     assertEquals(args.sliding(2).filter(_.head == "--excludeTables").map(_.last).toSeq, config.excludeTables)
+
+    val legacyArgs = SqueryGenerationTask.arguments(config.copy(squeryVersion = "0.12.0"), os.Path("/tmp/generated"))
+    assertEquals(legacyArgs.sliding(2).filter(_.head == "--newtypes").map(_.last).toSeq, Seq.empty)
   }
 }

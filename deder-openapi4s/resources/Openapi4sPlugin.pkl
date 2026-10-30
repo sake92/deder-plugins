@@ -26,7 +26,7 @@ class ModuleDefaults {
   tags: Listing<String> = new {}
   input: String? = null
   targetDir: String? = null
-  version: String = "0.9.0"
+  version: String = "0.10.0"
 }
 
 class ModuleOverride {

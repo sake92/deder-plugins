@@ -37,7 +37,7 @@ Set these fields in `config.defaults`; use `config.modules["module-id"]` to over
 | `tags` | empty listing | Client tags; empty includes all tags |
 | `input` | first resource directory + `/openapi.json` | OpenAPI document, JSON Schema file, or JSON Schema directory |
 | `targetDir` | first source directory | Output base directory |
-| `version` | `"0.9.0"` | OpenAPI4s CLI version |
+| `version` | `"0.10.0"` | OpenAPI4s CLI version |
 
 Set `framework = "none"` or `client = "none"` to omit those CLI options. Generated files can contain hand-written changes, so review regeneration before committing.
 

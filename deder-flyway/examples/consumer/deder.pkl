@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.21.1/DederProject.pkl"
 
 import "../../resources/FlywayPlugin.pkl" as FW
 
@@ -8,7 +8,7 @@ plugins {
       defaults = new {
         url = "jdbc:h2:./target/example-db"
         user = "sa"
-        jdbcDeps { "com.h2database:h2:2.3.232" }
+        jdbcDeps { "com.h2database:h2:2.5.252" }
       }
     }
   }

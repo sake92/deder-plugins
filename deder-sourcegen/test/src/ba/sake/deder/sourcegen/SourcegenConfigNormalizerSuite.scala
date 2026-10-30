@@ -47,7 +47,7 @@ class SourcegenConfigNormalizerSuite extends munit.FunSuite {
 
   test("resolves defaults when no override exists") {
     val defaults = makeDefaults(
-      deps = Seq("com.lihaoyi::upickle:4.1.0"),
+      deps = Seq("com.lihaoyi::upickle:4.4.3"),
       extra = Map("package" -> "com.example")
     )
     val config = makeConfig(defaults)
@@ -56,7 +56,7 @@ class SourcegenConfigNormalizerSuite extends munit.FunSuite {
     val resolved = SourcegenConfigNormalizer.normalize(module, config)
 
     assert(resolved.enabled)
-    assertEquals(resolved.deps, Seq("com.lihaoyi::upickle:4.1.0"))
+    assertEquals(resolved.deps, Seq("com.lihaoyi::upickle:4.4.3"))
     assertEquals(resolved.scriptsDir, "deder/sourcegen")
     assertEquals(resolved.scalaVersion, Option.empty[String])
     assertEquals(resolved.outputSourceSet, "main")
@@ -65,7 +65,7 @@ class SourcegenConfigNormalizerSuite extends munit.FunSuite {
 
   test("module override wins over defaults") {
     val defaults = makeDefaults(
-      deps = Seq("com.lihaoyi::upickle:4.1.0"),
+      deps = Seq("com.lihaoyi::upickle:4.4.3"),
       extra = Map("package" -> "com.example")
     )
     val moduleOverride = makeOverride(
@@ -83,7 +83,7 @@ class SourcegenConfigNormalizerSuite extends munit.FunSuite {
 
   test("partial override inherits non-overridden fields from defaults") {
     val defaults = makeDefaults(
-      deps = Seq("com.lihaoyi::upickle:4.1.0"),
+      deps = Seq("com.lihaoyi::upickle:4.4.3"),
       scriptsDir = "deder/sourcegen",
       outputSourceSet = "main",
       extra = Map("key" -> "defaultVal")
@@ -96,7 +96,7 @@ class SourcegenConfigNormalizerSuite extends munit.FunSuite {
 
     val resolved = SourcegenConfigNormalizer.normalize(module, config)
 
-    assertEquals(resolved.deps, Seq("com.lihaoyi::upickle:4.1.0"))
+    assertEquals(resolved.deps, Seq("com.lihaoyi::upickle:4.4.3"))
     assertEquals(resolved.scriptsDir, "deder/sourcegen")
     assertEquals(resolved.outputSourceSet, "test")
     assertEquals(resolved.extra("key"), "defaultVal")

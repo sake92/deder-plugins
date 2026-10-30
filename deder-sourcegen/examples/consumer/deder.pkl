@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.21.1/DederProject.pkl"
 
 import "../../resources/SourcegenPlugin.pkl" as SG
 
@@ -7,8 +7,8 @@ plugins {
     config = new {
       defaults = new {
         deps {
-          "com.lihaoyi::upickle:4.1.0"
-          "com.lihaoyi::os-lib:0.11.3"
+          "com.lihaoyi::upickle:4.4.3"
+          "com.lihaoyi::os-lib:0.11.10"
         }
         extra {
           ["package"] = "consumer.generated"

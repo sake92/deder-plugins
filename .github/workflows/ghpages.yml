@@ -25,7 +25,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 0
@@ -34,7 +34,7 @@ jobs:
         env:
           FLATMARK_BASE_URL: https://sake92.github.io/deder-plugins
         run: |
-          wget https://github.com/sake92/flatmark/releases/download/v0.0.28/flatmark-1.0.0.pkg
+          wget https://github.com/sake92/flatmark/releases/download/v0.3.0/flatmark-1.0.0.pkg
           sudo installer -pkg flatmark-1.0.0.pkg -target /
           ./scripts/build-docs.sh
 
