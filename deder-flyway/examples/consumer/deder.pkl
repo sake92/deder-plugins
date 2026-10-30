@@ -1,0 +1,23 @@
+amends "https://sake92.github.io/deder/config/v0.21.1/DederProject.pkl"
+
+import "../../resources/FlywayPlugin.pkl" as FW
+
+plugins {
+  new FW.FlywayPlugin {
+    config = new {
+      defaults = new {
+        url = "jdbc:h2:./target/example-db"
+        user = "sa"
+        jdbcDeps { "com.h2database:h2:2.5.252" }
+      }
+    }
+  }
+}
+
+modules {
+  new ScalaModule {
+    id = "consumer"
+    root = "."
+    scalaVersion = "3.7.4"
+  }
+}

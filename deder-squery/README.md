@@ -13,7 +13,7 @@ plugins {
     config = new {
       defaults = new {
         jdbcUrl = "jdbc:h2:./database"
-        jdbcDeps { "com.h2database:h2:2.3.232" }
+        jdbcDeps { "com.h2database:h2:2.5.252" }
         schemaMappings { ["PUBLIC"] = "example.db" }
       }
     }
@@ -23,12 +23,17 @@ plugins {
 
 Run `deder exec -t squeryGenerate -m <module-id>`. Generation also runs before
 compilation because `squeryGenerate` is a source generator. Add
-`ba.sake::squery:0.12.0` and your JDBC driver to the consuming module's `deps`
+`ba.sake::squery:0.13.0` and your JDBC driver to the consuming module's `deps`
 when the generated code uses them.
 
 The `defaults` object also supports `colNameIdentifierMapper`, `typeNameMapper`,
 `rowTypeSuffix`, `daoTypeSuffix`, `typeMappingRules`, `includeTables`,
-`excludeTables`, and `squeryVersion`. CLI options with multiple values use Pkl
-listings. `includeTables` defaults to all tables; exclusions take precedence.
+`excludeTables`, `newtypes`, and `squeryVersion`. CLI options with multiple
+values use Pkl listings. `includeTables` defaults to all tables; exclusions take
+precedence.
 Override any field for one module in `config.modules["module-id"]` or set
 `enabled = false` there. Generated files live in Deder's source generator output.
+
+Set `newtypes = "iron"` to generate Iron key newtypes instead of primitive keys
+(the default, `"none"`). Iron mode requires Scala 3.9.0 or newer and
+`ba.sake::squery-iron:0.13.0` in the consuming module.

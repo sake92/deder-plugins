@@ -1,0 +1,33 @@
+module ba.sake.deder.plugins.springboot
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class SpringBootPlugin extends P.DederPlugin {
+  id = "spring-boot"
+  version: String = "0.6.0"
+  deps {
+    "ba.sake::deder-spring-boot:\(version)"
+  }
+  config: SpringBootPluginConfig = new {}
+}
+
+class SpringBootPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {}
+}
+
+class ModuleDefaults {
+  enabled: Boolean = true
+  /// Application main class, falls back to the module's main class
+  mainClass: String? = null
+  /// JVM options used by `springBootRun`
+  jvmOptions: Listing<String> = new Listing {}
+}
+
+class ModuleOverride {
+  enabled: Boolean? = null
+  mainClass: String? = null
+  jvmOptions: Listing<String>? = null
+}
+
+config: SpringBootPluginConfig = new {}

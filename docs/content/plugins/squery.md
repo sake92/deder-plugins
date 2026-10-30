@@ -20,7 +20,7 @@ plugins {
     config = new {
       defaults = new {
         jdbcUrl = "jdbc:h2:./database"
-        jdbcDeps { "com.h2database:h2:2.3.232" }
+        jdbcDeps { "com.h2database:h2:2.5.252" }
         schemaMappings { ["PUBLIC"] = "example.db" }
       }
     }
@@ -28,7 +28,7 @@ plugins {
 }
 ```
 
-Add `ba.sake::squery:0.12.0` and the JDBC driver to the consuming Scala
+Add `ba.sake::squery:0.13.0` and the JDBC driver to the consuming Scala
 module's dependencies. Run `deder exec -t squeryGenerate -m <module-id>`, or
 compile the module to generate sources automatically.
 
@@ -49,7 +49,11 @@ to override them for one module. Set `enabled = false` to skip generation.
 | `typeMappingRules` | empty | Ordered `column-regex\|declared-type-regex\|Scala-type` rules. |
 | `includeTables` | all tables | Regexes matching `schema.table`; ordered and repeatable. |
 | `excludeTables` | empty | Regexes to exclude; exclusions take precedence. |
-| `squeryVersion` | `"0.12.0"` | Squery CLI version. |
+| `newtypes` | `"none"` | Key types: `"none"` for primitives or `"iron"` for Iron newtypes. |
+| `squeryVersion` | `"0.13.0"` | Squery CLI version. |
+
+With `newtypes = "iron"`, the consuming module requires Scala 3.9.0 or newer
+and `ba.sake::squery-iron:0.13.0` alongside Squery.
 
 Generated files are written to Deder's `squeryGenerate/sources` output.
 

@@ -42,15 +42,22 @@ object SqueryGenerationTask {
     def repeated(name: String, values: Seq[String]): Seq[String] =
       values.flatMap(value => Seq(name, value))
 
+    val newtypesArgs =
+      if config.squeryVersion == "0.12.0" then {
+        require(config.newtypes == "none", "Squery 0.12.0 does not support newtypes")
+        Seq.empty
+      } else Seq("--newtypes", config.newtypes)
+
     Seq(
-      "--jdbcUrl", config.jdbcUrl,
-      "--baseFolder", sourceOut.toString,
-      "--colNameIdentifierMapper", config.colNameIdentifierMapper,
-      "--typeNameMapper", config.typeNameMapper,
-      "--rowTypeSuffix", config.rowTypeSuffix,
-      "--daoTypeSuffix", config.daoTypeSuffix
+      "--jdbc-url", config.jdbcUrl,
+      "--base-folder", sourceOut.toString,
+      "--col-name-identifier-mapper", config.colNameIdentifierMapper,
+      "--type-name-mapper", config.typeNameMapper,
+      "--row-type-suffix", config.rowTypeSuffix,
+      "--dao-type-suffix", config.daoTypeSuffix
     ) ++
-      repeated("--schemaMappings", config.schemaMappings.map { case (schema, pkg) => s"$schema:$pkg" }) ++
+      newtypesArgs ++
+      repeated("--schema-mappings", config.schemaMappings.map { case (schema, pkg) => s"$schema:$pkg" }) ++
       repeated("--typeMappingRule", config.typeMappingRules) ++
       repeated("--includeTables", if config.includeTables.isEmpty then Seq(".*") else config.includeTables) ++
       repeated("--excludeTables", config.excludeTables)
