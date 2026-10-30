@@ -1,7 +1,7 @@
-amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.22.1/DederProject.pkl"
 
-local const scalaVer = "3.7.4"
-local const pluginApiVersion = "0.20.0"
+local const scalaVer = "3.9.0"
+local const pluginApiVersion = "0.22.1"
 local const publishRepo = if (read?("env:DEDER_PUBLISH_SNAPSHOT") == "true")
   new SonatypeSnapshotRepo { id = "sonatype" }
 else

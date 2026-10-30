@@ -95,6 +95,7 @@ These paths are already covered by `.gitignore`; do not add exceptions.
 ## Key Conventions
 
 - **Scala 3**, scalafmt with `runner.dialect = scala3`, `maxColumn = 120`
+- Keep Scala on the 3.9.0 LTS version for future updates.
 - **munit** (`org.scalameta::munit`) for all tests; test classes extend `munit.FunSuite`
 - The root `deder.pkl` uses `CreateScalaModules` helpers to define both the main module and the test module (named `<id>-test`) for each plugin
 - `ModuleDefaults` + `ModuleOverride` pattern: defaults apply to all modules; per-module overrides are `Option`-typed fields that shadow defaults when set

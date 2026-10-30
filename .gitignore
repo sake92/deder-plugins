@@ -28,6 +28,7 @@ tmp/
 docs/superpowers/
 .scalex
 .opencode
+/Lunacy/
 
 # flatmark generated output
 docs/_site/
