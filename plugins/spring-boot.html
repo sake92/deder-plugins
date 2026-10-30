@@ -45,13 +45,13 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
       <li><code>Main-Class: org.springframework.boot.loader.launch.JarLauncher</code>, <code>Start-Class: &lt;your main class&gt;</code></li>
      </ul>
      <p>Add it to your plugins list:</p>
-     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.4.0/SpringBootPlugin.pkl" as SB
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-meta"><span class="hljs-keyword">import</span> <span class="hljs-string">"https://sake92.github.io/deder-plugins/config/v0.4.0/SpringBootPlugin.pkl"</span> <span class="hljs-keyword">as</span> SB</span>
 
-plugins {
-  new SB.SpringBootPlugin {
-    config = new SB.SpringBootPluginConfig {
-      defaults = new SB.ModuleDefaults {
-        jvmOptions = new Listing { "-Xmx512m" }
+<span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> SB.<span class="hljs-property">SpringBootPlugin</span> {
+    <span class="hljs-property">config</span> = <span class="hljs-keyword">new</span> SB.<span class="hljs-property">SpringBootPluginConfig</span> {
+      <span class="hljs-property">defaults</span> = <span class="hljs-keyword">new</span> SB.<span class="hljs-property">ModuleDefaults</span> {
+        <span class="hljs-property">jvmOptions</span> = <span class="hljs-keyword">new</span> <span class="hljs-property">Listing</span> { <span class="hljs-string">"-Xmx512m"</span> }
       }
     }
   }
@@ -59,15 +59,15 @@ plugins {
 </code></pre>
      <p>Dependencies are not managed by the plugin (no BOM support yet), declare the versions in your module.</p>
      <p>Here are the defaults if you need to tweak them:</p>
-     <pre><code class="language-pkl">plugins {
-  new SB.SpringBootPlugin {
-    config = new SB.SpringBootPluginConfig {
-      defaults = new SB.ModuleDefaults {
-        enabled = true
-        mainClass = null // falls back to the module's mainClass
-        jvmOptions = new Listing {} // used by springBootRun
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> SB.<span class="hljs-property">SpringBootPlugin</span> {
+    <span class="hljs-property">config</span> = <span class="hljs-keyword">new</span> SB.<span class="hljs-property">SpringBootPluginConfig</span> {
+      <span class="hljs-property">defaults</span> = <span class="hljs-keyword">new</span> SB.<span class="hljs-property">ModuleDefaults</span> {
+        <span class="hljs-property">enabled</span> = <span class="hljs-literal">true</span>
+        <span class="hljs-property">mainClass</span> = <span class="hljs-literal">null</span> <span class="hljs-comment">// falls back to the module's mainClass</span>
+        <span class="hljs-property">jvmOptions</span> = <span class="hljs-keyword">new</span> <span class="hljs-property">Listing</span> {} <span class="hljs-comment">// used by springBootRun</span>
       }
-      modules = new Mapping {}
+      <span class="hljs-property">modules</span> = <span class="hljs-keyword">new</span> <span class="hljs-property">Mapping</span> {}
     }
   }
 }

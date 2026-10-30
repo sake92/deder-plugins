@@ -36,33 +36,33 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <h1 id="protobuf">Protobuf<a href="#protobuf" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>Generates protobuf and gRPC Java/Scala code from <code>.proto</code> files.</p>
      <p>Add it to your plugins list:</p>
-     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.4.0/ProtobufPlugin.pkl" as PB
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-meta"><span class="hljs-keyword">import</span> <span class="hljs-string">"https://sake92.github.io/deder-plugins/config/v0.4.0/ProtobufPlugin.pkl"</span> <span class="hljs-keyword">as</span> PB</span>
 
-plugins {
-  new PB.ProtobufPlugin {}
+<span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> PB.<span class="hljs-property">ProtobufPlugin</span> {}
 }
 </code></pre>
      <p>Here are the defaults if you need to tweak them:</p>
-     <pre><code class="language-pkl">plugins {
-  new PB.ProtobufPlugin {
-    config = new PB.ProtobufPluginConfig {
-      defaults = new PB.ModuleDefaults {
-        enabled = true
-        protoc = new PB.ResolverConfig {
-          kind = "system-path"
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> PB.<span class="hljs-property">ProtobufPlugin</span> {
+    <span class="hljs-property">config</span> = <span class="hljs-keyword">new</span> PB.<span class="hljs-property">ProtobufPluginConfig</span> {
+      <span class="hljs-property">defaults</span> = <span class="hljs-keyword">new</span> PB.<span class="hljs-property">ModuleDefaults</span> {
+        <span class="hljs-property">enabled</span> = <span class="hljs-literal">true</span>
+        <span class="hljs-property">protoc</span> = <span class="hljs-keyword">new</span> PB.<span class="hljs-property">ResolverConfig</span> {
+          <span class="hljs-property">kind</span> = <span class="hljs-string">"system-path"</span>
         }
-        builtins = new {}
-        plugins = new {}
-        imports = new PB.ImportConfig {
-          includeProjectDependencies = true
-          dependencyArtifacts = new {}
-          paths = new {}
+        <span class="hljs-property">builtins</span> = <span class="hljs-property">new</span> {}
+        <span class="hljs-property">plugins</span> = <span class="hljs-property">new</span> {}
+        <span class="hljs-property">imports</span> = <span class="hljs-keyword">new</span> PB.<span class="hljs-property">ImportConfig</span> {
+          <span class="hljs-property">includeProjectDependencies</span> = <span class="hljs-literal">true</span>
+          <span class="hljs-property">dependencyArtifacts</span> = <span class="hljs-property">new</span> {}
+          <span class="hljs-property">paths</span> = <span class="hljs-property">new</span> {}
         }
-        descriptor = null
-        main = new PB.SourceSetConfig {}
-        test = new PB.SourceSetConfig {}
+        <span class="hljs-property">descriptor</span> = <span class="hljs-literal">null</span>
+        <span class="hljs-property">main</span> = <span class="hljs-keyword">new</span> PB.<span class="hljs-property">SourceSetConfig</span> {}
+        <span class="hljs-property">test</span> = <span class="hljs-keyword">new</span> PB.<span class="hljs-property">SourceSetConfig</span> {}
       }
-      modules = new Mapping {}
+      <span class="hljs-property">modules</span> = <span class="hljs-keyword">new</span> <span class="hljs-property">Mapping</span> {}
     }
   }
 }

@@ -36,15 +36,15 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <h1 id="squery">Squery<a href="#squery" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>Generate Scala row models and DAOs from a JDBC database before compilation.</p>
      <p>Add the plugin to <code>deder.pkl</code>:</p>
-     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/deder-squery/early-access/SqueryPlugin.pkl" as SQ
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-meta"><span class="hljs-keyword">import</span> <span class="hljs-string">"https://sake92.github.io/deder-plugins/config/deder-squery/early-access/SqueryPlugin.pkl"</span> <span class="hljs-keyword">as</span> SQ</span>
 
-plugins {
-  new SQ.SqueryPlugin {
-    config = new {
-      defaults = new {
-        jdbcUrl = "jdbc:h2:./database"
-        jdbcDeps { "com.h2database:h2:2.3.232" }
-        schemaMappings { ["PUBLIC"] = "example.db" }
+<span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> SQ.<span class="hljs-property">SqueryPlugin</span> {
+    <span class="hljs-property">config</span> = <span class="hljs-property">new</span> {
+      <span class="hljs-property">defaults</span> = <span class="hljs-property">new</span> {
+        <span class="hljs-property">jdbcUrl</span> = <span class="hljs-string">"jdbc:h2:./database"</span>
+        <span class="hljs-property">jdbcDeps</span> { <span class="hljs-string">"com.h2database:h2:2.5.252"</span> }
+        <span class="hljs-property">schemaMappings</span> { [<span class="hljs-string">"PUBLIC"</span>] = <span class="hljs-string">"example.db"</span> }
       }
     }
   }

@@ -37,18 +37,18 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>Generates source code before module compilation using user-written Scala scripts.</p>
      <p>Place scripts in <code>&lt;module-root&gt;/deder/sourcegen/</code> with a <code>@main</code> entry point. Scripts are compiled and executed independently — they don't require the module to compile first.</p>
      <p>Add it to your plugins list:</p>
-     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/deder-sourcegen/early-access/SourcegenPlugin.pkl" as SG
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-meta"><span class="hljs-keyword">import</span> <span class="hljs-string">"https://sake92.github.io/deder-plugins/config/deder-sourcegen/early-access/SourcegenPlugin.pkl"</span> <span class="hljs-keyword">as</span> SG</span>
 
-plugins {
-  new SG.SourcegenPlugin {
-    config = new {
-      defaults = new {
-        deps {
-          "com.lihaoyi::upickle:4.1.0"
-          "com.lihaoyi::os-lib:0.11.3"
+<span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> SG.<span class="hljs-property">SourcegenPlugin</span> {
+    <span class="hljs-property">config</span> = <span class="hljs-property">new</span> {
+      <span class="hljs-property">defaults</span> = <span class="hljs-property">new</span> {
+        <span class="hljs-property">deps</span> {
+          <span class="hljs-string">"com.lihaoyi::upickle:4.4.3"</span>
+          <span class="hljs-string">"com.lihaoyi::os-lib:0.11.10"</span>
         }
-        extra {
-          ["package"] = "com.example.generated"
+        <span class="hljs-property">extra</span> {
+          [<span class="hljs-string">"package"</span>] = <span class="hljs-string">"com.example.generated"</span>
         }
       }
     }
@@ -56,18 +56,18 @@ plugins {
 }
 </code></pre>
      <p>Here are the defaults if you need to tweak them:</p>
-     <pre><code class="language-pkl">plugins {
-  new SG.SourcegenPlugin {
-    config = new {
-      defaults = new {
-        enabled = true
-        deps = new {}
-        scriptsDir = "deder/sourcegen"
-        scalaVersion = null
-        outputSourceSet = "main"
-        extra = new Mapping {}
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> SG.<span class="hljs-property">SourcegenPlugin</span> {
+    <span class="hljs-property">config</span> = <span class="hljs-property">new</span> {
+      <span class="hljs-property">defaults</span> = <span class="hljs-property">new</span> {
+        <span class="hljs-property">enabled</span> = <span class="hljs-literal">true</span>
+        <span class="hljs-property">deps</span> = <span class="hljs-property">new</span> {}
+        <span class="hljs-property">scriptsDir</span> = <span class="hljs-string">"deder/sourcegen"</span>
+        <span class="hljs-property">scalaVersion</span> = <span class="hljs-literal">null</span>
+        <span class="hljs-property">outputSourceSet</span> = <span class="hljs-string">"main"</span>
+        <span class="hljs-property">extra</span> = <span class="hljs-keyword">new</span> <span class="hljs-property">Mapping</span> {}
       }
-      modules = new Mapping {}
+      <span class="hljs-property">modules</span> = <span class="hljs-keyword">new</span> <span class="hljs-property">Mapping</span> {}
     }
   }
 }

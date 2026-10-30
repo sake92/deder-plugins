@@ -37,12 +37,12 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>Official plugins for the <a href="https://sake92.github.io/deder/">Deder build tool</a>.</p>
      <h2 id="using-a-plugin">Using a Plugin<a href="#using-a-plugin" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
      <p>Add a plugin to your <code>deder.pkl</code> by importing its config, and adding it in the <code>plugins</code> listing:</p>
-     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl" as WD
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-meta"><span class="hljs-keyword">import</span> <span class="hljs-string">"https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl"</span> <span class="hljs-keyword">as</span> WD</span>
 
-plugins {
-  new WD.WebDashboardPlugin {
-    // version = "1.2.3" // optionally override version
-    config { // most plugins have some config
+<span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> WD.<span class="hljs-property">WebDashboardPlugin</span> {
+    <span class="hljs-comment">// version = "1.2.3" // optionally override version</span>
+    <span class="hljs-property">config</span> { <span class="hljs-comment">// most plugins have some config</span>
 
     }
   }

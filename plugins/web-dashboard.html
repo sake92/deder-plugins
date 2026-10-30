@@ -38,20 +38,20 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
       <br>
       By default it is available at <a href="http://localhost:9292">http://localhost:9292</a></p>
      <p>Add it to your plugins list:</p>
-     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.4.0/WebDashboardPlugin.pkl" as WD
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-meta"><span class="hljs-keyword">import</span> <span class="hljs-string">"https://sake92.github.io/deder-plugins/config/v0.4.0/WebDashboardPlugin.pkl"</span> <span class="hljs-keyword">as</span> WD</span>
 
-plugins {
-  new WD.WebDashboardPlugin {}
+<span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> WD.<span class="hljs-property">WebDashboardPlugin</span> {}
 }
 </code></pre>
      <p>Here are the defaults if you need to tweak them:</p>
-     <pre><code class="language-pkl">plugins {
-  new WD.WebDashboardPlugin {
-    config = new {
-      enabled = true
-      host = "localhost"
-      port = 9292
-      statsRefreshIntervalMs = 5000
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> WD.<span class="hljs-property">WebDashboardPlugin</span> {
+    <span class="hljs-property">config</span> = <span class="hljs-property">new</span> {
+      <span class="hljs-property">enabled</span> = <span class="hljs-literal">true</span>
+      <span class="hljs-property">host</span> = <span class="hljs-string">"localhost"</span>
+      <span class="hljs-property">port</span> = <span class="hljs-number">9292</span>
+      <span class="hljs-property">statsRefreshIntervalMs</span> = <span class="hljs-number">5000</span>
     }
   }
 }

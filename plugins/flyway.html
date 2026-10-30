@@ -35,18 +35,18 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     <div class="content">
      <h1 id="flyway">Flyway<a href="#flyway" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>Runs <a href="https://flywaydb.org">Flyway</a> Community SQL migrations for Java and Scala modules (not test modules).</p>
-     <pre><code class="language-pkl">import "https://sake92.github.io/deder-plugins/config/v0.4.0/FlywayPlugin.pkl" as FW
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-meta"><span class="hljs-keyword">import</span> <span class="hljs-string">"https://sake92.github.io/deder-plugins/config/v0.4.0/FlywayPlugin.pkl"</span> <span class="hljs-keyword">as</span> FW</span>
 
-plugins {
-  new FW.FlywayPlugin {
-    config = new {
-      defaults = new {
-        url = "jdbc:postgresql://localhost/app"
-        user = "app"
-        password = read?("env:DB_PASSWORD") ?? ""
-        jdbcDeps {
-          "org.postgresql:postgresql:42.7.4"
-          "org.flywaydb:flyway-database-postgresql:11.8.2"
+<span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> FW.<span class="hljs-property">FlywayPlugin</span> {
+    <span class="hljs-property">config</span> = <span class="hljs-property">new</span> {
+      <span class="hljs-property">defaults</span> = <span class="hljs-property">new</span> {
+        <span class="hljs-property">url</span> = <span class="hljs-string">"jdbc:postgresql://localhost/app"</span>
+        <span class="hljs-property">user</span> = <span class="hljs-string">"app"</span>
+        <span class="hljs-property">password</span> = <span class="hljs-keyword">read</span>?(<span class="hljs-string">"env:DB_PASSWORD"</span>) ?? <span class="hljs-string">""</span>
+        <span class="hljs-property">jdbcDeps</span> {
+          <span class="hljs-string">"org.postgresql:postgresql:42.7.4"</span>
+          <span class="hljs-string">"org.flywaydb:flyway-database-postgresql:11.8.2"</span>
         }
       }
     }
@@ -55,14 +55,14 @@ plugins {
 </code></pre>
      <p>Secrets are plain Pkl values; use <code>read?("env:...")</code> to read them from environment variables.</p>
      <p>Defaults:</p>
-     <pre><code class="language-pkl">enabled = true
-url = ""
-user = ""
-password = ""
-locations { "classpath:db/migration" }
-schemas {}
-jdbcDeps {}
-cleanDisabled = true // flywayClean fails unless false
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-property">enabled</span> = <span class="hljs-literal">true</span>
+<span class="hljs-property">url</span> = <span class="hljs-string">""</span>
+<span class="hljs-property">user</span> = <span class="hljs-string">""</span>
+<span class="hljs-property">password</span> = <span class="hljs-string">""</span>
+<span class="hljs-property">locations</span> { <span class="hljs-string">"classpath:db/migration"</span> }
+<span class="hljs-property">schemas</span> {}
+<span class="hljs-property">jdbcDeps</span> {}
+<span class="hljs-property">cleanDisabled</span> = <span class="hljs-literal">true</span> <span class="hljs-comment">// flywayClean fails unless false</span>
 </code></pre>
      <p>Relative <code>filesystem:</code> locations resolve against the project root. Only SQL migrations are supported.</p>
      <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
