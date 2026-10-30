@@ -7,6 +7,8 @@ local const versions = new {
   sharaf = "0.19.0"
   tupson = "0.31.0"
   layoutz = "0.7.0"
+  springBootLoaderTools = "3.5.6"
+  flyway = "11.8.2"
 }
 local const publishRepo = if (read?("env:DEDER_PUBLISH_SNAPSHOT") == "true")
   new SonatypeSnapshotRepo { id = "sonatype" }
@@ -225,6 +227,60 @@ local const openapi4sModules =
     }
   }.get
 
+local const springBootModules =
+  new CreateScalaModules {
+    root = "deder-spring-boot"
+    id = "deder-spring-boot"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = versions.scala
+      deps {
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
+        "org.springframework.boot:spring-boot-loader-tools:\(versions.springBootLoaderTools)"
+      }
+      pomSettings =
+        pom(
+          "deder-spring-boot",
+          "Deder Spring Boot Plugin",
+          "Deder plugin for bundling and running Spring Boot applications"
+        )
+      publish = true
+      publishTo = publishRepo
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:\(versions.munit)"
+      }
+    }
+  }.get
+
+local const flywayModules =
+  new CreateScalaModules {
+    root = "deder-flyway"
+    id = "deder-flyway"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = versions.scala
+      deps {
+        "ba.sake::deder-plugin-api:\(versions.dederPluginApi)"
+        "org.flywaydb:flyway-core:\(versions.flyway)"
+      }
+      pomSettings =
+        pom(
+          "deder-flyway",
+          "Deder Flyway Plugin",
+          "Deder plugin for running Flyway database migrations"
+        )
+      publish = true
+      publishTo = publishRepo
+    }
+    testTemplate = (template.asTest()) {
+      deps {
+        "org.scalameta::munit:\(versions.munit)"
+      }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
@@ -233,4 +289,6 @@ modules {
   ...sourcegenModules.all
   ...openapi4sModules.all
   ...squeryModules.all
+  ...springBootModules.all
+  ...flywayModules.all
 }
