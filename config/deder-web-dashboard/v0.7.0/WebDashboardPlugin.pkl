@@ -1,0 +1,24 @@
+module ba.sake.deder.plugins.webDashboard
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class WebDashboardPlugin extends P.DederPlugin {
+  id = "web-dashboard"
+  version: String = "0.6.0"
+  deps {
+    "ba.sake::deder-web-dashboard:\(version)"
+  }
+  config: WebDashboardPluginConfig = new {}
+}
+
+class WebDashboardPluginConfig {
+  enabled: Boolean = read?("env:CI") == null
+  host: String = "127.0.0.1"
+  port: Int = 9292
+  statsRefreshIntervalMs: Int = 1000
+  tasksMaxConcurrent: Int = 3
+  tasksMaxHistory: Int = 200
+  tasksOutputLineLimit: Int = 500
+}
+
+config: WebDashboardPluginConfig = new {}

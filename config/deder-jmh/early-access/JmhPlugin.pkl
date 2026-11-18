@@ -1,0 +1,31 @@
+module ba.sake.deder.plugins.jmh
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class JmhPlugin extends P.DederPlugin {
+  id = "jmh"
+  version: String = "0.6.0"
+  deps { "ba.sake::deder-jmh:\(version)" }
+  config: JmhPluginConfig = new {}
+}
+
+class JmhPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {
+    default = (key) -> new ModuleOverride {}
+  }
+}
+
+class ModuleDefaults {
+  enabled: Boolean = false
+  jmhVersion: String(!isEmpty) = "1.37"
+  jvmOptions: Listing<String> = new {}
+}
+
+class ModuleOverride {
+  enabled: Boolean?
+  jmhVersion: String(!isEmpty)?
+  jvmOptions: Listing<String>?
+}
+
+config: JmhPluginConfig = new {}
