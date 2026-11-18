@@ -40,9 +40,11 @@ class WebDashboardPluginImpl extends DederPluginApi {
           config.tasksMaxConcurrent.toInt,
           params.taskRegistry
         )
-        val apiRoutes = new ApiRoutes(dashboardService, params.project, params.internals, executionLog, taskRunner)
+        val projectRoot = DederGlobals.projectRootDir.toString
+        val apiRoutes =
+          new ApiRoutes(dashboardService, params.project, params.internals, executionLog, taskRunner, projectRoot)
         val htmlRoutes =
-          new HtmlRoutes(config, dashboardService, params.project, params.internals, executionLog, taskRunner)
+          new HtmlRoutes(config, dashboardService, params.project, params.internals, executionLog, taskRunner, projectRoot)
         val srv = DashboardServer(config, apiRoutes, htmlRoutes)
         val thread = new Thread(() => srv.start())
         thread.setDaemon(true)

@@ -16,11 +16,11 @@ class HtmlRoutes(
     project: DederProject,
     internals: DederProjectInternals,
     executionLog: TaskExecutionLog,
-    taskRunner: TaskRunner
+    taskRunner: TaskRunner,
+    projectRoot: String
 ) {
 
   private val refreshMs = config.statsRefreshIntervalMs.toInt
-  private lazy val projectRoot = DederGlobals.projectRootDir.toString
 
   val routes = Routes {
     case GET -> Path() =>

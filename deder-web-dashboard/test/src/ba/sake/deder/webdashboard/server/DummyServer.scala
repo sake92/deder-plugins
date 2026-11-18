@@ -98,11 +98,11 @@ private class DummyModule(id: String, mt: DederProject.ModuleType)
   val dashboardService = new DashboardService(internals, taskRegistry)
   val executionLog = TaskExecutionLog(config.tasksMaxHistory.toInt)
   val taskRunner = TaskRunner(project, taskInvoker, internals, executionLog, config.tasksMaxConcurrent.toInt, taskRegistry)
-  val apiRoutes = new ApiRoutes(dashboardService, project, internals, executionLog, taskRunner)
-  val htmlRoutes = new HtmlRoutes(config, dashboardService, project, internals, executionLog, taskRunner)
+  val projectRoot = os.pwd.toString
+  val apiRoutes = new ApiRoutes(dashboardService, project, internals, executionLog, taskRunner, projectRoot)
+  val htmlRoutes = new HtmlRoutes(config, dashboardService, project, internals, executionLog, taskRunner, projectRoot)
   val server = DashboardServer(config, apiRoutes, htmlRoutes)
 
-  System.setProperty("DEDER_PROJECT_ROOT_DIR", os.pwd.toString)
   server.start()
   Thread.sleep(500)
 

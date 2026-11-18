@@ -13,7 +13,8 @@ class ApiRoutes(
     project: DederProject,
     internals: DederProjectInternals,
     executionLog: TaskExecutionLog,
-    taskRunner: TaskRunner
+    taskRunner: TaskRunner,
+    projectRoot: String
 ) {
   val routes = Routes {
     case GET -> Path("api", "tasks") =>
@@ -157,7 +158,6 @@ class ApiRoutes(
     val dederVersion = DederGlobals.version
     val uptimeSecs = internals.serverUptime.getSeconds
     val moduleCount = project.modules.size()
-    val projectRoot = DederGlobals.projectRootDir.toString
     val plugins = internals.loadedPlugins.map { p =>
       ApiPluginInfo(p.id, p.taskNames.size, p.taskNames)
     }
