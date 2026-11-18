@@ -1,0 +1,18 @@
+amends "https://sake92.github.io/deder/config/v0.22.1/DederProject.pkl"
+import "../../resources/JmhPlugin.pkl" as Jmh
+
+plugins {
+  new Jmh.JmhPlugin {
+    version = "0.7.1-SNAPSHOT"
+    config { modules { ["benchmarks"] = new Jmh.ModuleOverride { enabled = true } } }
+  }
+}
+
+modules {
+  new ScalaModule {
+    id = "benchmarks"
+    root = "."
+    scalaVersion = "3.9.0"
+    deps { "org.openjdk.jmh:jmh-core:1.37" }
+  }
+}

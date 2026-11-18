@@ -281,6 +281,23 @@ local const flywayModules =
     }
   }.get
 
+local const jmhModules =
+  new CreateScalaModules {
+    root = "deder-jmh"
+    id = "deder-jmh"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = versions.scala
+      deps { "ba.sake::deder-plugin-api:\(versions.dederPluginApi)" }
+      pomSettings = pom("deder-jmh", "Deder JMH Plugin", "Deder plugin for running JMH benchmarks")
+      publish = true
+      publishTo = publishRepo
+    }
+    testTemplate = (template.asTest()) {
+      deps { "org.scalameta::munit:\(versions.munit)" }
+    }
+  }.get
+
 modules {
   ...pluginModules.all
   ...buildInfoModules.all
@@ -291,4 +308,5 @@ modules {
   ...squeryModules.all
   ...springBootModules.all
   ...flywayModules.all
+  ...jmhModules.all
 }
