@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Run Java and Scala microbenchmarks">
+  <title>JMH | Deder Plugins</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/deder-plugins/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/deder-plugins/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/deder-plugins/">Deder Plugins</a>
+    <div></div>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="jmh">JMH<a href="#jmh" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Runs Java and Scala microbenchmarks with <a href="https://openjdk.org/projects/code-tools/jmh/">JMH</a>. Enable the plugin for a dedicated benchmark module and add <code>org.openjdk.jmh:jmh-core</code> at the same version as <code>jmhVersion</code> to that module's dependencies.</p>
+     <pre><code class="language-pkl hljs" data-highlighted="yes"><span class="hljs-meta"><span class="hljs-keyword">import</span> <span class="hljs-string">"https://sake92.github.io/deder-plugins/config/deder-jmh/early-access/JmhPlugin.pkl"</span> <span class="hljs-keyword">as</span> Jmh</span>
+
+<span class="hljs-property">plugins</span> {
+  <span class="hljs-keyword">new</span> Jmh.<span class="hljs-property">JmhPlugin</span> {
+    <span class="hljs-property">config</span> { <span class="hljs-property">modules</span> { [<span class="hljs-string">"benchmarks"</span>] = <span class="hljs-keyword">new</span> Jmh.<span class="hljs-property">ModuleOverride</span> { <span class="hljs-property">enabled</span> = <span class="hljs-literal">true</span> } } }
+  }
+}
+</code></pre>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes">deder <span class="hljs-built_in">exec</span> -t jmhList -m benchmarks
+deder <span class="hljs-built_in">exec</span> -t jmhRun -m benchmarks -- -wi 3 -i 3 -f 1 <span class="hljs-string">'.*ExampleBenchmark.*'</span>
+</code></pre>
+     <p>Arguments after <code>--</code> are passed to JMH. Generation follows module compilation and rebuilds the benchmark harness for each invocation. The runner uses the project's working directory and selected JDK. Avoid other workloads during measurement; Deder does not guarantee exclusive benchmark execution.</p>
+     <h2 id="configuration">Configuration<a href="#configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Fields in <code>defaults</code> apply to all supported modules; fields in <code>modules["module-id"]</code> override them for one module.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Default</th>
+        <th>Purpose</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>enabled</code></td>
+        <td><code>false</code></td>
+        <td>Enable benchmark tasks.</td>
+       </tr>
+       <tr>
+        <td><code>jmhVersion</code></td>
+        <td><code>"1.37"</code></td>
+        <td>JMH version.</td>
+       </tr>
+       <tr>
+        <td><code>jvmOptions</code></td>
+        <td>empty</td>
+        <td>JVM options for the generator and JMH launcher. JMH fork options can be passed as JMH arguments or annotations.</td>
+       </tr>
+      </tbody>
+     </table>
+     <h2 id="schema">Schema<a href="#schema" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <ul>
+      <li><a href="../config/deder-jmh/early-access/JmhPlugin.pkl">early-access</a></li>
+     </ul>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#jmh">JMH</a>
+         <ul>
+          <li><a href="#configuration">Configuration</a></li>
+          <li><a href="#schema">Schema</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <footer class="pico container">Deder Plugins | Official Deder Build Tool Plugins</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/deder-plugins/scripts/code-copy.js"></script>
+ </body>
+</html>
