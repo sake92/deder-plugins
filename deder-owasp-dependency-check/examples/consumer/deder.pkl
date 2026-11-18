@@ -1,0 +1,17 @@
+amends "https://sake92.github.io/deder/config/v0.22.1/DederProject.pkl"
+
+import "../../resources/OwaspPlugin.pkl" as OWASP
+
+plugins {
+  new OWASP.OwaspPlugin {
+    version = "0.7.1-SNAPSHOT"
+  }
+}
+modules {
+  new ScalaModule {
+    id = "consumer"
+    root = "."
+    scalaVersion = "3.9.0"
+    deps { "com.google.guava:guava:33.4.8-jre" }
+  }
+}

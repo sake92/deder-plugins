@@ -281,7 +281,25 @@ local const flywayModules =
     }
   }.get
 
+local const owaspModules =
+  new CreateScalaModules {
+    root = "deder-owasp-dependency-check"
+    id = "deder-owasp-dependency-check"
+    layout = "default"
+    template = new ScalaModule {
+      scalaVersion = versions.scala
+      deps { "ba.sake::deder-plugin-api:\(versions.dederPluginApi)" }
+      pomSettings = pom("deder-owasp-dependency-check", "Deder OWASP Dependency Check Plugin", "Deder plugin for scanning dependencies for known vulnerabilities")
+      publish = true
+      publishTo = publishRepo
+    }
+    testTemplate = (template.asTest()) {
+      deps { "org.scalameta::munit:\(versions.munit)" }
+    }
+  }.get
+
 modules {
+  ...owaspModules.all
   ...pluginModules.all
   ...buildInfoModules.all
   ...dashboardModules.all

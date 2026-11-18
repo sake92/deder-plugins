@@ -1,0 +1,33 @@
+module ba.sake.deder.plugins.owasp
+
+import "https://sake92.github.io/deder/config-api/DederPlugins.pkl" as P
+
+class OwaspPlugin extends P.DederPlugin {
+  id = "owasp-dependency-check"
+  version: String = "0.7.1-SNAPSHOT"
+  deps { "ba.sake::deder-owasp-dependency-check:\(version)" }
+  config: OwaspPluginConfig = new {}
+}
+class OwaspPluginConfig {
+  defaults: ModuleDefaults = new {}
+  modules: Mapping<String, ModuleOverride> = new Mapping {}
+}
+class ModuleDefaults {
+  enabled: Boolean = true
+  dependencyCheckVersion: String = "12.2.2"
+  formats: Listing<String> = new { "HTML"; "JSON" }
+  failOnCvss: Float? = null
+  suppressionFiles: Listing<String> = new {}
+  dataDirectory: String = ".deder/owasp-dependency-check-data"
+  extraArgs: Listing<String> = new {}
+}
+class ModuleOverride {
+  enabled: Boolean? = null
+  dependencyCheckVersion: String? = null
+  formats: Listing<String>? = null
+  failOnCvss: Float? = null
+  suppressionFiles: Listing<String>? = null
+  dataDirectory: String? = null
+  extraArgs: Listing<String>? = null
+}
+config: OwaspPluginConfig = new {}
