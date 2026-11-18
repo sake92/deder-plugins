@@ -47,3 +47,13 @@ Each plugin also has an `examples/` folder in this GitHub repository.
 | Generates source code from user-written Scala scripts. | |
 | **[Squery](plugins/squery.html)** | [early-access](config/deder-squery/early-access/SqueryPlugin.pkl) |
 | Generates Scala row models and DAOs from a JDBC database. | |
+| **[Spring Boot](plugins/spring-boot.html)** | [early-access](config/deder-spring-boot/early-access/SpringBootPlugin.pkl) |
+| Bundles and runs Spring Boot applications. | |
+| **[Flyway](plugins/flyway.html)** | [early-access](config/deder-flyway/early-access/FlywayPlugin.pkl) |
+| Runs SQL database migrations. | |
+| **[OpenAPI4s](plugins/openapi4s.html)** | [early-access](config/deder-openapi4s/early-access/Openapi4sPlugin.pkl) |
+| Generates editable Scala sources from OpenAPI or JSON Schema. | |
+| **[JMH](plugins/jmh.html)** | [early-access](config/deder-jmh/early-access/JmhPlugin.pkl) |
+| Runs Java and Scala microbenchmarks. | |
+| **[OWASP Dependency-Check](plugins/owasp-dependency-check.html)** | [early-access](config/deder-owasp-dependency-check/early-access/OwaspPlugin.pkl) |
+| Scans runtime dependencies for known vulnerabilities. | |
