@@ -90,28 +90,19 @@ class DashboardServerSuite extends FunSuite {
     config.tasksMaxConcurrent.toInt,
     stubTaskRegistry
   )
-  val apiRoutes = new ApiRoutes(dashboardService, stubProject, stubInternals, executionLog, taskRunner)
+  private val projectRoot = os.pwd.toString
+  val apiRoutes = new ApiRoutes(dashboardService, stubProject, stubInternals, executionLog, taskRunner, projectRoot)
   val htmlRoutes =
-    new HtmlRoutes(config, dashboardService, stubProject, stubInternals, executionLog, taskRunner)
+    new HtmlRoutes(config, dashboardService, stubProject, stubInternals, executionLog, taskRunner, projectRoot)
   val server = DashboardServer(config, apiRoutes, htmlRoutes)
   private val baseUrl = s"http://$testHost:$testPort"
-  private val projectRootProperty = "DEDER_PROJECT_ROOT_DIR"
-  private var previousProjectRoot: Option[String] = None
 
   override def beforeAll(): Unit = {
-    previousProjectRoot = Option(System.getProperty(projectRootProperty))
-    System.setProperty(projectRootProperty, os.pwd.toString)
     server.start()
     Thread.sleep(500)
   }
 
-  override def afterAll(): Unit = {
-    server.stop()
-    previousProjectRoot match {
-      case Some(value) => System.setProperty(projectRootProperty, value)
-      case None        => System.clearProperty(projectRootProperty)
-    }
-  }
+  override def afterAll(): Unit = server.stop()
 
   test("GET / redirects to /server") {
     val res = quickRequest.get(uri"$baseUrl/").followRedirects(false).send()
